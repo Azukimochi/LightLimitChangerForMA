@@ -1,10 +1,10 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using UnityEditor.Animations;
 using VRC.SDK3.Avatars.Components;
 using VRC.SDK3.Avatars.ScriptableObjects;
+using VRC.Core;
 using nadena.dev.modular_avatar.core;
 
 public class LightLimitChanger : EditorWindow
@@ -172,6 +172,27 @@ public class LightLimitChanger : EditorWindow
         };
         AssetDatabase.CreateAsset(menu, $"{savePath}.asset");
 
+        //////////////
+        //Prefabの生成
+
+        var prefab = new GameObject(saveName);
+        var menuInstaller = prefab.GetOrAddComponent<ModularAvatarMenuInstaller>();
+        menuInstaller.menuToAppend = menu;
+        var parameters = prefab.GetOrAddComponent<ModularAvatarParameters>();
+        parameters.parameters.Add(new ParameterConfig
+        {
+            nameOrPrefix = saveName,
+            defaultValue = 0,
+            syncType = ParameterSyncType.Bool,
+            saved = true,
+        });
+        var mergeAnimator = prefab.GetOrAddComponent<ModularAvatarMergeAnimator>();
+        mergeAnimator.animator = controller;
+        mergeAnimator.layerType = VRCAvatarDescriptor.AnimLayerType.FX;
+        mergeAnimator.pathMode = MergeAnimatorPathMode.Absolute;
+        mergeAnimator.matchAvatarWriteDefaults = true;
+        PrefabUtility.SaveAsPrefabAsset(prefab, $"{savePath}.prefab");
+        DestroyImmediate(prefab);
 
 
         AssetDatabase.SaveAssets();
