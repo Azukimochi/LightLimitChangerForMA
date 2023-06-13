@@ -5,7 +5,9 @@ MAで使用できるPrefab形式で生成するため、非破壊かつアバタ
 
 ### 使い方
 
-＊Modular Avaterを前提としています  
+＊Modular Avaterを前提としています
+* Liltoonにのみ対応しています  
+
  1. 上部メニュー ツール(Tools) / Modular Avater / LightLimitChanger より起動  
  2. [Avater]のボックスにアバターをドラッグ&ドロップ  
  3. [Paramater]をお好みで変更  
