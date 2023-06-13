@@ -14,7 +14,7 @@ public class LightLimitChanger : EditorWindow
     float defaultLightValue = 0.5f;
     float MaxLightValue = 1.0f;
     float MinLightValue = 0.0f;
-    
+
     const string SHADER_KEY_LightMinLimit = "material._LightMinLimit";
     const string SHADER_KEY_LightMaxLimit = "material._LightMaxLimit";
 
@@ -38,7 +38,7 @@ public class LightLimitChanger : EditorWindow
         defaultLightValue = EditorGUILayout.FloatField("DefaultLight", defaultLightValue);
 
         EditorGUI.BeginDisabledGroup(avater == null);
-        if(GUILayout.Button("Generate"))
+        if (GUILayout.Button("Generate"))
         {
             var path = EditorUtility.SaveFilePanelInProject("保存場所", "New Assets", "asset", "アセットの保存場所");
             if (path == null) return;
@@ -50,7 +50,7 @@ public class LightLimitChanger : EditorWindow
         }
         EditorGUI.EndDisabledGroup();
     }
-    private void GenerateAssets(string savePath, string saveName, GameObject avater) 
+    private void GenerateAssets(string savePath, string saveName, GameObject avater)
     {
         /////////////////////
         //アニメーションの生成
@@ -121,6 +121,58 @@ public class LightLimitChanger : EditorWindow
                     threshold = 1,
                 },
             };
+        //////////////////////
+        //ExprettionMenuの生成
+
+        //SubMenuの生成
+        var subMenu = new VRCExpressionsMenu
+        {
+            controls = new List<VRCExpressionsMenu.Control>
+                {
+                new VRCExpressionsMenu.Control {
+                        name = saveName + " Toggle",
+                        type = VRCExpressionsMenu.Control.ControlType.Toggle,
+                        parameter = new VRCExpressionsMenu.Control.Parameter
+                        {
+                            name = saveName,
+                        },
+                        subParameters = new VRCExpressionsMenu.Control.Parameter[] { },
+                        value = 1,
+                        labels = new VRCExpressionsMenu.Control.Label[] { },
+                    },
+                new VRCExpressionsMenu.Control {
+                    name = saveName + " light",
+                    type = VRCExpressionsMenu.Control.ControlType.RadialPuppet,
+                    subParameters = new VRCExpressionsMenu.Control.Parameter[] {
+                        new VRCExpressionsMenu.Control.Parameter
+                        {
+                            name = saveName + "_motion"
+                        }
+                    },
+                    value = defaultLightValue,
+                    labels = new VRCExpressionsMenu.Control.Label[] { },
+                },
+             },
+        };
+        AssetDatabase.CreateAsset(subMenu, $"{savePath}_subMenu.asset");
+
+        //Menuの生成
+        var menu = new VRCExpressionsMenu()
+        {
+            controls = new List<VRCExpressionsMenu.Control>
+                {
+                new VRCExpressionsMenu.Control {
+                        name = saveName,
+                        type = VRCExpressionsMenu.Control.ControlType.SubMenu,
+                        subMenu = subMenu,
+                        subParameters = new VRCExpressionsMenu.Control.Parameter[] { },
+                        labels = new VRCExpressionsMenu.Control.Label[] { },
+                    },
+             },
+        };
+        AssetDatabase.CreateAsset(menu, $"{savePath}.asset");
+
+
 
         AssetDatabase.SaveAssets();
 
@@ -133,19 +185,19 @@ public class LightLimitChanger : EditorWindow
 
         if (children.childCount == 0) return;
 
-        foreach(Transform obj in children)
+        foreach (Transform obj in children)
         {
             SkinnedMeshRenderer SkinnedMeshR = obj.gameObject.GetComponent<SkinnedMeshRenderer>();
             if (SkinnedMeshR != null)
             {
-                foreach(var mat in SkinnedMeshR.sharedMaterials)
+                foreach (var mat in SkinnedMeshR.sharedMaterials)
                 {
-                    if(mat != null && (mat.shader.name.IndexOf("lilToon") != -1 || mat.shader.name.IndexOf("motchiri") != -1))
+                    if (mat != null && (mat.shader.name.IndexOf("lilToon") != -1 || mat.shader.name.IndexOf("motchiri") != -1))
                     {
                         string path = getObjectPath(obj).Replace(avaterName + "/", "");
                         animActiveClip.SetCurve(path, typeof(SkinnedMeshRenderer), SHADER_KEY_LightMinLimit, new AnimationCurve(new Keyframe(0 / 60.0f, MinLightValue), new Keyframe(1 / 60.0f, MaxLightValue)));
                         animActiveClip.SetCurve(path, typeof(SkinnedMeshRenderer), SHADER_KEY_LightMaxLimit, new AnimationCurve(new Keyframe(0 / 60.0f, MinLightValue), new Keyframe(1 / 60.0f, MaxLightValue)));
-                        
+
                         animDeActiveClip.SetCurve(path, typeof(SkinnedMeshRenderer), SHADER_KEY_LightMinLimit, new AnimationCurve(new Keyframe(0 / 60.0f, 0.0f), new Keyframe(1 / 60.0f, 0.0f)));
                         animDeActiveClip.SetCurve(path, typeof(SkinnedMeshRenderer), SHADER_KEY_LightMaxLimit, new AnimationCurve(new Keyframe(0 / 60.0f, 1.0f), new Keyframe(1 / 60.0f, 1.0f)));
                     }
