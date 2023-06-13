@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System;
 using UnityEngine;
 using UnityEditor;
 using UnityEditor.Animations;
@@ -40,7 +41,7 @@ public class LightLimitChanger : EditorWindow
         EditorGUI.BeginDisabledGroup(avater == null);
         if (GUILayout.Button("Generate"))
         {
-            var path = EditorUtility.SaveFilePanelInProject("保存場所", "New Assets", "asset", "アセットの保存場所");
+            var path = EditorUtility.SaveFilePanelInProject("保存場所", "Light Change", "asset", "アセットの保存場所");
             if (path == null) return;
 
             path = new System.Text.RegularExpressions.Regex(@"\.asset").Replace(path, "");
@@ -179,12 +180,21 @@ public class LightLimitChanger : EditorWindow
         var menuInstaller = prefab.GetOrAddComponent<ModularAvatarMenuInstaller>();
         menuInstaller.menuToAppend = menu;
         var parameters = prefab.GetOrAddComponent<ModularAvatarParameters>();
+
+        //パラメータの設定
         parameters.parameters.Add(new ParameterConfig
         {
             nameOrPrefix = saveName,
-            defaultValue = 0,
+            defaultValue = (float)Convert.ToDouble(this.DefaultUse),
             syncType = ParameterSyncType.Bool,
-            saved = true,
+            saved = this.IsValueSave
+        });
+        parameters.parameters.Add(new ParameterConfig
+        {
+            nameOrPrefix = name = saveName + "_motion",
+            defaultValue = this.defaultLightValue,
+            syncType = ParameterSyncType.Float,
+            saved = this.IsValueSave
         });
         var mergeAnimator = prefab.GetOrAddComponent<ModularAvatarMergeAnimator>();
         mergeAnimator.animator = controller;
@@ -193,7 +203,6 @@ public class LightLimitChanger : EditorWindow
         mergeAnimator.matchAvatarWriteDefaults = true;
         PrefabUtility.SaveAsPrefabAsset(prefab, $"{savePath}.prefab");
         DestroyImmediate(prefab);
-
 
         AssetDatabase.SaveAssets();
 
