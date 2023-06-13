@@ -21,6 +21,8 @@ public class LightLimitChanger : EditorWindow
 
     GameObject avater;
 
+    string infoLabel = "";
+
     [MenuItem("Tools/Modular Avatar/LightLimitChanger")]
     static void CreateGUI()
     {
@@ -30,8 +32,8 @@ public class LightLimitChanger : EditorWindow
     {
         GUILayout.Label("---- Select Avater / アバターを選択");
         avater = (GameObject)EditorGUILayout.ObjectField(" Avater", avater, typeof(GameObject), true);
-
-        GUILayout.Label("\n---- Paramater / パラメータ");
+        EditorGUILayout.Space();
+        GUILayout.Label("---- Paramater / パラメータ");
         isDefaultUse = EditorGUILayout.Toggle(" DefaultUse", isDefaultUse);
         isValueSave = EditorGUILayout.Toggle(" SaveValue", isValueSave);
         MaxLightValue = EditorGUILayout.FloatField(" MaxLight", MaxLightValue);
@@ -47,9 +49,13 @@ public class LightLimitChanger : EditorWindow
             path = new System.Text.RegularExpressions.Regex(@"\.asset").Replace(path, "");
             var saveName = System.IO.Path.GetFileNameWithoutExtension(path);
 
+            infoLabel = "生成中・・・";
             GenerateAssets(path, saveName, avater);
+            infoLabel = "生成終了";
         }
         EditorGUI.EndDisabledGroup();
+        GUILayout.Label(infoLabel);
+       
     }
     private void GenerateAssets(string savePath, string saveName, GameObject avater)
     {
