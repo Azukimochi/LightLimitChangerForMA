@@ -10,8 +10,8 @@ using nadena.dev.modular_avatar.core;
 
 public class LightLimitChanger : EditorWindow
 {
-    bool DefaultUse = false;
-    bool IsValueSave = false;
+    bool isDefaultUse = false;
+    bool isValueSave = false;
     float defaultLightValue = 0.5f;
     float MaxLightValue = 1.0f;
     float MinLightValue = 0.0f;
@@ -28,20 +28,20 @@ public class LightLimitChanger : EditorWindow
     }
     private void OnGUI()
     {
-        GUILayout.Label("アバターを選択");
-        avater = (GameObject)EditorGUILayout.ObjectField("Avater", avater, typeof(GameObject), true);
+        GUILayout.Label("---- Select Avater / アバターを選択");
+        avater = (GameObject)EditorGUILayout.ObjectField(" Avater", avater, typeof(GameObject), true);
 
-        GUILayout.Label("\nパラメータ");
-        DefaultUse = EditorGUILayout.Toggle("DefaultUse", DefaultUse);
-        IsValueSave = EditorGUILayout.Toggle("SaveValue", IsValueSave);
-        MaxLightValue = EditorGUILayout.FloatField("MaxLight", MaxLightValue);
-        MinLightValue = EditorGUILayout.FloatField("MinLight", MinLightValue);
-        defaultLightValue = EditorGUILayout.FloatField("DefaultLight", defaultLightValue);
+        GUILayout.Label("\n---- Paramater / パラメータ");
+        isDefaultUse = EditorGUILayout.Toggle(" DefaultUse", isDefaultUse);
+        isValueSave = EditorGUILayout.Toggle(" SaveValue", isValueSave);
+        MaxLightValue = EditorGUILayout.FloatField(" MaxLight", MaxLightValue);
+        MinLightValue = EditorGUILayout.FloatField(" MinLight", MinLightValue);
+        defaultLightValue = EditorGUILayout.FloatField(" DefaultLight", defaultLightValue);
 
         EditorGUI.BeginDisabledGroup(avater == null);
-        if (GUILayout.Button("Generate"))
+        if (GUILayout.Button(" Generate / 生成 "))
         {
-            var path = EditorUtility.SaveFilePanelInProject("保存場所", "Light Change", "asset", "アセットの保存場所");
+            var path = EditorUtility.SaveFilePanelInProject("保存場所", $"{avater.name} Light Change", "asset", "アセットの保存場所");
             if (path == null) return;
 
             path = new System.Text.RegularExpressions.Regex(@"\.asset").Replace(path, "");
@@ -73,7 +73,7 @@ public class LightLimitChanger : EditorWindow
             {
                 name = saveName,
                 type = AnimatorControllerParameterType.Bool,
-                defaultBool = this.DefaultUse
+                defaultBool = this.isDefaultUse
             },
             new AnimatorControllerParameter()
             {
@@ -122,8 +122,9 @@ public class LightLimitChanger : EditorWindow
                     threshold = 1,
                 },
             };
+
         //////////////////////
-        //ExprettionMenuの生成
+        //ExpressionMenuの生成
 
         //SubMenuの生成
         var subMenu = new VRCExpressionsMenu
@@ -181,21 +182,22 @@ public class LightLimitChanger : EditorWindow
         menuInstaller.menuToAppend = menu;
         var parameters = prefab.GetOrAddComponent<ModularAvatarParameters>();
 
-        //パラメータの設定
+        //MA Parameters
         parameters.parameters.Add(new ParameterConfig
         {
             nameOrPrefix = saveName,
-            defaultValue = (float)Convert.ToDouble(this.DefaultUse),
+            defaultValue = (float)Convert.ToDouble(this.isDefaultUse),
             syncType = ParameterSyncType.Bool,
-            saved = this.IsValueSave
+            saved = this.isValueSave
         });
         parameters.parameters.Add(new ParameterConfig
         {
             nameOrPrefix = name = saveName + "_motion",
             defaultValue = this.defaultLightValue,
             syncType = ParameterSyncType.Float,
-            saved = this.IsValueSave
+            saved = this.isValueSave
         });
+        // MA MergeAnimator
         var mergeAnimator = prefab.GetOrAddComponent<ModularAvatarMergeAnimator>();
         mergeAnimator.animator = controller;
         mergeAnimator.layerType = VRCAvatarDescriptor.AnimLayerType.FX;
@@ -236,12 +238,6 @@ public class LightLimitChanger : EditorWindow
             createAnimationClip(obj.gameObject, animActiveClip, animDeActiveClip, avaterName);
         }
     }
-    /*
-    private void setAnimationKey(GameObject obj, AnimationClip clip, string path, string shaderPropName)
-    {
-        clip.SetCurve(path, typeof(SkinnedMeshRenderer), shaderPropName, new AnimationCurve(new Keyframe(0 / 60.0f, MinLightValue), new Keyframe(1 / 60.0f, MaxLightValue)));
-    }
-    */
     private string getObjectPath(Transform trans)
     {
         string path = trans.name;
