@@ -8,6 +8,7 @@ using VRC.SDK3.Avatars.ScriptableObjects;
 using VRC.Core;
 using nadena.dev.modular_avatar.core;
 
+#if UNITY_EDITOR
 public class LightLimitChanger : EditorWindow
 {
     bool isDefaultUse = false;
@@ -256,3 +257,4 @@ public class LightLimitChanger : EditorWindow
         return path;
     }
 }
+#endif
