@@ -1,0 +1,14 @@
+{
+  "name": "io.github.azukimochi.light-limit-changer",
+  "version": "1.0.1",
+  "displayName": "LightLimitChanger",
+  "description": "Light limit change animation generate tool for VRChat avaters",
+  "author": {
+    "name": "Azukimochi",
+    "url": "https://github.com/Azukimochi"
+  },
+  "url" : "",
+  "legacyFolders" : {
+     "Assets/BoneRenamer" : "5d9f373681328dd47ba2854b321c188a"
+  }
+}
