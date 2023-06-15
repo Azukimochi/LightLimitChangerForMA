@@ -149,8 +149,8 @@ namespace io.github.azukimochi
 
             var layer = new AnimatorControllerLayer() { name = "Light", defaultWeight = 1, stateMachine = new AnimatorStateMachine().HideInHierarchy().AddTo(fx) };
             var stateMachine = layer.stateMachine;
-            var defaultState = new AnimatorState() { name = "Default", writeDefaultValues = false, motion = defaultAnim };
-            var state = new AnimatorState() { name = "Control", writeDefaultValues = false, motion = anim, timeParameterActive = true, timeParameter = ParameterName_Value };
+            var defaultState = new AnimatorState() { name = "Default", writeDefaultValues = false, motion = defaultAnim }.HideInHierarchy().AddTo(fx);
+            var state = new AnimatorState() { name = "Control", writeDefaultValues = false, motion = anim, timeParameterActive = true, timeParameter = ParameterName_Value }.HideInHierarchy().AddTo(fx);
 
             var condition = new AnimatorCondition[] { new AnimatorCondition() { parameter = ParameterName_Toggle, mode = AnimatorConditionMode.If, threshold = 0 } };
 
@@ -184,35 +184,6 @@ namespace io.github.azukimochi
 
             //////////////////////
             //ExpressionMenuの生成
-
-            //SubMenuの生成
-            var subMenu = new VRCExpressionsMenu
-            {
-                controls = new List<VRCExpressionsMenu.Control>
-                {
-                    new VRCExpressionsMenu.Control 
-                    {
-                        name = "Enable",
-                        type = VRCExpressionsMenu.Control.ControlType.Toggle,
-                        parameter = new VRCExpressionsMenu.Control.Parameter
-                        {
-                            name = ParameterName_Toggle,
-                        },
-                    },
-                    new VRCExpressionsMenu.Control 
-                    {
-                        name = "Light",
-                        type = VRCExpressionsMenu.Control.ControlType.RadialPuppet,
-                        subParameters = new VRCExpressionsMenu.Control.Parameter[] 
-                        {
-                            new VRCExpressionsMenu.Control.Parameter
-                            {
-                                name = ParameterName_Value
-                            }
-                        },
-                    },
-                },
-            }.AddTo(fx);
 
             //Menuの生成
             var menu = new VRCExpressionsMenu()
@@ -254,6 +225,20 @@ namespace io.github.azukimochi
                 },
             }.AddTo(fx);
 
+            var prefab = new GameObject("Light Limit Changer");
+            prefab.transform.parent = avatar.transform;
+
+            var menuInstaller = prefab.GetOrAddComponent<ModularAvatarMenuInstaller>();
+            menuInstaller.menuToAppend = menu;
+            var mergeAnimator = prefab.GetOrAddComponent<ModularAvatarMergeAnimator>();
+            mergeAnimator.deleteAttachedAnimator = true;
+            mergeAnimator.animator = fx;
+            mergeAnimator.layerType = VRCAvatarDescriptor.AnimLayerType.FX;
+            mergeAnimator.pathMode = MergeAnimatorPathMode.Absolute;
+            mergeAnimator.matchAvatarWriteDefaults = true;
+            var parameters = prefab.GetOrAddComponent<ModularAvatarParameters>();
+            parameters.parameters.Add(new ParameterConfig() { nameOrPrefix = ParameterName_Toggle, saved = IsValueSave, defaultValue = IsDefaultUse ? 1 : 0, syncType = ParameterSyncType.Bool });
+            parameters.parameters.Add(new ParameterConfig() { nameOrPrefix = ParameterName_Value, saved = IsValueSave, defaultValue = DefaultLightValue, syncType = ParameterSyncType.Float });
 
         }
 
