@@ -11,5 +11,12 @@ namespace io.github.azukimochi
         public AnimatorController FX;
         public AnimationClip DefaultAnimation;
         public AnimationClip ChangeLimitAnimation;
+
+        public bool IsValid()
+        {
+            return FX != null
+                && DefaultAnimation != null
+                && ChangeLimitAnimation != null;
+        }
     }
 }

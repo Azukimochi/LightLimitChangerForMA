@@ -70,9 +70,8 @@ namespace io.github.azukimochi
 
             var settings = avatar.GetComponentInChildren<LightLimitChangerSettings>(true);
             Debug.Log(settings);
-            if (settings == null)
+            if (settings == null || !settings.IsValid())
             {
-
                 var fileName = $"{TargetAvatar.name}_{DateTime.Now:yyyyMMddHHmmss}_{GUID.Generate()}.controller";
                 var savePath = EditorUtility.SaveFilePanelInProject("保存場所", System.IO.Path.GetFileNameWithoutExtension(fileName), System.IO.Path.GetExtension(fileName).Trim('.'), "アセットの保存場所");
                 if (string.IsNullOrEmpty(savePath))
@@ -161,8 +160,7 @@ namespace io.github.azukimochi
                 },
                 }.AddTo(fx);
 
-                var prefab = new GameObject("Light Limit Changer");
-                prefab.transform.parent = avatar.transform;
+                var prefab = avatar.gameObject.GetOrAddChild("Light Limit Changer");
 
                 var menuInstaller = prefab.GetOrAddComponent<ModularAvatarMenuInstaller>();
                 menuInstaller.menuToAppend = menu;
@@ -176,7 +174,7 @@ namespace io.github.azukimochi
 
                 ConfigureParameters(fx, parameters);
 
-                settings = prefab.AddComponent<LightLimitChangerSettings>();
+                settings = prefab.GetOrAddComponent<LightLimitChangerSettings>();
                 settings.FX = fx;
                 settings.DefaultAnimation = defaultAnim;
                 settings.ChangeLimitAnimation = anim;
@@ -260,6 +258,26 @@ namespace io.github.azukimochi
 
     internal static class Utils
     {
+        public static GameObject GetOrAddChild(this GameObject obj, string name)
+        {
+            var c = obj.transform.EnumerateChildren().FirstOrDefault(x => x.name == name)?.gameObject;
+            if (c == null)
+            {
+                c = new GameObject(name);
+                c.transform.parent = obj.transform;
+            }
+            return c;
+        }
+
+        public static IEnumerable<Transform> EnumerateChildren(this Transform tr)
+        {
+            int count = tr.childCount;
+            for(int i = 0 ; i < count; i++)
+            {
+                yield return tr.GetChild(i);
+            }
+        }
+
         public static T AddTo<T>(this T obj, UnityEngine.Object asset) where T : UnityEngine.Object
         {
             AssetDatabase.AddObjectToAsset(obj, asset);
