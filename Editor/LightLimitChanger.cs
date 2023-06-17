@@ -182,7 +182,7 @@ namespace io.github.azukimochi
             else
             {
                 ConfigureAnimation(settings.DefaultAnimation, settings.ChangeLimitAnimation);
-                ConfigureParameters(settings.FX, settings.GetComponent<ModularAvatarParameters>());
+                ConfigureParameters(settings.FX as AnimatorController, settings.GetComponent<ModularAvatarParameters>());
             }
 
             AssetDatabase.SaveAssets();
