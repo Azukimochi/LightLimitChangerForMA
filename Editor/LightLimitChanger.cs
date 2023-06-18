@@ -35,7 +35,8 @@ namespace io.github.azukimochi
         public static void CreateWindow()
         {
             var window = GetWindow<LightLimitChanger>("LightLimitChanger");
-            window.minSize = window.maxSize = new Vector2(600, 270);
+            window.minSize = new Vector2(300, 270);
+            window.maxSize = new Vector2(1000, 270);
         }
 
         private void OnGUI()
