@@ -1,5 +1,5 @@
 {
-    "name": "io.github.azukimochi.lightlimitchanger.editor",
+    "name": "io.github.azukimochi.light-limit-changer.editor",
     "references": [
         "GUID:fc900867c0f47cd49b6e2ae4ef907300",
         "GUID:3b561cce4d58e0e4f82089e8eb14b13b"
