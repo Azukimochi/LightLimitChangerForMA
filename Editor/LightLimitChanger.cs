@@ -32,7 +32,11 @@ namespace io.github.azukimochi
         private string infoLabel = "";
 
         [MenuItem("Tools/Modular Avatar/LightLimitChanger")]
-        public static void CreateWindow() => GetWindow<LightLimitChanger>("LightLimitChanger");
+        public static void CreateWindow()
+        {
+            var window = GetWindow<LightLimitChanger>("LightLimitChanger");
+            window.minSize = window.maxSize = new Vector2(600, 270);
+        }
 
         private void OnGUI()
         {
