@@ -10,5 +10,9 @@
   "url" : "",
   "legacyFolders" : {
      "Assets/LightLimitChangerForMA" : "d16480667da21494ebcd863403b37688"
+  },
+  "vpmDependencies" : {
+    "com.vrchat.avatars" : "3.2.1",
+    "nadena.dev.modular-avatar" : "1.5.1"
   }
 }
