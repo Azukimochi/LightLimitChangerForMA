@@ -22,6 +22,9 @@ namespace io.github.azukimochi
         private const string SHADER_KEY_LILTOON_LightMinLimit = "_LightMinLimit";
         private const string SHADER_KEY_LILTOON_LightMaxLimit = "_LightMaxLimit";
         private const string SHADER_KEY_LILTOON_MainHSVG = "_MainTexHSVG";
+        private const string SHADER_KEY_SUNAO_Unlit = "_Unlit";
+        private const string SHADER_KEY_SUNAO_EnableBlightFix = "_EnableBlightFix";
+        private const string SHADER_KEY_SUNAO_BlightOutput = "_BlightOutput";
 
         private const string ParameterName_Toggle = "LightLimitEnable";
         private const string ParameterName_Value = "LightLimitValue";
@@ -162,9 +165,11 @@ namespace io.github.azukimochi
                 if (renderer is MeshRenderer || renderer is SkinnedMeshRenderer)
                 {
                     var type = renderer.GetType();
-                    bool isLilToon = false;
+                    bool hasLilToon = false;
+                    bool hasSunaoShader = false;
 
-                    (float Min, float Max) defaultValue = (0, 1);
+                    (float Min, float Max) lilDefaultValue = (0, 1);
+                    (float Unlit, float Bright, int Enable) sunaoDefaultValue = (0, 1, 0);
 
                     foreach (var material in renderer.sharedMaterials)
                     {
@@ -175,28 +180,66 @@ namespace io.github.azukimochi
                             for (int i = 0; i < count; i++)
                             {
                                 var propertyName = shader.GetPropertyName(i);
+                                switch (propertyName)
+                                {
+                                    case SHADER_KEY_LILTOON_LightMinLimit:
+                                        lilDefaultValue.Min = material.GetFloat(propertyName);
+                                        goto lilToon;
+                                    case SHADER_KEY_LILTOON_LightMaxLimit:
+                                        lilDefaultValue.Max = material.GetFloat(propertyName);
+                                        goto lilToon;
+
+                                    lilToon:
+                                        hasLilToon = true;
+                                        break;
+
+                                    case SHADER_KEY_SUNAO_EnableBlightFix:
+                                        sunaoDefaultValue.Enable = material.GetInt(propertyName);
+                                        goto sunao;
+
+                                    case SHADER_KEY_SUNAO_BlightOutput:
+                                        sunaoDefaultValue.Bright = material.GetFloat(propertyName);
+                                        goto sunao;
+
+                                    case SHADER_KEY_SUNAO_Unlit:
+                                        sunaoDefaultValue.Unlit = material.GetFloat(propertyName);
+                                        goto sunao;
+
+                                    sunao:
+                                        hasSunaoShader = true;
+                                        break;
+                                }
+                                
                                 if (propertyName == SHADER_KEY_LILTOON_LightMinLimit)
                                 {
-                                    isLilToon = true;
-                                    defaultValue.Min = material.GetFloat(propertyName);
+                                    hasLilToon = true;
+                                    lilDefaultValue.Min = material.GetFloat(propertyName);
                                 }
                                 if (propertyName == SHADER_KEY_LILTOON_LightMaxLimit)
                                 {
-                                    isLilToon = true;
-                                    defaultValue.Max = material.GetFloat(propertyName);
+                                    hasLilToon = true;
+                                    lilDefaultValue.Max = material.GetFloat(propertyName);
                                 }
+
                             }
                         }
-                        if (isLilToon)
-                            break;
                     }
-                    if (isLilToon)
+                    var relativePath = renderer.transform.GetRelativePath(avatar.transform);
+                    if (hasLilToon)
                     {
-                        var relativePath = renderer.transform.GetRelativePath(avatar.transform);
-                        defaultAnim.SetCurve(relativePath, type, $"material.{SHADER_KEY_LILTOON_LightMinLimit}", AnimationCurve.Constant(0, 0, defaultValue.Min));
-                        defaultAnim.SetCurve(relativePath, type, $"material.{SHADER_KEY_LILTOON_LightMaxLimit}", AnimationCurve.Constant(0, 0, defaultValue.Max));
+                        defaultAnim.SetCurve(relativePath, type, $"material.{SHADER_KEY_LILTOON_LightMinLimit}", AnimationCurve.Constant(0, 0, lilDefaultValue.Min));
+                        defaultAnim.SetCurve(relativePath, type, $"material.{SHADER_KEY_LILTOON_LightMaxLimit}", AnimationCurve.Constant(0, 0, lilDefaultValue.Max));
                         anim.SetCurve(relativePath, type, $"material.{SHADER_KEY_LILTOON_LightMinLimit}", linearCurve);
                         anim.SetCurve(relativePath, type, $"material.{SHADER_KEY_LILTOON_LightMaxLimit}", linearCurve);
+                    }
+                    if (hasSunaoShader)
+                    {
+                        defaultAnim.SetCurve(relativePath, type, $"material.{SHADER_KEY_SUNAO_EnableBlightFix}", AnimationCurve.Constant(0, 0, sunaoDefaultValue.Enable));
+                        defaultAnim.SetCurve(relativePath, type, $"material.{SHADER_KEY_SUNAO_BlightOutput}", AnimationCurve.Constant(0, 0, sunaoDefaultValue.Bright));
+                        defaultAnim.SetCurve(relativePath, type, $"material.{SHADER_KEY_SUNAO_Unlit}", AnimationCurve.Constant(0, 0, sunaoDefaultValue.Unlit));
+                        anim.SetCurve(relativePath, type, $"material.{SHADER_KEY_SUNAO_EnableBlightFix}", AnimationCurve.Constant(0, 0, 1));
+                        anim.SetCurve(relativePath, type, $"material.{SHADER_KEY_SUNAO_BlightOutput}", linearCurve);
+                        anim.SetCurve(relativePath, type, $"material.{SHADER_KEY_SUNAO_Unlit}", AnimationCurve.Constant(0, 0, 1));
                     }
                 }
             }
