@@ -91,16 +91,56 @@ namespace io.github.azukimochi
 
         private static string[] _relativePathBuffer;
 
+        public struct DisabledScope : IDisposable
+        {
+            public DisabledScope(bool disabled)
+            {
+                EditorGUI.BeginDisabledGroup(disabled);
+            }
+
+            public void Dispose()
+            {
+                EditorGUI.EndDisabledGroup();
+            }
+        }
+
+        public struct GroupScope : IDisposable
+        {
+            private float _originalLabelWidth;
+            public GroupScope(string header, float labelWidth)
+            {
+                GUILayout.Label($"---- {header}", EditorStyles.boldLabel);
+                _originalLabelWidth = EditorGUIUtility.labelWidth = labelWidth;
+
+                EditorGUI.indentLevel++;
+            }
+
+            public void Dispose()
+            {
+                EditorGUIUtility.labelWidth = _originalLabelWidth;
+                EditorGUI.indentLevel--;
+                EditorGUILayout.Space();
+            }
+        }
+
         public struct FoldoutHeaderGroupScope : IDisposable
         {
             public bool IsOpen;
             public FoldoutHeaderGroupScope(ref bool isOpen, string content)
             {
                 IsOpen = isOpen = EditorGUILayout.BeginFoldoutHeaderGroup(isOpen, content);
+                if (isOpen)
+                {
+                    EditorGUI.indentLevel++;
+                }
             }
 
             public void Dispose()
             {
+                if (IsOpen)
+                {
+                    EditorGUI.indentLevel--;
+                }
                 EditorGUILayout.EndFoldoutHeaderGroup();
             }
         }
