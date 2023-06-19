@@ -8,7 +8,8 @@ namespace io.github.azukimochi
 {
     internal static class Localization
     {
-        private static int _SelectedLanguage = 0;
+        private const string PreferenceKey = "io.github.azukimochi.light-limit-changer.lang";
+        private static int _SelectedLanguage = EditorPrefs.GetInt(PreferenceKey);
         private static readonly GUIContent[] _SupportedLanguages = new GUIContent[] { new GUIContent("日本語"), new GUIContent("English") };
         private static readonly GUIContent _Label = new GUIContent("Language");
 
@@ -43,7 +44,12 @@ namespace io.github.azukimochi
 
         public static void ShowLocalizationUI()
         {
-            _SelectedLanguage = EditorGUILayout.Popup(_Label, _SelectedLanguage, _SupportedLanguages);
+            var current = _SelectedLanguage;
+            _SelectedLanguage = EditorGUILayout.Popup(_Label, current, _SupportedLanguages);
+            if (current != _SelectedLanguage)
+            {
+                EditorPrefs.SetInt(PreferenceKey, _SelectedLanguage);
+            }
         }
     }
 }
