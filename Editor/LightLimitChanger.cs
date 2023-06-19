@@ -28,6 +28,11 @@ namespace io.github.azukimochi
         private const string SHADER_KEY_SUNAO_PointLight = "_PointLight";
         private const string SHADER_KEY_SUNAO_SHLight = "_SHLight";
 
+        private const string SHADER_KEY_POIYOMI_LightingMinLightBrightness = "_LightingMinLightBrightness";
+        private const string SHADER_KEY_POIYOMI_LightingCap = "_LightingCap";
+        private const string SHADER_KEY_POIYOMI_MainColorAdjustToggle = "_MainColorAdjustToggle";
+        private const string SHADER_KEY_POIYOMI_Saturation = "_Saturation";
+
         private const string ParameterName_Toggle = "LightLimitEnable";
         private const string ParameterName_Value = "LightLimitValue";
         private const string ParameterName_Saturation = "LightLimitSaturation";
@@ -211,9 +216,11 @@ namespace io.github.azukimochi
                     var type = renderer.GetType();
                     bool hasLilToon = false;
                     bool hasSunaoShader = false;
+                    bool hasPoiyomiShader = false;
 
                     (float Min, float Max) lilDefaultValue = (0, 1);
                     (float Minimum, float Directional, float Point, float SH) sunaoDefaultValue = (0, 1, 1, 1);
+                    (float Min, float Max) poiyomiDefaultValue = (0, 1);
 
                     foreach (var material in renderer.sharedMaterials)
                     {
@@ -256,6 +263,18 @@ namespace io.github.azukimochi
                                     sunao:
                                         hasSunaoShader = true;
                                         break;
+
+                                    case SHADER_KEY_POIYOMI_LightingMinLightBrightness:
+                                        poiyomiDefaultValue.Min = material.GetFloat(propertyName);
+                                        goto poiyomi;
+
+                                    case SHADER_KEY_POIYOMI_LightingCap:
+                                        poiyomiDefaultValue.Max = material.GetFloat(propertyName);
+                                        goto poiyomi;
+
+                                    poiyomi:
+                                        hasPoiyomiShader = true;
+                                        break;
                                 }
                             }
                         }
@@ -279,6 +298,14 @@ namespace io.github.azukimochi
                         anim.SetCurve(relativePath, type, $"material.{SHADER_KEY_SUNAO_DirectionalLight}", linearCurve);
                         anim.SetCurve(relativePath, type, $"material.{SHADER_KEY_SUNAO_PointLight}", linearCurve);
                         anim.SetCurve(relativePath, type, $"material.{SHADER_KEY_SUNAO_SHLight}", linearCurve);
+                    }
+                    if (hasPoiyomiShader)
+                    {
+                        defaultAnim.SetCurve(relativePath, type, $"material.{SHADER_KEY_POIYOMI_LightingMinLightBrightness}", AnimationCurve.Constant(0, 0, poiyomiDefaultValue.Min));
+                        defaultAnim.SetCurve(relativePath, type, $"material.{SHADER_KEY_POIYOMI_LightingCap}", AnimationCurve.Constant(0, 0, poiyomiDefaultValue.Max));
+
+                        anim.SetCurve(relativePath, type, $"material.{SHADER_KEY_POIYOMI_LightingMinLightBrightness}", linearCurve);
+                        anim.SetCurve(relativePath, type, $"material.{SHADER_KEY_POIYOMI_LightingCap}", linearCurve);
                     }
                 }
             }
@@ -332,16 +359,17 @@ namespace io.github.azukimochi
             AnimationClip anim = new AnimationClip() { name = "Change Saturation" }.AddTo(fx);
 
             var avatar = TargetAvatar;
-            var linearCurve = AnimationCurve.Linear(0, 0, 1 / 60f, 2);
 
             foreach (var renderer in avatar.GetComponentsInChildren<Renderer>(true))
             {
                 if (renderer is MeshRenderer || renderer is SkinnedMeshRenderer)
                 {
                     var type = renderer.GetType();
-                    bool isLilToon = false;
+                    bool hasLilToon = false;
+                    bool hasPoiyomiShader = false;
 
-                    Color defaultValue = new Color(0, 1, 1, 1);
+                    Color lilDefaultValue = new Color(0, 1, 1, 1);
+                    (float Saturation, int Enable) poiyomiDefaultValue = (0, 0);
 
                     foreach (var material in renderer.sharedMaterials)
                     {
@@ -352,27 +380,43 @@ namespace io.github.azukimochi
                             for (int i = 0; i < count; i++)
                             {
                                 var propertyName = shader.GetPropertyName(i);
+                                
                                 if (propertyName == SHADER_KEY_LILTOON_MainHSVG)
                                 {
-                                    isLilToon = true;
-                                    defaultValue = material.GetColor(propertyName);
+                                    hasLilToon = true;
+                                    lilDefaultValue = material.GetColor(propertyName);
+                                }
+                                if (propertyName == SHADER_KEY_POIYOMI_MainColorAdjustToggle)
+                                {
+                                    hasPoiyomiShader = true;
+                                    poiyomiDefaultValue.Enable = material.GetInt(propertyName);
+                                }
+                                if (propertyName == SHADER_KEY_POIYOMI_Saturation)
+                                {
+                                    hasPoiyomiShader = true;
+                                    poiyomiDefaultValue.Saturation = material.GetFloat(propertyName);
                                 }
                             }
                         }
-                        if (isLilToon)
-                            break;
                     }
-                    if (isLilToon)
+                    var relativePath = renderer.transform.GetRelativePath(avatar.transform);
+                    if (hasLilToon)
                     {
-                        var relativePath = renderer.transform.GetRelativePath(avatar.transform);
-                        defaultAnim.SetCurve(relativePath, type, $"material.{SHADER_KEY_LILTOON_MainHSVG}.r", AnimationCurve.Constant(0, 0, defaultValue.r));
-                        defaultAnim.SetCurve(relativePath, type, $"material.{SHADER_KEY_LILTOON_MainHSVG}.g", AnimationCurve.Constant(0, 0, defaultValue.g));
-                        defaultAnim.SetCurve(relativePath, type, $"material.{SHADER_KEY_LILTOON_MainHSVG}.b", AnimationCurve.Constant(0, 0, defaultValue.b));
-                        defaultAnim.SetCurve(relativePath, type, $"material.{SHADER_KEY_LILTOON_MainHSVG}.a", AnimationCurve.Constant(0, 0, defaultValue.a));
-                        anim.SetCurve(relativePath, type, $"material.{SHADER_KEY_LILTOON_MainHSVG}.r", AnimationCurve.Constant(0, 0, defaultValue.r));
-                        anim.SetCurve(relativePath, type, $"material.{SHADER_KEY_LILTOON_MainHSVG}.g", linearCurve);
-                        anim.SetCurve(relativePath, type, $"material.{SHADER_KEY_LILTOON_MainHSVG}.b", AnimationCurve.Constant(0, 0, defaultValue.b));
-                        anim.SetCurve(relativePath, type, $"material.{SHADER_KEY_LILTOON_MainHSVG}.a", AnimationCurve.Constant(0, 0, defaultValue.a));
+                        defaultAnim.SetCurve(relativePath, type, $"material.{SHADER_KEY_LILTOON_MainHSVG}.r", AnimationCurve.Constant(0, 0, lilDefaultValue.r));
+                        defaultAnim.SetCurve(relativePath, type, $"material.{SHADER_KEY_LILTOON_MainHSVG}.g", AnimationCurve.Constant(0, 0, lilDefaultValue.g));
+                        defaultAnim.SetCurve(relativePath, type, $"material.{SHADER_KEY_LILTOON_MainHSVG}.b", AnimationCurve.Constant(0, 0, lilDefaultValue.b));
+                        defaultAnim.SetCurve(relativePath, type, $"material.{SHADER_KEY_LILTOON_MainHSVG}.a", AnimationCurve.Constant(0, 0, lilDefaultValue.a));
+                        anim.SetCurve(relativePath, type, $"material.{SHADER_KEY_LILTOON_MainHSVG}.r", AnimationCurve.Constant(0, 0, lilDefaultValue.r));
+                        anim.SetCurve(relativePath, type, $"material.{SHADER_KEY_LILTOON_MainHSVG}.g", AnimationCurve.Linear(0, 0, 1 / 60f, 2));
+                        anim.SetCurve(relativePath, type, $"material.{SHADER_KEY_LILTOON_MainHSVG}.b", AnimationCurve.Constant(0, 0, lilDefaultValue.b));
+                        anim.SetCurve(relativePath, type, $"material.{SHADER_KEY_LILTOON_MainHSVG}.a", AnimationCurve.Constant(0, 0, lilDefaultValue.a));
+                    }
+                    if (hasPoiyomiShader)
+                    {
+                        defaultAnim.SetCurve(relativePath, type, $"material.{SHADER_KEY_POIYOMI_MainColorAdjustToggle}", AnimationCurve.Constant(0, 0, poiyomiDefaultValue.Enable));
+                        defaultAnim.SetCurve(relativePath, type, $"material.{SHADER_KEY_POIYOMI_Saturation}", AnimationCurve.Constant(0, 0, poiyomiDefaultValue.Saturation));
+                        anim.SetCurve(relativePath, type, $"material.{SHADER_KEY_POIYOMI_MainColorAdjustToggle}", AnimationCurve.Constant(0, 0, poiyomiDefaultValue.Enable));
+                        anim.SetCurve(relativePath, type, $"material.{SHADER_KEY_POIYOMI_Saturation}", AnimationCurve.Linear(0, -1, 1 / 60f, 1));
                     }
                 }
             }
