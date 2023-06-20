@@ -36,6 +36,7 @@ namespace io.github.azukimochi
         private const string ParameterName_Toggle = "LightLimitEnable";
         private const string ParameterName_Value = "LightLimitValue";
         private const string ParameterName_Saturation = "LightLimitSaturation";
+        private const string ParameterName_Reset = "LightLimitReset";
 
         private const string GenerateObjectName = "Light Limit Changer";
 
@@ -48,8 +49,8 @@ namespace io.github.azukimochi
         public static void CreateWindow()
         {
             var window = GetWindow<LightLimitChanger>(Title);
-            window.minSize = new Vector2(380, 360);
-            window.maxSize = new Vector2(1000, 360);
+            window.minSize = new Vector2(380, 380);
+            window.maxSize = new Vector2(1000, 380);
         }
 
         private void OnGUI()
@@ -93,6 +94,7 @@ namespace io.github.azukimochi
                         if (group.IsOpen)
                         {
                             param.AllowSaturationControl = EditorGUILayout.Toggle(Localization.S("Allow Saturation Control"), param.AllowSaturationControl);
+                            param.AddResetButton = EditorGUILayout.Toggle(Localization.S("Add Resset Button"), param.AddResetButton);
                         }
                     }
 
@@ -169,6 +171,7 @@ namespace io.github.azukimochi
 
                 ConfigureLightControl(fx, parameters);
                 ConfigureSaturationControl(fx, parameters);
+                ConfigureResetParamerters(fx, parameters);
 
                 var menuInstaller = obj.GetOrAddComponent<ModularAvatarMenuInstaller>();
                 menuInstaller.menuToAppend = CreateMenu(fx);
@@ -196,6 +199,7 @@ namespace io.github.azukimochi
 
                 ConfigureLightControl(fx, parameters);
                 ConfigureSaturationControl(fx, parameters);
+                ConfigureResetParamerters(fx, parameters);
             }
             settings.Parameters = Parameters;
             AssetDatabase.SaveAssets();
@@ -338,8 +342,8 @@ namespace io.github.azukimochi
 
             state.AddTransition(tr);
 
-            stateMachine.AddState(defaultState, stateMachine.entryPosition + new Vector3(0, 200));
-            stateMachine.AddState(state, stateMachine.entryPosition + new Vector3(0, 350));
+            stateMachine.AddState(defaultState, stateMachine.entryPosition + new Vector3(-20, 50));
+            stateMachine.AddState(state, stateMachine.entryPosition + new Vector3(-20, 100));
 
             fx.AddLayer(layer);
 
@@ -449,13 +453,66 @@ namespace io.github.azukimochi
 
             state.AddTransition(tr);
 
-            stateMachine.AddState(defaultState, stateMachine.entryPosition + new Vector3(0, 200));
-            stateMachine.AddState(state, stateMachine.entryPosition + new Vector3(0, 350));
+            stateMachine.AddState(defaultState, stateMachine.entryPosition + new Vector3(-20, 50));
+            stateMachine.AddState(state, stateMachine.entryPosition + new Vector3(-20, 100));
 
             fx.AddLayer(layer);
 
             fx.AddParameter(new AnimatorControllerParameter() { name = ParameterName_Saturation, defaultFloat = 0.5f, type = AnimatorControllerParameterType.Float });
             parameters.parameters.Add(new ParameterConfig() { nameOrPrefix = ParameterName_Saturation, saved = Parameters.IsValueSave, defaultValue = 0.5f, syncType = ParameterSyncType.Float });
+        }
+
+        private void ConfigureResetParamerters(AnimatorController fx, ModularAvatarParameters parameters)
+        {
+            if (!Parameters.AddResetButton)
+                return;
+
+            AnimatorStateMachine stateMachine;
+            var layer = new AnimatorControllerLayer()
+            {
+                name = "Reset",
+                stateMachine = stateMachine = new AnimatorStateMachine().HideInHierarchy().AddTo(fx),
+                defaultWeight = 1,
+            };
+            var blank = new AnimationClip() { name = "Blank" }.HideInHierarchy().AddTo(fx);
+            var off = new AnimatorState() { name = "Off", writeDefaultValues = false, motion = blank }.HideInHierarchy().AddTo(fx);
+            var on = new AnimatorState() { name = "On", writeDefaultValues = false, motion = blank }.HideInHierarchy().AddTo(fx);
+
+            var cond = new AnimatorCondition[] { new AnimatorCondition() { mode = AnimatorConditionMode.If, parameter = ParameterName_Reset } };
+
+            var t = new AnimatorStateTransition() 
+            {
+                destinationState = on,
+                duration = 0,
+                hasExitTime = false,
+                conditions = cond
+            }.HideInHierarchy().AddTo(fx);
+
+            off.AddTransition(t);
+
+            cond[0].mode = AnimatorConditionMode.IfNot;
+            t = new AnimatorStateTransition()
+            {
+                destinationState = off,
+                duration = 0,
+                hasExitTime = false,
+                conditions = cond
+            }.HideInHierarchy().AddTo(fx);
+
+            on.AddTransition(t);
+
+            var dr = on.AddStateMachineBehaviour<VRCAvatarParameterDriver>();
+            dr.parameters.Add(new VRC.SDKBase.VRC_AvatarParameterDriver.Parameter() { type = VRC.SDKBase.VRC_AvatarParameterDriver.ChangeType.Set, name = ParameterName_Value, value = Parameters.DefaultLightValue });
+            if (Parameters.AllowSaturationControl)
+            dr.parameters.Add(new VRC.SDKBase.VRC_AvatarParameterDriver.Parameter() { type = VRC.SDKBase.VRC_AvatarParameterDriver.ChangeType.Set, name = ParameterName_Saturation, value = 0.5f });
+
+            stateMachine.AddState(off, stateMachine.entryPosition + new Vector3(-20, 50));
+            stateMachine.AddState(on, stateMachine.entryPosition + new Vector3(-20, 100));
+
+            fx.AddParameter(ParameterName_Reset, AnimatorControllerParameterType.Bool);
+            parameters.parameters.Add(new ParameterConfig() { nameOrPrefix = ParameterName_Reset, syncType = ParameterSyncType.Bool, localOnly = true, saved = false });
+
+            fx.AddLayer(layer);
         }
 
         private VRCExpressionsMenu CreateMenu(AnimatorController fx)
@@ -502,6 +559,16 @@ namespace io.github.azukimochi
                             name = ParameterName_Saturation
                         }
                     },
+                });
+            }
+
+            if (Parameters.AddResetButton)
+            {
+                mainMenu.controls.Add(new VRCExpressionsMenu.Control()
+                {
+                    name = "Reset",
+                    type = VRCExpressionsMenu.Control.ControlType.Button,
+                    parameter = new VRCExpressionsMenu.Control.Parameter() { name = ParameterName_Reset }
                 });
             }
 
