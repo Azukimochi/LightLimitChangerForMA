@@ -16,6 +16,7 @@ namespace io.github.azukimochi
         public float MinLightValue;
 
         public bool AllowSaturationControl;
+        public bool AddResetButton;
 
         public static LightLimitChangeParameters Default => new LightLimitChangeParameters()
         {
@@ -25,6 +26,7 @@ namespace io.github.azukimochi
             MaxLightValue = 1.0f,
             MinLightValue = 0.0f,
             AllowSaturationControl = false,
+            AddResetButton = false,
         };
     }
 }
