@@ -15,6 +15,8 @@ namespace io.github.azukimochi
         public float MaxLightValue;
         public float MinLightValue;
 
+        public TargetShaders TargetShader;
+
         public bool AllowSaturationControl;
         public bool AddResetButton;
 
@@ -25,6 +27,7 @@ namespace io.github.azukimochi
             DefaultLightValue = 0.5f,
             MaxLightValue = 1.0f,
             MinLightValue = 0.0f,
+            TargetShader = unchecked((TargetShaders)uint.MaxValue),  //TargetShaders.lilToon | TargetShaders.Sunao | TargetShaders.Poiyomi,
             AllowSaturationControl = false,
             AddResetButton = false,
         };

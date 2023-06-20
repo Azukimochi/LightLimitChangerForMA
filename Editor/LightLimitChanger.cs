@@ -43,14 +43,16 @@ namespace io.github.azukimochi
         public const string Title = "Light Limit Changer For MA";
         public const string Version = "1.2.0";
 
+        private static readonly string[] _targetShaderLabels = Enum.GetNames(typeof(TargetShaders));
+
         private string infoLabel = "";
 
         [MenuItem("Tools/Modular Avatar/LightLimitChanger")]
         public static void CreateWindow()
         {
             var window = GetWindow<LightLimitChanger>(Title);
-            window.minSize = new Vector2(380, 380);
-            window.maxSize = new Vector2(1000, 380);
+            window.minSize = new Vector2(380, 400);
+            window.maxSize = new Vector2(1000, 400);
         }
 
         private void OnGUI()
@@ -93,6 +95,7 @@ namespace io.github.azukimochi
                     {
                         if (group.IsOpen)
                         {
+                            param.TargetShader = (TargetShaders)EditorGUILayout.MaskField(Localization.S("Target Shader"), (int)param.TargetShader, _targetShaderLabels);
                             param.AllowSaturationControl = EditorGUILayout.Toggle(Localization.S("Allow Saturation Control"), param.AllowSaturationControl);
                             param.AddResetButton = EditorGUILayout.Toggle(Localization.S("Add Resset Button"), param.AddResetButton);
                         }
@@ -101,7 +104,7 @@ namespace io.github.azukimochi
                     Parameters = param;
                 }
                 
-                using (new Utils.DisabledScope(TargetAvatar == null))
+                using (new Utils.DisabledScope(TargetAvatar == null || Parameters.TargetShader == 0))
                 {
                     string buttonLabel;
                     {
@@ -284,14 +287,15 @@ namespace io.github.azukimochi
                         }
                     }
                     var relativePath = renderer.transform.GetRelativePath(avatar.transform);
-                    if (hasLilToon)
+                    var targetShader = Parameters.TargetShader;
+                    if (hasLilToon && targetShader.HasFlag(TargetShaders.lilToon))
                     {
                         defaultAnim.SetCurve(relativePath, type, $"material.{SHADER_KEY_LILTOON_LightMinLimit}", AnimationCurve.Constant(0, 0, lilDefaultValue.Min));
                         defaultAnim.SetCurve(relativePath, type, $"material.{SHADER_KEY_LILTOON_LightMaxLimit}", AnimationCurve.Constant(0, 0, lilDefaultValue.Max));
                         anim.SetCurve(relativePath, type, $"material.{SHADER_KEY_LILTOON_LightMinLimit}", linearCurve);
                         anim.SetCurve(relativePath, type, $"material.{SHADER_KEY_LILTOON_LightMaxLimit}", linearCurve);
                     }
-                    if (hasSunaoShader)
+                    if (hasSunaoShader && targetShader.HasFlag(TargetShaders.Sunao))
                     {
                         defaultAnim.SetCurve(relativePath, type, $"material.{SHADER_KEY_SUNAO_MinimumLight}", AnimationCurve.Constant(0, 0, sunaoDefaultValue.Minimum));
                         defaultAnim.SetCurve(relativePath, type, $"material.{SHADER_KEY_SUNAO_DirectionalLight}", AnimationCurve.Constant(0, 0, sunaoDefaultValue.Directional));
@@ -303,7 +307,7 @@ namespace io.github.azukimochi
                         anim.SetCurve(relativePath, type, $"material.{SHADER_KEY_SUNAO_PointLight}", linearCurve);
                         anim.SetCurve(relativePath, type, $"material.{SHADER_KEY_SUNAO_SHLight}", linearCurve);
                     }
-                    if (hasPoiyomiShader)
+                    if (hasPoiyomiShader && targetShader.HasFlag(TargetShaders.Poiyomi))
                     {
                         defaultAnim.SetCurve(relativePath, type, $"material.{SHADER_KEY_POIYOMI_LightingMinLightBrightness}", AnimationCurve.Constant(0, 0, poiyomiDefaultValue.Min));
                         defaultAnim.SetCurve(relativePath, type, $"material.{SHADER_KEY_POIYOMI_LightingCap}", AnimationCurve.Constant(0, 0, poiyomiDefaultValue.Max));
@@ -404,7 +408,8 @@ namespace io.github.azukimochi
                         }
                     }
                     var relativePath = renderer.transform.GetRelativePath(avatar.transform);
-                    if (hasLilToon)
+                    var targetShader = Parameters.TargetShader;
+                    if (hasLilToon && targetShader.HasFlag(TargetShaders.lilToon))
                     {
                         defaultAnim.SetCurve(relativePath, type, $"material.{SHADER_KEY_LILTOON_MainHSVG}.r", AnimationCurve.Constant(0, 0, lilDefaultValue.r));
                         defaultAnim.SetCurve(relativePath, type, $"material.{SHADER_KEY_LILTOON_MainHSVG}.g", AnimationCurve.Constant(0, 0, lilDefaultValue.g));
@@ -415,7 +420,7 @@ namespace io.github.azukimochi
                         anim.SetCurve(relativePath, type, $"material.{SHADER_KEY_LILTOON_MainHSVG}.b", AnimationCurve.Constant(0, 0, lilDefaultValue.b));
                         anim.SetCurve(relativePath, type, $"material.{SHADER_KEY_LILTOON_MainHSVG}.a", AnimationCurve.Constant(0, 0, lilDefaultValue.a));
                     }
-                    if (hasPoiyomiShader)
+                    if (hasPoiyomiShader && targetShader.HasFlag(TargetShaders.Poiyomi))
                     {
                         defaultAnim.SetCurve(relativePath, type, $"material.{SHADER_KEY_POIYOMI_MainColorAdjustToggle}", AnimationCurve.Constant(0, 0, poiyomiDefaultValue.Enable));
                         defaultAnim.SetCurve(relativePath, type, $"material.{SHADER_KEY_POIYOMI_Saturation}", AnimationCurve.Constant(0, 0, poiyomiDefaultValue.Saturation));
