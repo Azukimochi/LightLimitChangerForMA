@@ -91,6 +91,18 @@ namespace io.github.azukimochi
 
         private static string[] _relativePathBuffer;
 
+        public static string GetVersion()
+        {
+            var packageInfo = JsonUtility.FromJson<PackageInfo>(System.IO.File.ReadAllText(System.IO.Path.Combine(System.IO.Path.GetDirectoryName(Application.dataPath), AssetDatabase.GUIDToAssetPath("a82bfa088b3f7634aaadfdea98eb87e0"))));
+            return packageInfo.version ?? ":: Failed get current version";
+        }
+
+        [Serializable]
+        private struct PackageInfo
+        {
+            public string version;
+        }
+
         public struct DisabledScope : IDisposable
         {
             public DisabledScope(bool disabled)
