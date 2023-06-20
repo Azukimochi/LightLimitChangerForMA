@@ -41,7 +41,7 @@ namespace io.github.azukimochi
         private const string GenerateObjectName = "Light Limit Changer";
 
         public const string Title = "Light Limit Changer For MA";
-        public const string Version = "1.2.0";
+        public static string Version = string.Empty;
 
         private static readonly string[] _targetShaderLabels = Enum.GetNames(typeof(TargetShaders));
 
@@ -53,6 +53,11 @@ namespace io.github.azukimochi
             var window = GetWindow<LightLimitChanger>(Title);
             window.minSize = new Vector2(380, 400);
             window.maxSize = new Vector2(1000, 400);
+        }
+
+        private void OnEnable()
+        {
+            Version = Utils.GetVersion();
         }
 
         private void OnGUI()
