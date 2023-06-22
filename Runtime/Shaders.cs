@@ -3,7 +3,7 @@
 namespace io.github.azukimochi
 {
     [Flags]
-    public enum TargetShaders : int
+    public enum Shaders : int
     {
         lilToon = 1 << 0,
         Sunao = 1 << 1,

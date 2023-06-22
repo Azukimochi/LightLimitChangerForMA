@@ -25,6 +25,7 @@ namespace io.github.azukimochi
             { "DefaultLight", "明るさの初期値" },
             { "Options", "オプション" },
             { "Target Shader", "対象シェーダー" },
+            { "Target Shader must be selected", "対象シェーダーを選択してください" },
             { "Allow Saturation Control", "彩度調整を有効にする" },
             { "Add Resset Button", "リセットボタンを追加する" },
             { "Generate", "生成" },
