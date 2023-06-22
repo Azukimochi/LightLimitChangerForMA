@@ -6,6 +6,8 @@ using UnityEditor;
 using System.Linq;
 using System;
 using UnityEditor.Animations;
+using VRC.SDK3.Avatars.Components;
+using System.Reflection;
 
 namespace io.github.azukimochi
 {
@@ -28,9 +30,11 @@ namespace io.github.azukimochi
 
         public static void ClearLayers(this AnimatorController controller) => controller.layers = Array.Empty<AnimatorControllerLayer>();
 
-        public static bool TryGetComponentInChildren<T>(this Component component, out T result) where T : Component
+        public static bool TryGetComponentInChildren<T>(this Component component, out T result) where T : Component => component.gameObject.TryGetComponentInChildren(out result);
+
+        public static bool TryGetComponentInChildren<T>(this GameObject obj, out T result) where T : Component
         {
-            result = component.GetComponentInChildren<T>();
+            result = obj.GetComponentInChildren<T>();
             return result != null;
         }
 
@@ -43,6 +47,17 @@ namespace io.github.azukimochi
                 c.transform.parent = obj.transform;
             }
             return c;
+        }
+
+        public static VRCAvatarDescriptor FindAvatarFromParent(this GameObject obj)
+        {
+            var tr = obj.transform;
+            VRCAvatarDescriptor avatar = null;
+            while(tr != null && (avatar = tr.GetComponent<VRCAvatarDescriptor>()) == null)
+            {
+                tr = tr.parent;
+            }
+            return avatar;
         }
 
         public static IEnumerable<Transform> EnumerateChildren(this Transform tr)
@@ -93,7 +108,16 @@ namespace io.github.azukimochi
 
         public static IEnumerable<string> EnumeratePropertyNames(this Shader shader) => Enumerable.Range(0, shader.GetPropertyCount()).Select(shader.GetPropertyName);
 
-        private static AnimationCurve _tempAnimationCurve;
+        private static MethodInfo _GetGeneratedAssetsFolder = typeof(nadena.dev.modular_avatar.core.editor.AvatarProcessor).Assembly.GetTypes().FirstOrDefault(x => x.Name == "Util")?.GetMethod(nameof(GetGeneratedAssetsFolder), BindingFlags.Static | BindingFlags.NonPublic);
+
+        public static string GetGeneratedAssetsFolder()
+        {
+            var method = _GetGeneratedAssetsFolder;
+            if (method != null)
+                return method.Invoke(null, null) as string;
+
+            return AssetDatabase.GUIDToAssetPath(AssetDatabase.CreateFolder("Assets/", "_LightLimitChangerTemporary"));
+        }
 
         public static string GetVersion()
         {

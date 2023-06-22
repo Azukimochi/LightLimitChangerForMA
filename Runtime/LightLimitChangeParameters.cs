@@ -20,6 +20,7 @@ namespace io.github.azukimochi
         public bool AllowSaturationControl;
         public bool AddResetButton;
         public bool GenerateAtBuild;
+        public bool ExcludeEditorOnly;
 
         public static LightLimitChangeParameters Default => new LightLimitChangeParameters()
         {

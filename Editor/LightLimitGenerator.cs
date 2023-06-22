@@ -39,9 +39,12 @@ namespace io.github.azukimochi
         public static void Generate(VRCAvatarDescriptor avatar, LightLimitChangerSettings settings)
         {
             var fx = settings.FX;
+            if (fx == null)
+                fx = settings.FX = CreateTemporaryAsset();
+
             var obj = settings.gameObject;
             fx.parameters = Array.Empty<AnimatorControllerParameter>();
-            var parameters = obj.GetOrAddComponent<ModularAvatarParameters>();
+            var parameters = obj.GetOrAddComponent<ModularAvatarParameters>(); 
             var menuInstaller = obj.GetOrAddComponent<ModularAvatarMenuInstaller>();
             var mergeAnimator = obj.GetOrAddComponent<ModularAvatarMergeAnimator>();
             parameters.parameters.Clear();
@@ -56,56 +59,16 @@ namespace io.github.azukimochi
             fx.ClearLayers();
 
             ConfigureControls(avatar, settings);
-            ConfigureResetParamerters(settings);
+            ConfigureResetParameters(settings);
 
             AssetDatabase.SaveAssets();
         }
 
         private static void ConfigureControls(VRCAvatarDescriptor avatar, LightLimitChangerSettings settings)
         {
-            var fx = settings.FX;
+            var fx = settings.FX ;
             var parameters = settings.Parameters;
-            var enumerable = avatar.GetComponentsInChildren<Renderer>(true).Where(x => x is MeshRenderer || x is SkinnedMeshRenderer).Select(renderer =>
-            {
-                var materials = renderer.sharedMaterials.Select(material =>
-                {
-                    Shaders shaders = 0;
-                    var shader = material?.shader;
-                    if (shader != null)
-                    {
-                        int count = shader.GetPropertyCount();
-                        for (int i = 0; i < count; i++)
-                        {
-                            var propertyName = shader.GetPropertyName(i);
-                            switch (propertyName)
-                            {
-                                case SHADER_KEY_LILTOON_LightMinLimit:
-                                case SHADER_KEY_LILTOON_LightMaxLimit:
-                                case SHADER_KEY_LILTOON_MainHSVG:
-                                    shaders |= Shaders.lilToon;
-                                    continue;
-
-                                case SHADER_KEY_SUNAO_MinimumLight:
-                                case SHADER_KEY_SUNAO_DirectionalLight:
-                                case SHADER_KEY_SUNAO_PointLight:
-                                case SHADER_KEY_SUNAO_SHLight:
-                                    shaders |= Shaders.Sunao;
-                                    continue;
-
-                                case SHADER_KEY_POIYOMI_LightingMinLightBrightness:
-                                case SHADER_KEY_POIYOMI_LightingCap:
-                                case SHADER_KEY_POIYOMI_MainColorAdjustToggle:
-                                case SHADER_KEY_POIYOMI_Saturation:
-                                    shaders |= Shaders.Poiyomi;
-                                    continue;
-                            }
-                        }
-                    }
-                    return (material, shaders);
-                }).Where(x => x.shaders != 0);
-
-                return (renderer, materials);
-            }).SelectMany(x => x.materials.Select(y => (Renderer: x.renderer, Material: y.material, Shaders: y.shaders))).GroupBy(x => x.Shaders, y => (y.Renderer, y.Material));
+            var groups = avatar.GetComponentsInChildren<Renderer>(true).Where(x => (x is MeshRenderer || x is SkinnedMeshRenderer) && (!settings.Parameters.ExcludeEditorOnly || x.tag != "EditorOnly")).Select(renderer => (renderer, materials: renderer.sharedMaterials.Select(material => (material, shader: GetShaderType(material?.shader))).Where(x => x.shader != 0))).SelectMany(x => x.materials.Select(y => (Renderer: x.renderer, Material: y.material, Shaders: y.shader))).GroupBy(x => x.Shaders, y => (y.Renderer, y.Material));
 
             (AnimationClip Default, AnimationClip Control) light = (new AnimationClip() { name = "Default Light" }, new AnimationClip() { name = "Change Light" });
             (AnimationClip Default, AnimationClip Control) saturation = (new AnimationClip() { name = "Default Saturation" }, new AnimationClip() { name = "Change Saturation" });
@@ -119,7 +82,7 @@ namespace io.github.azukimochi
                 saturation.Control.AddTo(fx);
             }
 
-            foreach (var group in enumerable)
+            foreach (var group in groups)
             {
                 foreach (var (renderer, material) in group)
                 {
@@ -200,7 +163,7 @@ namespace io.github.azukimochi
                 }
             }
 
-            AddLayer(fx, "Light", light.Default, light.Control);
+            AddLayer(fx, "Light", light.Default, light.Control, ParameterName_Value);
 
             fx.AddParameter(new AnimatorControllerParameter() { name = ParameterName_Toggle, defaultBool = parameters.IsDefaultUse, type = AnimatorControllerParameterType.Bool });
             fx.AddParameter(new AnimatorControllerParameter() { name = ParameterName_Value, defaultFloat = parameters.DefaultLightValue, type = AnimatorControllerParameterType.Float });
@@ -212,19 +175,72 @@ namespace io.github.azukimochi
 
             if (parameters.AllowSaturationControl)
             {
-                AddLayer(fx, "Saturation", light.Default, light.Control);
+                AddLayer(fx, "Saturation", saturation.Default, saturation.Control, ParameterName_Saturation);
 
                 fx.AddParameter(new AnimatorControllerParameter() { name = ParameterName_Saturation, defaultFloat = 0.5f, type = AnimatorControllerParameterType.Float });
                 param.parameters.Add(new ParameterConfig() { nameOrPrefix = ParameterName_Saturation, saved = parameters.IsValueSave, defaultValue = 0.5f, syncType = ParameterSyncType.Float });
             }
         }
 
-        private static void AddLayer(AnimatorController fx, string name, AnimationClip @default, AnimationClip control)
+        private static Shaders GetShaderType(Shader shader)
+        {
+            Shaders result = 0;
+            if (shader == null)
+                return result;
+            string name = shader.name;
+            if (name.IndexOf("lilToon", StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                result = Shaders.lilToon;
+            }
+            else if (name.IndexOf("poiyomi", StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                result = Shaders.Poiyomi;
+            }
+            else if (name.IndexOf("Sunao", StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                result = Shaders.Sunao;
+            }
+
+            if (result == 0)
+            {
+                int count = shader.GetPropertyCount();
+                for (int i = 0; i < count; i++)
+                {
+                    var propertyName = shader.GetPropertyName(i);
+                    switch (propertyName)
+                    {
+                        case SHADER_KEY_LILTOON_LightMinLimit:
+                        case SHADER_KEY_LILTOON_LightMaxLimit:
+                        case SHADER_KEY_LILTOON_MainHSVG:
+                            result = Shaders.lilToon;
+                            break;
+
+                        case SHADER_KEY_SUNAO_MinimumLight:
+                        case SHADER_KEY_SUNAO_DirectionalLight:
+                        case SHADER_KEY_SUNAO_PointLight:
+                        case SHADER_KEY_SUNAO_SHLight:
+                            result = Shaders.Sunao;
+                            break;
+
+                        case SHADER_KEY_POIYOMI_LightingMinLightBrightness:
+                        case SHADER_KEY_POIYOMI_LightingCap:
+                        case SHADER_KEY_POIYOMI_MainColorAdjustToggle:
+                        case SHADER_KEY_POIYOMI_Saturation:
+                            result = Shaders.Poiyomi;
+                            break;
+                    }
+                }
+            }
+
+            return result;
+        }
+
+        private static void AddLayer(AnimatorController fx, string name, AnimationClip @default, AnimationClip control, string parameterName)
         {
             var layer = new AnimatorControllerLayer() { name = name, defaultWeight = 1, stateMachine = new AnimatorStateMachine().HideInHierarchy().AddTo(fx) };
             var stateMachine = layer.stateMachine;
             var defaultState = new AnimatorState() { name = "Default", writeDefaultValues = false, motion = @default }.HideInHierarchy().AddTo(fx);
-            var state = new AnimatorState() { name = "Control", writeDefaultValues = false, motion = control, timeParameterActive = true, timeParameter = ParameterName_Value }.HideInHierarchy().AddTo(fx);
+            var state = new AnimatorState() { name = "Control", writeDefaultValues = false, motion = control, timeParameterActive = true, timeParameter = parameterName }.HideInHierarchy().AddTo(fx);
 
             var condition = new AnimatorCondition[] { new AnimatorCondition() { parameter = ParameterName_Toggle, mode = AnimatorConditionMode.If, threshold = 0 } };
 
@@ -256,7 +272,7 @@ namespace io.github.azukimochi
 
         }
 
-        private static void ConfigureResetParamerters(LightLimitChangerSettings settings)
+        private static void ConfigureResetParameters(LightLimitChangerSettings settings)
         {
             if (!settings.Parameters.AddResetButton)
                 return;
@@ -384,6 +400,14 @@ namespace io.github.azukimochi
             }.AddTo(fx);
 
             return rootMenu;
+        }
+
+        private static AnimatorController CreateTemporaryAsset()
+        {
+            var fx = new AnimatorController() { name = GUID.Generate().ToString() };
+            AssetDatabase.CreateAsset(fx, System.IO.Path.Combine(Utils.GetGeneratedAssetsFolder(), $"{fx.name}.controller"));
+            AssetDatabase.SaveAssets();
+            return fx;
         }
     }
 }
