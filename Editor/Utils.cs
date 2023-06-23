@@ -49,6 +49,16 @@ namespace io.github.azukimochi
             return c;
         }
 
+        public static T UndoGetOrAddComponent<T>(this GameObject obj) where T : Component
+        {
+            var component = obj.GetComponent<T>();
+            if (component == null)
+            {
+                component = Undo.AddComponent<T>(obj);
+            }
+            return component;
+        }
+
         public static VRCAvatarDescriptor FindAvatarFromParent(this GameObject obj)
         {
             var tr = obj.transform;

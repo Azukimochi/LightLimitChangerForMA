@@ -12,6 +12,7 @@ namespace io.github.azukimochi
         private static int _SelectedLanguage = EditorPrefs.GetInt(PreferenceKey);
         private static readonly GUIContent[] _SupportedLanguages = new GUIContent[] { new GUIContent("日本語"), new GUIContent("English") };
         private static readonly GUIContent _Label = new GUIContent("Language");
+        private static GUIContent _buffer = new GUIContent();
 
         private static Dictionary<string, string> _LocalizedText = new Dictionary<string, string>()
         {
@@ -27,7 +28,9 @@ namespace io.github.azukimochi
             { "Target Shader", "対象シェーダー" },
             { "Target Shader must be selected", "対象シェーダーを選択してください" },
             { "Allow Saturation Control", "彩度調整を有効にする" },
-            { "Add Resset Button", "リセットボタンを追加する" },
+            { "Add Reset Button", "リセットボタンを追加する" },
+            { "Exclude EditorOnly", "EditorOnlyを除外する" },
+            { "Generate At Build/PlayMode", "ビルド・実行時に生成する" },
             { "Generate", "生成" },
             { "Regenerate", "再生成" },
             { "Processing", "生成中" },
@@ -43,6 +46,13 @@ namespace io.github.azukimochi
             if (_SelectedLanguage == 0 && _LocalizedText.TryGetValue(text, out var res))
                 return res;
             return text;
+        }
+
+        public static GUIContent G(string text)
+        {
+            var buffer = _buffer;
+            buffer.text = S(text);
+            return buffer;
         }
 
         public static void ShowLocalizationUI()

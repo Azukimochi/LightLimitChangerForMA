@@ -44,9 +44,9 @@ namespace io.github.azukimochi
 
             var obj = settings.gameObject;
             fx.parameters = Array.Empty<AnimatorControllerParameter>();
-            var parameters = obj.GetOrAddComponent<ModularAvatarParameters>(); 
-            var menuInstaller = obj.GetOrAddComponent<ModularAvatarMenuInstaller>();
-            var mergeAnimator = obj.GetOrAddComponent<ModularAvatarMergeAnimator>();
+            var parameters = obj.UndoGetOrAddComponent<ModularAvatarParameters>(); 
+            var menuInstaller = obj.UndoGetOrAddComponent<ModularAvatarMenuInstaller>();
+            var mergeAnimator = obj.UndoGetOrAddComponent<ModularAvatarMergeAnimator>();
             parameters.parameters.Clear();
             menuInstaller.menuToAppend = CreateMenu(fx, settings.Parameters);
             mergeAnimator.deleteAttachedAnimator = true;

@@ -71,7 +71,7 @@ namespace io.github.azukimochi
                 {
                     var param = Parameters;
 
-                    param.IsDefaultUse = EditorGUILayout.Toggle(Localization.S( "DefaultUse"), param.IsDefaultUse);
+                    param.IsDefaultUse = EditorGUILayout.Toggle(Localization.S("DefaultUse"), param.IsDefaultUse);
                     param.IsValueSave = EditorGUILayout.Toggle(Localization.S("SaveValue"), param.IsValueSave);
                     param.MaxLightValue = EditorGUILayout.FloatField(Localization.S("MaxLight"), param.MaxLightValue);
                     param.MinLightValue = EditorGUILayout.FloatField(Localization.S("MinLight"), param.MinLightValue);
@@ -89,7 +89,7 @@ namespace io.github.azukimochi
                             }
 
                             param.AllowSaturationControl = EditorGUILayout.Toggle(Localization.S("Allow Saturation Control"), param.AllowSaturationControl);
-                            param.AddResetButton = EditorGUILayout.Toggle(Localization.S("Add Resset Button"), param.AddResetButton);
+                            param.AddResetButton = EditorGUILayout.Toggle(Localization.S("Add Reset Button"), param.AddResetButton);
                         }
                     }
 
