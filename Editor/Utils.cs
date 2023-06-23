@@ -150,7 +150,8 @@ namespace io.github.azukimochi
             public GroupScope(string header, float labelWidth)
             {
                 GUILayout.Label($"---- {header}", EditorStyles.boldLabel);
-                _originalLabelWidth = EditorGUIUtility.labelWidth = labelWidth;
+                _originalLabelWidth = EditorGUIUtility.labelWidth;
+                EditorGUIUtility.labelWidth = labelWidth;
 
                 EditorGUI.indentLevel++;
             }
