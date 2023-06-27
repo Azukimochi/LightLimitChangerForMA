@@ -175,10 +175,12 @@ namespace io.github.azukimochi
 
         private static GUIContent _labelSingleton = new GUIContent();
 
-        public static GUIContent Label(string text)
+        public static GUIContent Label(string text, string textTip = null)
         {
             var label = _labelSingleton;
             label.text = text;
+            label.tooltip = textTip;
+
             return label;
         }
 

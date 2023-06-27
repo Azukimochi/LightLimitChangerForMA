@@ -31,7 +31,7 @@ namespace io.github.azukimochi
         {
             var window = GetWindow<LightLimitChanger>(Title);
             var pos = window.position;
-            pos.size = new Vector2(380, 450);
+            pos.size = new Vector2(380, 470);
             window.position = pos;
             //window.maxSize = new Vector2(1000, 450);
         }
@@ -53,7 +53,7 @@ namespace io.github.azukimochi
                 using (new Utils.GroupScope(Localization.S("Select Avatar"), 180))
                 {
                     EditorGUI.BeginChangeCheck();
-                    TargetAvatar = EditorGUILayout.ObjectField(Localization.S("Avatar"), TargetAvatar, typeof(VRCAvatarDescriptor), true) as VRCAvatarDescriptor;
+                    TargetAvatar = EditorGUILayout.ObjectField(Localization.G("Avatar", "Set the avatar to generate animation"), TargetAvatar, typeof(VRCAvatarDescriptor), true) as VRCAvatarDescriptor;
                     if (EditorGUI.EndChangeCheck())
                     {
                         Parameters = TargetAvatar != null && TargetAvatar.TryGetComponentInChildren<LightLimitChangerSettings>(out var settings)
@@ -66,30 +66,30 @@ namespace io.github.azukimochi
                 {
                     var param = Parameters;
 
-                    param.IsDefaultUse = EditorGUILayout.Toggle(Localization.G("DefaultUse"), param.IsDefaultUse);
-                    param.IsValueSave = EditorGUILayout.Toggle(Localization.G("SaveValue"), param.IsValueSave);
-                    param.OverwriteDefaultLightMinMax = EditorGUILayout.Toggle(Localization.G("Overwrite Default Min/Max"), param.OverwriteDefaultLightMinMax);
-                    param.MaxLightValue = EditorGUILayout.FloatField(Localization.G("MaxLight"), param.MaxLightValue);
-                    param.MinLightValue = EditorGUILayout.FloatField(Localization.G("MinLight"), param.MinLightValue);
-                    param.DefaultLightValue = EditorGUILayout.FloatField(Localization.G("DefaultLight"), param.DefaultLightValue);
+                    param.IsDefaultUse = EditorGUILayout.Toggle(Localization.G("DefaultUse", "Use the light animation in the initial state"), param.IsDefaultUse);
+                    param.IsValueSave = EditorGUILayout.Toggle(Localization.G("SaveValue", "Keep brightness changes in the avatar"), param.IsValueSave);
+                    param.OverwriteDefaultLightMinMax = EditorGUILayout.Toggle(Localization.G("Overwrite Default Min/Max", "Override the default avatar brightness with the lower and upper limit parameters below"), param.OverwriteDefaultLightMinMax);
+                    param.MaxLightValue = EditorGUILayout.FloatField(Localization.G("MaxLight", "Brightness upper limit setting [0-10]"), param.MaxLightValue);
+                    param.MinLightValue = EditorGUILayout.FloatField(Localization.G("MinLight", "Brightness lower limit setting [0-10]"), param.MinLightValue);
+                    param.DefaultLightValue = EditorGUILayout.FloatField(Localization.G("DefaultLight", "Initial brightness setting [0-1]"), param.DefaultLightValue);
 
                     using (var group = new Utils.FoldoutHeaderGroupScope(ref _isOptionFoldoutOpen, Localization.G("Options")))
                     {
                         if (group.IsOpen)
                         {
                             EditorGUI.BeginChangeCheck();
-                            param.TargetShader = (Shaders)EditorGUILayout.MaskField(Localization.G("Target Shader"), (int)param.TargetShader, _targetShaderLabels);
+                            param.TargetShader = (Shaders)EditorGUILayout.MaskField(Localization.G("Target Shader", "You can choose which shader to control"), (int)param.TargetShader, _targetShaderLabels);
                             if (EditorGUI.EndChangeCheck())
                             {
                                 infoLabel = param.TargetShader == 0 ? Localization.S("Target Shader must be selected") : string.Empty;
                             }
 
-                            param.AllowSaturationControl = EditorGUILayout.Toggle(Localization.G("Allow Saturation Control"), param.AllowSaturationControl);
-                            param.AddResetButton = EditorGUILayout.Toggle(Localization.G("Add Reset Button"), param.AddResetButton);
+                            param.AllowSaturationControl = EditorGUILayout.Toggle(Localization.G("Allow Saturation Control", "You can enable the saturation adjustment function"), param.AllowSaturationControl);
+                            param.AddResetButton = EditorGUILayout.Toggle(Localization.G("Add Reset Button", "Add a reset button to return the parameter to the set value"), param.AddResetButton);
 
-                            param.ExcludeEditorOnly = EditorGUILayout.Toggle(Localization.G("Exclude EditorOnly"), param.ExcludeEditorOnly);
+                            param.ExcludeEditorOnly = EditorGUILayout.Toggle(Localization.G("Exclude EditorOnly", "Exclude objects marked with EditorOnly tag from animation"), param.ExcludeEditorOnly);
                             EditorGUILayout.Separator();
-                            param.GenerateAtBuild = EditorGUILayout.Toggle(Localization.G("Generate At Build/PlayMode"), param.GenerateAtBuild);
+                            param.GenerateAtBuild = EditorGUILayout.Toggle(Localization.G("Generate At Build/PlayMode", "Automatically generate animations at build/play mode"), param.GenerateAtBuild);
                         }
                     }
 

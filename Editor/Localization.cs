@@ -39,16 +39,31 @@ namespace io.github.azukimochi
             { "Save",  "保存" },
             { "Save Location",  "アセットの保存場所" },
             { "Cancelled", "キャンセルしました" },
+            { "Set the avatar to generate animation", "アニメーションを生成するアバターをセットしてください"},
+            { "Use the light animation in the initial state", "初期状態でライトのアニメーションを使用します"},
+            { "Keep brightness changes in the avatar", "明るさの変更をアバターに保持したままにします"},
+            { "Override the default avatar brightness with the lower and upper limit parameters below", "デフォルトのアバターの明るさを以下の下限上限設定パラメータで上書きします"},
+            { "Brightness upper limit setting [0-10]", "明るさの上限設定です [0-10]" },
+            { "Brightness lower limit setting [0-10]", "明るさの下限設定です [0-10]" },
+            { "Initial brightness setting [0-1]", "初期の明るさ設定 [0-1]" },
+            { "You can choose which shader to control", "制御するシェーダーを選択できます" },
+            { "You can enable the saturation adjustment function", "彩度の調整機能を有効化することができます"},
+            { "Add a reset button to return the parameter to the set value", "パラメータを設定値に戻すリセットボタンを追加します" },
+            { "Exclude objects marked with EditorOnly tag from animation", "EditorOnlyタグに設定されているオブジェクトをアニメーションから除外します" },
+            { "Automatically generate animations at build/play mode", "ビルド・実行時にアニメーションを自動生成します" }
         };
 
         public static string S(string text)
         {
-            if (_SelectedLanguage == 0 && _LocalizedText.TryGetValue(text, out var res))
-                return res;
+            if(text != null)
+            {
+                if (_SelectedLanguage == 0 && _LocalizedText.TryGetValue(text, out var res))
+                    return res;
+            }
             return text;
         }
 
-        public static GUIContent G(string text) => Utils.Label(S(text));
+        public static GUIContent G(string text, string textTip = null) => Utils.Label(S(text), S(textTip));
 
         public static void ShowLocalizationUI()
         {
