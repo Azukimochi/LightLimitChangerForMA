@@ -6,6 +6,8 @@ using UnityEditor;
 using System.Linq;
 using System;
 using UnityEditor.Animations;
+using VRC.SDK3.Avatars.Components;
+using System.Reflection;
 
 namespace io.github.azukimochi
 {
@@ -28,9 +30,11 @@ namespace io.github.azukimochi
 
         public static void ClearLayers(this AnimatorController controller) => controller.layers = Array.Empty<AnimatorControllerLayer>();
 
-        public static bool TryGetComponentInChildren<T>(this Component component, out T result) where T : Component
+        public static bool TryGetComponentInChildren<T>(this Component component, out T result) where T : Component => component.gameObject.TryGetComponentInChildren(out result);
+
+        public static bool TryGetComponentInChildren<T>(this GameObject obj, out T result) where T : Component
         {
-            result = component.GetComponentInChildren<T>();
+            result = obj.GetComponentInChildren<T>();
             return result != null;
         }
 
@@ -43,6 +47,27 @@ namespace io.github.azukimochi
                 c.transform.parent = obj.transform;
             }
             return c;
+        }
+
+        public static T UndoGetOrAddComponent<T>(this GameObject obj) where T : Component
+        {
+            var component = obj.GetComponent<T>();
+            if (component == null)
+            {
+                component = Undo.AddComponent<T>(obj);
+            }
+            return component;
+        }
+
+        public static VRCAvatarDescriptor FindAvatarFromParent(this GameObject obj)
+        {
+            var tr = obj.transform;
+            VRCAvatarDescriptor avatar = null;
+            while(tr != null && (avatar = tr.GetComponent<VRCAvatarDescriptor>()) == null)
+            {
+                tr = tr.parent;
+            }
+            return avatar;
         }
 
         public static IEnumerable<Transform> EnumerateChildren(this Transform tr)
@@ -91,10 +116,70 @@ namespace io.github.azukimochi
 
         private static string[] _relativePathBuffer;
 
+        public static IEnumerable<string> EnumeratePropertyNames(this Shader shader) => Enumerable.Range(0, shader.GetPropertyCount()).Select(shader.GetPropertyName);
+
+        private static MethodInfo _GetGeneratedAssetsFolder = typeof(nadena.dev.modular_avatar.core.editor.AvatarProcessor).Assembly.GetTypes().FirstOrDefault(x => x.Name == "Util")?.GetMethod(nameof(GetGeneratedAssetsFolder), BindingFlags.Static | BindingFlags.NonPublic);
+
+        public static string GetGeneratedAssetsFolder()
+        {
+            var method = _GetGeneratedAssetsFolder;
+            if (method != null)
+                return method.Invoke(null, null) as string;
+
+            return AssetDatabase.GUIDToAssetPath(AssetDatabase.CreateFolder("Assets/", "_LightLimitChangerTemporary"));
+        }
+
         public static string GetVersion()
         {
             var packageInfo = JsonUtility.FromJson<PackageInfo>(System.IO.File.ReadAllText(System.IO.Path.Combine(System.IO.Path.GetDirectoryName(Application.dataPath), AssetDatabase.GUIDToAssetPath("a82bfa088b3f7634aaadfdea98eb87e0"))));
             return packageInfo.version ?? ":: Failed get current version";
+        }
+
+        private static bool _isVersionInfoFoldoutOpen = false;
+        private static GUIContent _titleCache = null;
+
+        public static void ShowVersionInfo()
+        {
+            if (_titleCache == null)
+            {
+                _titleCache = new GUIContent($"{LightLimitChanger.Title} {GetVersion()}");
+            }
+            using (var foldout = new FoldoutHeaderGroupScope(ref _isVersionInfoFoldoutOpen, _titleCache))
+            {
+                if (foldout.IsOpen)
+                {
+                    DrawWebButton("BOOTH", "https://mochis-factory.booth.pm/items/4864776");
+                    DrawWebButton("GitHub", "https://github.com/Azukimochi/LightLimitChangerForMA");
+                }
+            }
+        }
+
+        /*
+         * Quouted from https://github.com/lilxyzw/lilToon/blob/2ef370dc444172787c075ec3a822438c2bee26cb/Assets/lilToon/Editor/lilEditorGUI.cs#L65
+         *
+         * Copyright (c) 2020-2023 lilxyzw
+         * 
+         * Full Licence: https://github.com/lilxyzw/lilToon/blob/master/LICENSE
+        */
+        private static void DrawWebButton(string text, string URL)
+        {
+            var position = EditorGUI.IndentedRect(EditorGUILayout.GetControlRect());
+            var icon = EditorGUIUtility.IconContent("BuildSettings.Web.Small");
+            icon.text = text;
+            var style = new GUIStyle(EditorStyles.label) { padding = new RectOffset() };
+            if (GUI.Button(position, icon, style))
+            {
+                Application.OpenURL(URL);
+            }
+        }
+
+        private static GUIContent _labelSingleton = new GUIContent();
+
+        public static GUIContent Label(string text)
+        {
+            var label = _labelSingleton;
+            label.text = text;
+            return label;
         }
 
         [Serializable]
@@ -119,10 +204,12 @@ namespace io.github.azukimochi
         public struct GroupScope : IDisposable
         {
             private float _originalLabelWidth;
+
             public GroupScope(string header, float labelWidth)
             {
                 GUILayout.Label($"---- {header}", EditorStyles.boldLabel);
-                _originalLabelWidth = EditorGUIUtility.labelWidth = labelWidth;
+                _originalLabelWidth = EditorGUIUtility.labelWidth;
+                EditorGUIUtility.labelWidth = labelWidth;
 
                 EditorGUI.indentLevel++;
             }
@@ -138,7 +225,10 @@ namespace io.github.azukimochi
         public struct FoldoutHeaderGroupScope : IDisposable
         {
             public bool IsOpen;
-            public FoldoutHeaderGroupScope(ref bool isOpen, string content)
+            public FoldoutHeaderGroupScope(ref bool isOpen, string content) : this(ref isOpen, Label(content))
+            { }
+
+            public FoldoutHeaderGroupScope(ref bool isOpen, GUIContent content)
             {
                 IsOpen = isOpen = EditorGUILayout.BeginFoldoutHeaderGroup(isOpen, content);
                 if (isOpen)
@@ -154,6 +244,38 @@ namespace io.github.azukimochi
                     EditorGUI.indentLevel--;
                 }
                 EditorGUILayout.EndFoldoutHeaderGroup();
+            }
+        }
+
+        public static class Animation
+        {
+            private static AnimationCurve _singleton;
+            private static readonly Keyframe[] _buffer1 = new Keyframe[1];
+            private static readonly Keyframe[] _buffer2 = new Keyframe[2];
+
+            public static AnimationCurve Constant(float value)
+            {
+                var curve = _singleton;
+                if (curve == null)
+                {
+                    return _singleton = AnimationCurve.Constant(0, 0, value);
+                }
+                _buffer1[0] = new Keyframe(0, value);
+                curve.keys = _buffer1;
+                return curve;
+            }
+
+            public static AnimationCurve Linear(float start, float end)
+            {
+                var curve = _singleton;
+                if (curve == null)
+                {
+                    return _singleton = AnimationCurve.Linear(0, start, 1 / 60f, end);
+                }
+                _buffer2[0] = new Keyframe(0, start);
+                _buffer2[1] = new Keyframe(1 / 60f, end);
+                curve.keys = _buffer2;
+                return curve;
             }
         }
     }

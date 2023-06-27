@@ -20,13 +20,17 @@ namespace io.github.azukimochi
             { "Parameter", "パラメーター" },
             { "DefaultUse", "初期状態で適用する" },
             { "SaveValue", "パラメータを保持する" },
+            { "Overwrite Default Min/Max", "初期の上限と下限を上書きする" },
             { "MaxLight", "明るさの上限" },
             { "MinLight", "明るさの下限" },
             { "DefaultLight", "明るさの初期値" },
             { "Options", "オプション" },
             { "Target Shader", "対象シェーダー" },
+            { "Target Shader must be selected", "対象シェーダーを選択してください" },
             { "Allow Saturation Control", "彩度調整を有効にする" },
-            { "Add Resset Button", "リセットボタンを追加する" },
+            { "Add Reset Button", "リセットボタンを追加する" },
+            { "Exclude EditorOnly", "EditorOnlyを除外する" },
+            { "Generate At Build/PlayMode", "ビルド・実行時に生成する" },
             { "Generate", "生成" },
             { "Regenerate", "再生成" },
             { "Processing", "生成中" },
@@ -43,6 +47,8 @@ namespace io.github.azukimochi
                 return res;
             return text;
         }
+
+        public static GUIContent G(string text) => Utils.Label(S(text));
 
         public static void ShowLocalizationUI()
         {
