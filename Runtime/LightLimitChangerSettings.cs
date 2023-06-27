@@ -13,7 +13,7 @@ namespace io.github.azukimochi
     public sealed class LightLimitChangerSettings : MonoBehaviour, IEditorOnly
     {
         public AnimatorController FX;
-        public LightLimitChangeParameters Parameters = LightLimitChangeParameters.Default;
+        public LightLimitChangerParameters Parameters = LightLimitChangerParameters.Default;
 
         public static Action<LightLimitChangerSettings> OnAwake;
 

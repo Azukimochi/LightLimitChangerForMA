@@ -102,6 +102,9 @@ namespace io.github.azukimochi
                             material.GetColor(SHADER_KEY_LILTOON_MainHSVG)
                         );
 
+                        if (parameters.OverwriteDefaultLightMinMax)
+                            (min, max) = (parameters.MinLightValue, parameters.MaxLightValue);
+
                         light.Default.SetCurve(relativePath, type, $"{MATERIAL_ANIMATION_KEY_PREFIX}{SHADER_KEY_LILTOON_LightMinLimit}", Utils.Animation.Constant(min));
                         light.Default.SetCurve(relativePath, type, $"{MATERIAL_ANIMATION_KEY_PREFIX}{SHADER_KEY_LILTOON_LightMaxLimit}", Utils.Animation.Constant(max));
 
@@ -128,6 +131,9 @@ namespace io.github.azukimochi
                             material.GetFloat(SHADER_KEY_SUNAO_SHLight)
                         );
 
+                        if (parameters.OverwriteDefaultLightMinMax)
+                            min = parameters.MinLightValue;
+
                         light.Default.SetCurve(relativePath, type, $"{MATERIAL_ANIMATION_KEY_PREFIX}{SHADER_KEY_SUNAO_MinimumLight}", Utils.Animation.Constant(min));
                         light.Default.SetCurve(relativePath, type, $"{MATERIAL_ANIMATION_KEY_PREFIX}{SHADER_KEY_SUNAO_DirectionalLight}", Utils.Animation.Constant(dir));
                         light.Default.SetCurve(relativePath, type, $"{MATERIAL_ANIMATION_KEY_PREFIX}{SHADER_KEY_SUNAO_PointLight}", Utils.Animation.Constant(point));
@@ -145,9 +151,12 @@ namespace io.github.azukimochi
                         var (min, max, sat) =
                         (
                             material.GetFloat(SHADER_KEY_POIYOMI_LightingMinLightBrightness),
-                            material.GetFloat(SHADER_KEY_POIYOMI_MainColorAdjustToggle),
+                            material.GetFloat(SHADER_KEY_POIYOMI_LightingCap),
                             material.GetFloat(SHADER_KEY_POIYOMI_Saturation)
                         );
+
+                        if (parameters.OverwriteDefaultLightMinMax)
+                            (min, max) = (parameters.MinLightValue, parameters.MaxLightValue);
 
                         light.Default.SetCurve(relativePath, type, $"{MATERIAL_ANIMATION_KEY_PREFIX}{SHADER_KEY_POIYOMI_LightingMinLightBrightness}", Utils.Animation.Constant(min));
                         light.Default.SetCurve(relativePath, type, $"{MATERIAL_ANIMATION_KEY_PREFIX}{SHADER_KEY_POIYOMI_LightingCap}", Utils.Animation.Constant(max));
@@ -327,7 +336,7 @@ namespace io.github.azukimochi
             fx.AddLayer(layer);
         }
 
-        private static VRCExpressionsMenu CreateMenu(AnimatorController fx, LightLimitChangeParameters parameters)
+        private static VRCExpressionsMenu CreateMenu(AnimatorController fx, LightLimitChangerParameters parameters)
         {
             var mainMenu = new VRCExpressionsMenu
             {

@@ -135,6 +135,53 @@ namespace io.github.azukimochi
             return packageInfo.version ?? ":: Failed get current version";
         }
 
+        private static bool _isVersionInfoFoldoutOpen = false;
+        private static GUIContent _titleCache = null;
+
+        public static void ShowVersionInfo()
+        {
+            if (_titleCache == null)
+            {
+                _titleCache = new GUIContent($"{LightLimitChanger.Title} {GetVersion()}");
+            }
+            using (var foldout = new FoldoutHeaderGroupScope(ref _isVersionInfoFoldoutOpen, _titleCache))
+            {
+                if (foldout.IsOpen)
+                {
+                    DrawWebButton("BOOTH", "https://mochis-factory.booth.pm/items/4864776");
+                    DrawWebButton("GitHub", "https://github.com/Azukimochi/LightLimitChangerForMA");
+                }
+            }
+        }
+
+        /*
+         * Quouted from https://github.com/lilxyzw/lilToon/blob/2ef370dc444172787c075ec3a822438c2bee26cb/Assets/lilToon/Editor/lilEditorGUI.cs#L65
+         *
+         * Copyright (c) 2020-2023 lilxyzw
+         * 
+         * Full Licence: https://github.com/lilxyzw/lilToon/blob/master/LICENSE
+        */
+        private static void DrawWebButton(string text, string URL)
+        {
+            var position = EditorGUI.IndentedRect(EditorGUILayout.GetControlRect());
+            var icon = EditorGUIUtility.IconContent("BuildSettings.Web.Small");
+            icon.text = text;
+            var style = new GUIStyle(EditorStyles.label) { padding = new RectOffset() };
+            if (GUI.Button(position, icon, style))
+            {
+                Application.OpenURL(URL);
+            }
+        }
+
+        private static GUIContent _labelSingleton = new GUIContent();
+
+        public static GUIContent Label(string text)
+        {
+            var label = _labelSingleton;
+            label.text = text;
+            return label;
+        }
+
         [Serializable]
         private struct PackageInfo
         {
@@ -157,6 +204,7 @@ namespace io.github.azukimochi
         public struct GroupScope : IDisposable
         {
             private float _originalLabelWidth;
+
             public GroupScope(string header, float labelWidth)
             {
                 GUILayout.Label($"---- {header}", EditorStyles.boldLabel);
@@ -177,7 +225,10 @@ namespace io.github.azukimochi
         public struct FoldoutHeaderGroupScope : IDisposable
         {
             public bool IsOpen;
-            public FoldoutHeaderGroupScope(ref bool isOpen, string content)
+            public FoldoutHeaderGroupScope(ref bool isOpen, string content) : this(ref isOpen, Label(content))
+            { }
+
+            public FoldoutHeaderGroupScope(ref bool isOpen, GUIContent content)
             {
                 IsOpen = isOpen = EditorGUILayout.BeginFoldoutHeaderGroup(isOpen, content);
                 if (isOpen)

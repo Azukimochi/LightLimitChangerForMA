@@ -12,7 +12,6 @@ namespace io.github.azukimochi
         private static int _SelectedLanguage = EditorPrefs.GetInt(PreferenceKey);
         private static readonly GUIContent[] _SupportedLanguages = new GUIContent[] { new GUIContent("日本語"), new GUIContent("English") };
         private static readonly GUIContent _Label = new GUIContent("Language");
-        private static GUIContent _buffer = new GUIContent();
 
         private static Dictionary<string, string> _LocalizedText = new Dictionary<string, string>()
         {
@@ -21,6 +20,7 @@ namespace io.github.azukimochi
             { "Parameter", "パラメーター" },
             { "DefaultUse", "初期状態で適用する" },
             { "SaveValue", "パラメータを保持する" },
+            { "Overwrite Default Min/Max", "初期の上限と下限を上書きする" },
             { "MaxLight", "明るさの上限" },
             { "MinLight", "明るさの下限" },
             { "DefaultLight", "明るさの初期値" },
@@ -48,12 +48,7 @@ namespace io.github.azukimochi
             return text;
         }
 
-        public static GUIContent G(string text)
-        {
-            var buffer = _buffer;
-            buffer.text = S(text);
-            return buffer;
-        }
+        public static GUIContent G(string text) => Utils.Label(S(text));
 
         public static void ShowLocalizationUI()
         {
