@@ -62,18 +62,26 @@ namespace io.github.azukimochi
                     }
                 }
 
+                var param = Parameters;
+
                 using (new Utils.GroupScope(Localization.S("Parameter"), 180))
                 {
-                    var param = Parameters;
+                    
 
                     param.IsDefaultUse = EditorGUILayout.Toggle(Localization.G("DefaultUse", "Use the light animation in the initial state"), param.IsDefaultUse);
                     param.IsValueSave = EditorGUILayout.Toggle(Localization.G("SaveValue", "Keep brightness changes in the avatar"), param.IsValueSave);
                     param.OverwriteDefaultLightMinMax = EditorGUILayout.Toggle(Localization.G("Overwrite Default Min/Max", "Override the default avatar brightness with the lower and upper limit parameters below"), param.OverwriteDefaultLightMinMax);
-                    param.MaxLightValue = EditorGUILayout.FloatField(Localization.G("MaxLight", "Brightness upper limit setting [0-10]"), param.MaxLightValue);
-                    param.MinLightValue = EditorGUILayout.FloatField(Localization.G("MinLight", "Brightness lower limit setting [0-10]"), param.MinLightValue);
-                    param.DefaultLightValue = EditorGUILayout.FloatField(Localization.G("DefaultLight", "Initial brightness setting [0-1]"), param.DefaultLightValue);
+                    param.MaxLightValue = EditorGUILayout.FloatField(Localization.G("MaxLight[0-10]", "Brightness upper limit setting [0-10]"), param.MaxLightValue);
+                    param.MinLightValue = EditorGUILayout.FloatField(Localization.G("MinLight[0-10]", "Brightness lower limit setting [0-10]"), param.MinLightValue);
+                    param.DefaultLightValue = EditorGUILayout.FloatField(Localization.G("DefaultLight[0-1]", "Initial brightness setting [0-1]"), param.DefaultLightValue);
 
-                    using (var group = new Utils.FoldoutHeaderGroupScope(ref _isOptionFoldoutOpen, Localization.G("Options")))
+                }
+                using (new Utils.GroupScope(Localization.S("Options"), 180))
+                {
+                    param.AllowSaturationControl = EditorGUILayout.Toggle(Localization.G("Allow Saturation Control", "You can enable the saturation adjustment function"), param.AllowSaturationControl);
+                    param.AddResetButton = EditorGUILayout.Toggle(Localization.G("Add Reset Button", "Add a reset button to return the parameter to the set value"), param.AddResetButton);
+
+                    using (var group = new Utils.FoldoutHeaderGroupScope(ref _isOptionFoldoutOpen, Localization.G("Advanced Setting")))
                     {
                         if (group.IsOpen)
                         {
@@ -83,19 +91,13 @@ namespace io.github.azukimochi
                             {
                                 infoLabel = param.TargetShader == 0 ? Localization.S("Target Shader must be selected") : string.Empty;
                             }
-
-                            param.AllowSaturationControl = EditorGUILayout.Toggle(Localization.G("Allow Saturation Control", "You can enable the saturation adjustment function"), param.AllowSaturationControl);
-                            param.AddResetButton = EditorGUILayout.Toggle(Localization.G("Add Reset Button", "Add a reset button to return the parameter to the set value"), param.AddResetButton);
-
                             param.ExcludeEditorOnly = EditorGUILayout.Toggle(Localization.G("Exclude EditorOnly", "Exclude objects marked with EditorOnly tag from animation"), param.ExcludeEditorOnly);
-                            EditorGUILayout.Separator();
                             param.GenerateAtBuild = EditorGUILayout.Toggle(Localization.G("Generate At Build/PlayMode", "Automatically generate animations at build/play mode"), param.GenerateAtBuild);
                         }
                     }
-
-                    Parameters = param;
                 }
-                
+                Parameters = param;
+
                 using (new Utils.DisabledScope(TargetAvatar == null || Parameters.TargetShader == 0))
                 {
                     string buttonLabel;

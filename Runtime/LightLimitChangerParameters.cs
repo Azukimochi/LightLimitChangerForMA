@@ -27,7 +27,7 @@ namespace io.github.azukimochi
         {
             IsDefaultUse = false,
             IsValueSave = false,
-            OverwriteDefaultLightMinMax = false,
+            OverwriteDefaultLightMinMax = true,
             DefaultLightValue = 0.5f,
             MaxLightValue = 1.0f,
             MinLightValue = 0.0f,
@@ -35,6 +35,7 @@ namespace io.github.azukimochi
             AllowSaturationControl = false,
             AddResetButton = false,
             GenerateAtBuild = true,
+            ExcludeEditorOnly = true
         };
     }
 }
