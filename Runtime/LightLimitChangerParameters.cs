@@ -19,6 +19,7 @@ namespace io.github.azukimochi
         public Shaders TargetShader;
 
         public bool AllowSaturationControl;
+        public bool AllowUnlitControl;
         public bool AddResetButton;
         public bool GenerateAtBuild;
         public bool ExcludeEditorOnly;
@@ -33,6 +34,7 @@ namespace io.github.azukimochi
             MinLightValue = 0.0f,
             TargetShader = unchecked((Shaders)uint.MaxValue),  //TargetShaders.lilToon | TargetShaders.Sunao | TargetShaders.Poiyomi,
             AllowSaturationControl = false,
+            AllowUnlitControl = false,
             AddResetButton = false,
             GenerateAtBuild = true,
             ExcludeEditorOnly = true

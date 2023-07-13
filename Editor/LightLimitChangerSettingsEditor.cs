@@ -23,6 +23,7 @@ namespace io.github.azukimochi
         private SerializedProperty MinLightValue;
         private SerializedProperty TargetShader;
         private SerializedProperty AllowSaturationControl;
+        private SerializedProperty AllowUnlitControl;
         private SerializedProperty AddResetButton;
         private SerializedProperty GenerateAtBuild;
         private SerializedProperty ExcludeEditorOnly;
@@ -41,6 +42,7 @@ namespace io.github.azukimochi
             MinLightValue =                 parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.MinLightValue));
             TargetShader =                  parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.TargetShader));
             AllowSaturationControl =        parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.AllowSaturationControl));
+            AllowUnlitControl =             parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.AllowUnlitControl));
             AddResetButton =                parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.AddResetButton));
             GenerateAtBuild =               parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.GenerateAtBuild));
             ExcludeEditorOnly =             parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.ExcludeEditorOnly));
@@ -58,9 +60,13 @@ namespace io.github.azukimochi
             EditorGUILayout.PropertyField(IsDefaultUse, Localization.G("DefaultUse"));
             EditorGUILayout.PropertyField(IsValueSave, Localization.G("SaveValue"));
             EditorGUILayout.PropertyField(OverwriteDefaultLightMinMax, Localization.G("Overwrite Default Min/Max"));
-            EditorGUILayout.PropertyField(MaxLightValue, Localization.G("MaxLight"));
-            EditorGUILayout.PropertyField(MinLightValue, Localization.G("MinLight"));
-            EditorGUILayout.PropertyField(DefaultLightValue, Localization.G("DefaultLight"));
+            EditorGUILayout.PropertyField(MaxLightValue, Localization.G("MaxLight[0-10]"));
+            EditorGUILayout.PropertyField(MinLightValue, Localization.G("MinLight[0-10]"));
+            EditorGUILayout.PropertyField(DefaultLightValue, Localization.G("DefaultLight[0-1]"));
+
+            EditorGUILayout.PropertyField(AllowSaturationControl, Localization.G("Allow Saturation Control"));
+            EditorGUILayout.PropertyField(AllowUnlitControl, Localization.G("Allow Unlit Control"));
+            EditorGUILayout.PropertyField(AddResetButton, Localization.G("Add Reset Button"));
 
             using (var group = new Utils.FoldoutHeaderGroupScope(ref _isOptionFoldoutOpen, Localization.G("Options")))
             {
@@ -68,8 +74,6 @@ namespace io.github.azukimochi
                 {
                     TargetShader.intValue = EditorGUILayout.MaskField(Localization.G("Target Shader"), TargetShader.intValue, TargetShader.enumNames);
 
-                    EditorGUILayout.PropertyField(AllowSaturationControl, Localization.G("Allow Saturation Control"));
-                    EditorGUILayout.PropertyField(AddResetButton, Localization.G("Add Reset Button"));
                     EditorGUILayout.PropertyField(ExcludeEditorOnly, Localization.G("Exclude EditorOnly"));
                     EditorGUILayout.Separator();
                     EditorGUILayout.PropertyField(GenerateAtBuild, Localization.G("Generate At Build/PlayMode"));

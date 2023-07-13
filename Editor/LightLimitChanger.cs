@@ -71,14 +71,15 @@ namespace io.github.azukimochi
                     param.IsDefaultUse = EditorGUILayout.Toggle(Localization.G("DefaultUse", "Use the light animation in the initial state"), param.IsDefaultUse);
                     param.IsValueSave = EditorGUILayout.Toggle(Localization.G("SaveValue", "Keep brightness changes in the avatar"), param.IsValueSave);
                     param.OverwriteDefaultLightMinMax = EditorGUILayout.Toggle(Localization.G("Overwrite Default Min/Max", "Override the default avatar brightness with the lower and upper limit parameters below"), param.OverwriteDefaultLightMinMax);
-                    param.MaxLightValue = EditorGUILayout.FloatField(Localization.G("MaxLight[0-10]", "Brightness upper limit setting [0-10]"), param.MaxLightValue);
-                    param.MinLightValue = EditorGUILayout.FloatField(Localization.G("MinLight[0-10]", "Brightness lower limit setting [0-10]"), param.MinLightValue);
-                    param.DefaultLightValue = EditorGUILayout.FloatField(Localization.G("DefaultLight[0-1]", "Initial brightness setting [0-1]"), param.DefaultLightValue);
+                    param.MaxLightValue = EditorGUILayout.FloatField(Localization.G("MaxLight[0-10]", "Brightness upper limit setting"), param.MaxLightValue);
+                    param.MinLightValue = EditorGUILayout.FloatField(Localization.G("MinLight[0-10]", "Brightness lower limit setting"), param.MinLightValue);
+                    param.DefaultLightValue = EditorGUILayout.FloatField(Localization.G("DefaultLight[0-1]", "Initial brightness setting"), param.DefaultLightValue);
 
                 }
                 using (new Utils.GroupScope(Localization.S("Options"), 180))
                 {
                     param.AllowSaturationControl = EditorGUILayout.Toggle(Localization.G("Allow Saturation Control", "You can enable the saturation adjustment function"), param.AllowSaturationControl);
+                    param.AllowUnlitControl = EditorGUILayout.Toggle(Localization.G("Allow Unlit Control", "You can enable the Unlit adjustment function (Liltoon/Sunao Only)"), param.AllowUnlitControl);
                     param.AddResetButton = EditorGUILayout.Toggle(Localization.G("Add Reset Button", "Add a reset button to return the parameter to the set value"), param.AddResetButton);
 
                     using (var group = new Utils.FoldoutHeaderGroupScope(ref _isOptionFoldoutOpen, Localization.G("Advanced Setting")))

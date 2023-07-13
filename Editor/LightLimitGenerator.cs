@@ -17,11 +17,13 @@ namespace io.github.azukimochi
     {
         private const string SHADER_KEY_LILTOON_LightMinLimit = "_LightMinLimit";
         private const string SHADER_KEY_LILTOON_LightMaxLimit = "_LightMaxLimit";
+        private const string SHADER_KEY_LILTOON_UNLIT = "_AsUnlit";
         private const string SHADER_KEY_LILTOON_MainHSVG = "_MainTexHSVG";
 
         private const string SHADER_KEY_SUNAO_MinimumLight = "_MinimumLight";
         private const string SHADER_KEY_SUNAO_DirectionalLight = "_DirectionalLight";
         private const string SHADER_KEY_SUNAO_PointLight = "_PointLight";
+        private const string SHADER_KEY_SUNAO_Unlit = "_Unlit";
         private const string SHADER_KEY_SUNAO_SHLight = "_SHLight";
 
         private const string SHADER_KEY_POIYOMI_LightingMinLightBrightness = "_LightingMinLightBrightness";
@@ -34,6 +36,7 @@ namespace io.github.azukimochi
         private const string ParameterName_Toggle = "LightLimitEnable";
         private const string ParameterName_Value = "LightLimitValue";
         private const string ParameterName_Saturation = "LightLimitSaturation";
+        private const string ParameterName_Unlit = "LghtLimitUnlit";
         private const string ParameterName_Reset = "LightLimitReset";
 
         public static void Generate(VRCAvatarDescriptor avatar, LightLimitChangerSettings settings)
@@ -72,6 +75,7 @@ namespace io.github.azukimochi
 
             (AnimationClip Default, AnimationClip Control) light = (new AnimationClip() { name = "Default Light" }, new AnimationClip() { name = "Change Light" });
             (AnimationClip Default, AnimationClip Control) saturation = (new AnimationClip() { name = "Default Saturation" }, new AnimationClip() { name = "Change Saturation" });
+            (AnimationClip Default, AnimationClip Control) unlit = (new AnimationClip() { name = "Default Unlit" }, new AnimationClip() { name = "Change Unlit" });
 
             light.Default.AddTo(fx);
             light.Control.AddTo(fx);
@@ -80,6 +84,11 @@ namespace io.github.azukimochi
             {
                 saturation.Default.AddTo(fx);
                 saturation.Control.AddTo(fx);
+            }
+            if (parameters.AllowUnlitControl)
+            {
+                unlit.Default.AddTo(fx);
+                unlit.Control.AddTo(fx);
             }
 
             foreach (var group in groups)
@@ -120,6 +129,9 @@ namespace io.github.azukimochi
                         saturation.Control.SetCurve(relativePath, type, $"{MATERIAL_ANIMATION_KEY_PREFIX}{SHADER_KEY_LILTOON_MainHSVG}.g", Utils.Animation.Linear(0, 2));
                         saturation.Control.SetCurve(relativePath, type, $"{MATERIAL_ANIMATION_KEY_PREFIX}{SHADER_KEY_LILTOON_MainHSVG}.b", Utils.Animation.Constant(sat.b));
                         saturation.Control.SetCurve(relativePath, type, $"{MATERIAL_ANIMATION_KEY_PREFIX}{SHADER_KEY_LILTOON_MainHSVG}.a", Utils.Animation.Constant(sat.a));
+
+                        unlit.Default.SetCurve(relativePath, type, $"{MATERIAL_ANIMATION_KEY_PREFIX}{SHADER_KEY_LILTOON_UNLIT}", Utils.Animation.Constant(0));
+                        unlit.Control.SetCurve(relativePath, type, $"{MATERIAL_ANIMATION_KEY_PREFIX}{SHADER_KEY_LILTOON_UNLIT}", Utils.Animation.Linear(0.0f, 1.0f));
                     }
                     if (key.HasFlag(Shaders.Sunao))
                     {
@@ -145,6 +157,10 @@ namespace io.github.azukimochi
                         light.Control.SetCurve(relativePath, type, $"{MATERIAL_ANIMATION_KEY_PREFIX}{SHADER_KEY_SUNAO_DirectionalLight}", curve);
                         light.Control.SetCurve(relativePath, type, $"{MATERIAL_ANIMATION_KEY_PREFIX}{SHADER_KEY_SUNAO_PointLight}", curve);
                         light.Control.SetCurve(relativePath, type, $"{MATERIAL_ANIMATION_KEY_PREFIX}{SHADER_KEY_SUNAO_SHLight}", curve);
+
+
+                        unlit.Default.SetCurve(relativePath, type, $"{MATERIAL_ANIMATION_KEY_PREFIX}{SHADER_KEY_SUNAO_Unlit}", Utils.Animation.Constant(0));
+                        unlit.Control.SetCurve(relativePath, type, $"{MATERIAL_ANIMATION_KEY_PREFIX}{SHADER_KEY_SUNAO_Unlit}", Utils.Animation.Linear(0.0f, 1.0f));
                     }
                     if (key.HasFlag(Shaders.Poiyomi))
                     {
@@ -189,6 +205,14 @@ namespace io.github.azukimochi
                 fx.AddParameter(new AnimatorControllerParameter() { name = ParameterName_Saturation, defaultFloat = 0.5f, type = AnimatorControllerParameterType.Float });
                 param.parameters.Add(new ParameterConfig() { nameOrPrefix = ParameterName_Saturation, saved = parameters.IsValueSave, defaultValue = 0.5f, syncType = ParameterSyncType.Float });
             }
+
+            if(parameters.AllowUnlitControl)
+            {
+                AddLayer(fx, "Unlit", unlit.Default, unlit.Control, ParameterName_Unlit);
+
+                fx.AddParameter(new AnimatorControllerParameter() { name = ParameterName_Unlit, defaultFloat = 0.0f, type = AnimatorControllerParameterType.Float });
+                param.parameters.Add(new ParameterConfig() { nameOrPrefix = ParameterName_Unlit, saved = parameters.IsValueSave, defaultValue = 0.0f, syncType = ParameterSyncType.Float });
+            }
         }
 
         private static Shaders GetShaderType(Shader shader)
@@ -221,6 +245,7 @@ namespace io.github.azukimochi
                         case SHADER_KEY_LILTOON_LightMinLimit:
                         case SHADER_KEY_LILTOON_LightMaxLimit:
                         case SHADER_KEY_LILTOON_MainHSVG:
+                        case SHADER_KEY_LILTOON_UNLIT:
                             result = Shaders.lilToon;
                             break;
 
@@ -326,7 +351,8 @@ namespace io.github.azukimochi
             dr.parameters.Add(new VRC.SDKBase.VRC_AvatarParameterDriver.Parameter() { type = VRC.SDKBase.VRC_AvatarParameterDriver.ChangeType.Set, name = ParameterName_Value, value = settings.Parameters.DefaultLightValue });
             if (settings.Parameters.AllowSaturationControl)
                 dr.parameters.Add(new VRC.SDKBase.VRC_AvatarParameterDriver.Parameter() { type = VRC.SDKBase.VRC_AvatarParameterDriver.ChangeType.Set, name = ParameterName_Saturation, value = 0.5f });
-
+            if (settings.Parameters.AllowUnlitControl)
+                dr.parameters.Add(new VRC.SDKBase.VRC_AvatarParameterDriver.Parameter() { type = VRC.SDKBase.VRC_AvatarParameterDriver.ChangeType.Set, name = ParameterName_Unlit, value = 0.05f });
             stateMachine.AddState(off, stateMachine.entryPosition + new Vector3(-20, 50));
             stateMachine.AddState(on, stateMachine.entryPosition + new Vector3(-20, 100));
 
@@ -382,6 +408,22 @@ namespace io.github.azukimochi
                     },
                 });
             }
+            if (parameters.AllowUnlitControl)
+            {
+                mainMenu.controls.Add(new VRCExpressionsMenu.Control()
+                {
+                    name = "Unlit",
+                    type = VRCExpressionsMenu.Control.ControlType.RadialPuppet,
+                    subParameters = new VRCExpressionsMenu.Control.Parameter[]
+                    {
+                        new VRCExpressionsMenu.Control.Parameter
+                        {
+                            name = ParameterName_Unlit
+                        }
+                    },
+                });
+            }
+
 
             if (parameters.AddResetButton)
             {
