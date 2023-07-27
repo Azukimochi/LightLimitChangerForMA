@@ -31,7 +31,7 @@ namespace io.github.azukimochi
         {
             var window = GetWindow<LightLimitChanger>(Title);
             var pos = window.position;
-            pos.size = new Vector2(380, 480);
+            pos.size = new Vector2(380, 500);
             window.position = pos;
             //window.maxSize = new Vector2(1000, 450);
         }

@@ -142,14 +142,15 @@ namespace io.github.azukimochi
         {
             if (_titleCache == null)
             {
-                _titleCache = new GUIContent($"{LightLimitChanger.Title} {GetVersion()}");
+                _titleCache = new GUIContent($"{LightLimitChanger.Title} {GetVersion()} 更新履歴");
             }
             using (var foldout = new FoldoutHeaderGroupScope(ref _isVersionInfoFoldoutOpen, _titleCache))
             {
                 if (foldout.IsOpen)
                 {
+                    DrawWebButton("GitHub", "https://github.com/Azukimochi/LightLimitChangerForMA/releases");
+                    DrawWebButton("Twitter", "https://twitter.com/search?q=from%3Aazukimochi25%20%23LightLimitChanger&src=typed_query&f=live");
                     DrawWebButton("BOOTH", "https://mochis-factory.booth.pm/items/4864776");
-                    DrawWebButton("GitHub", "https://github.com/Azukimochi/LightLimitChangerForMA");
                 }
             }
         }
