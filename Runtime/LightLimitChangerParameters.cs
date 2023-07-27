@@ -18,6 +18,7 @@ namespace io.github.azukimochi
 
         public Shaders TargetShader;
 
+        public bool AllowColorTemp;
         public bool AllowSaturationControl;
         public bool AllowUnlitControl;
         public bool AddResetButton;
@@ -33,6 +34,7 @@ namespace io.github.azukimochi
             MaxLightValue = 1.0f,
             MinLightValue = 0.0f,
             TargetShader = unchecked((Shaders)uint.MaxValue),  //TargetShaders.lilToon | TargetShaders.Sunao | TargetShaders.Poiyomi,
+            AllowColorTemp = false,
             AllowSaturationControl = false,
             AllowUnlitControl = false,
             AddResetButton = false,

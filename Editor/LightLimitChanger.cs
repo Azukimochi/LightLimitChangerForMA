@@ -78,6 +78,7 @@ namespace io.github.azukimochi
                 }
                 using (new Utils.GroupScope(Localization.S("Options"), 180))
                 {
+                    param.AllowColorTemp = EditorGUILayout.Toggle(Localization.G("Allow Color Temperature Control", "You can enable the Color Temperature adjustment function"), param.AllowColorTemp);
                     param.AllowSaturationControl = EditorGUILayout.Toggle(Localization.G("Allow Saturation Control", "You can enable the saturation adjustment function"), param.AllowSaturationControl);
                     param.AllowUnlitControl = EditorGUILayout.Toggle(Localization.G("Allow Unlit Control", "You can enable the Unlit adjustment function (Liltoon/Sunao Only)"), param.AllowUnlitControl);
                     param.AddResetButton = EditorGUILayout.Toggle(Localization.G("Add Reset Button", "Add a reset button to return the parameter to the set value"), param.AddResetButton);
