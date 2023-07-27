@@ -19,6 +19,9 @@ namespace io.github.azukimochi
         private const string SHADER_KEY_LILTOON_LightMaxLimit = "_LightMaxLimit";
         private const string SHADER_KEY_LILTOON_UNLIT = "_AsUnlit";
         private const string SHADER_KEY_LILTOON_MainHSVG = "_MainTexHSVG";
+        private const string SHADER_KEY_LILTOON_COLOR = "_Color";
+        private const string SHADER_KEY_LILTOON_BASECOLOR = "_Base Color";
+        
 
         private const string SHADER_KEY_SUNAO_MinimumLight = "_MinimumLight";
         private const string SHADER_KEY_SUNAO_DirectionalLight = "_DirectionalLight";
@@ -83,22 +86,23 @@ namespace io.github.azukimochi
                     x.materials.Select(y => (Renderer: x.renderer, Material: y.material, Shaders: y.shader)))
                 .GroupBy(x => x.Shaders, y => (y.Renderer, y.Material));
 
-            //AnimationClip BaseColor = new AnimationClip() { name = "BaseColor" };
+            AnimationClip baseColor = new AnimationClip() { name = "BaseColor" };
             (AnimationClip Default, AnimationClip Control) light = (new AnimationClip() { name = "Default Light" }, new AnimationClip() { name = "Change Light" });
             (AnimationClip Default, AnimationClip Control) saturation = (new AnimationClip() { name = "Default Saturation" }, new AnimationClip() { name = "Change Saturation" });
             (AnimationClip Default, AnimationClip Control) unlit = (new AnimationClip() { name = "Default Unlit" }, new AnimationClip() { name = "Change Unlit" });
-            (AnimationClip Default, AnimationClip Control) colortemp = (new AnimationClip() { name = "Default ColorTemp" }, new AnimationClip() { name = "Change ColorTemp" });
+            (AnimationClip Default, AnimationClip Control) colorTemp = (new AnimationClip() { name = "Default ColorTemp" }, new AnimationClip() { name = "Change ColorTemp" });
 
             light.Default.AddTo(fx);
             light.Control.AddTo(fx);
-            
+
             if (parameters.AllowColorTemp)
             {
-                colortemp.Default.AddTo(fx);
-                colortemp.Control.AddTo(fx);
+                colorTemp.Default.AddTo(fx);
+                colorTemp.Control.AddTo(fx);
             }
             if (parameters.AllowSaturationControl)
             {
+                baseColor.AddTo(fx);
                 saturation.Default.AddTo(fx);
                 saturation.Control.AddTo(fx);
             }
@@ -121,11 +125,12 @@ namespace io.github.azukimochi
 
                     if (key.HasFlag(Shaders.lilToon))
                     {
-                        var (min, max, sat) =
+                        var (min, max, color, sat) =
                         (
                             material.GetFloat(SHADER_KEY_LILTOON_LightMinLimit),
                             material.GetFloat(SHADER_KEY_LILTOON_LightMaxLimit),
-                            material.GetColor(SHADER_KEY_LILTOON_MainHSVG)
+                            material.GetColor(SHADER_KEY_LILTOON_COLOR),
+                            material.GetVector(SHADER_KEY_LILTOON_MainHSVG)
                         );
 
                         if (parameters.OverwriteDefaultLightMinMax)
@@ -136,28 +141,25 @@ namespace io.github.azukimochi
 
                         light.Control.SetCurve(relativePath, type, $"{MATERIAL_ANIMATION_KEY_PREFIX}{SHADER_KEY_LILTOON_LightMinLimit}", Utils.Animation.Linear(parameters.MinLightValue, parameters.MaxLightValue));
                         light.Control.SetCurve(relativePath, type, $"{MATERIAL_ANIMATION_KEY_PREFIX}{SHADER_KEY_LILTOON_LightMaxLimit}", Utils.Animation.Linear(parameters.MinLightValue, parameters.MaxLightValue));
-
-                        saturation.Default.SetCurve(relativePath, type, $"{MATERIAL_ANIMATION_KEY_PREFIX}{SHADER_KEY_LILTOON_MainHSVG}.r", Utils.Animation.Constant(sat.r));
-                        saturation.Default.SetCurve(relativePath, type, $"{MATERIAL_ANIMATION_KEY_PREFIX}{SHADER_KEY_LILTOON_MainHSVG}.g", Utils.Animation.Constant(sat.g));
-                        saturation.Default.SetCurve(relativePath, type, $"{MATERIAL_ANIMATION_KEY_PREFIX}{SHADER_KEY_LILTOON_MainHSVG}.b", Utils.Animation.Constant(sat.b));
-                        saturation.Default.SetCurve(relativePath, type, $"{MATERIAL_ANIMATION_KEY_PREFIX}{SHADER_KEY_LILTOON_MainHSVG}.a", Utils.Animation.Constant(sat.a));
-
-                        saturation.Control.SetCurve(relativePath, type, $"{MATERIAL_ANIMATION_KEY_PREFIX}{SHADER_KEY_LILTOON_MainHSVG}.r", Utils.Animation.Constant(sat.r));
-                        saturation.Control.SetCurve(relativePath, type, $"{MATERIAL_ANIMATION_KEY_PREFIX}{SHADER_KEY_LILTOON_MainHSVG}.g", Utils.Animation.Linear(0, 2));
-                        saturation.Control.SetCurve(relativePath, type, $"{MATERIAL_ANIMATION_KEY_PREFIX}{SHADER_KEY_LILTOON_MainHSVG}.b", Utils.Animation.Constant(sat.b));
-                        saturation.Control.SetCurve(relativePath, type, $"{MATERIAL_ANIMATION_KEY_PREFIX}{SHADER_KEY_LILTOON_MainHSVG}.a", Utils.Animation.Constant(sat.a));
-
-                        colortemp.Default.SetCurve(relativePath, type, $"{MATERIAL_ANIMATION_KEY_PREFIX}{SHADER_KEY_LILTOON_MainHSVG}.r", Utils.Animation.Constant(sat.r));
-                        colortemp.Default.SetCurve(relativePath, type, $"{MATERIAL_ANIMATION_KEY_PREFIX}{SHADER_KEY_LILTOON_MainHSVG}.g", Utils.Animation.Constant(sat.g));
-                        colortemp.Default.SetCurve(relativePath, type, $"{MATERIAL_ANIMATION_KEY_PREFIX}{SHADER_KEY_LILTOON_MainHSVG}.b", Utils.Animation.Constant(sat.b));
-                        colortemp.Default.SetCurve(relativePath, type, $"{MATERIAL_ANIMATION_KEY_PREFIX}{SHADER_KEY_LILTOON_MainHSVG}.a", Utils.Animation.Constant(sat.a));
-
-                        colortemp.Control.SetCurve(relativePath, type, $"{MATERIAL_ANIMATION_KEY_PREFIX}{SHADER_KEY_LILTOON_MainHSVG}.r", Utils.Animation.Linear(-0.2f, 0.2f));
-                        colortemp.Control.SetCurve(relativePath, type, $"{MATERIAL_ANIMATION_KEY_PREFIX}{SHADER_KEY_LILTOON_MainHSVG}.g", Utils.Animation.Constant(sat.g));
-                        colortemp.Control.SetCurve(relativePath, type, $"{MATERIAL_ANIMATION_KEY_PREFIX}{SHADER_KEY_LILTOON_MainHSVG}.b", Utils.Animation.Constant(sat.b));
-                        colortemp.Control.SetCurve(relativePath, type, $"{MATERIAL_ANIMATION_KEY_PREFIX}{SHADER_KEY_LILTOON_MainHSVG}.a", Utils.Animation.Constant(sat.a));
-
                         
+                        colorTemp.Default.SetCurve(relativePath, type, $"{MATERIAL_ANIMATION_KEY_PREFIX}{SHADER_KEY_LILTOON_COLOR}.r", Utils.Animation.Constant(1));
+                        colorTemp.Default.SetCurve(relativePath, type, $"{MATERIAL_ANIMATION_KEY_PREFIX}{SHADER_KEY_LILTOON_COLOR}.g", Utils.Animation.Constant(1));
+                        colorTemp.Default.SetCurve(relativePath, type, $"{MATERIAL_ANIMATION_KEY_PREFIX}{SHADER_KEY_LILTOON_COLOR}.b", Utils.Animation.Constant(1));
+                        colorTemp.Default.SetCurve(relativePath, type, $"{MATERIAL_ANIMATION_KEY_PREFIX}{SHADER_KEY_LILTOON_COLOR}.a", Utils.Animation.Constant(1));
+
+                        colorTemp.Control.SetCurve(relativePath, type, $"{MATERIAL_ANIMATION_KEY_PREFIX}{SHADER_KEY_LILTOON_COLOR}.r", Utils.Animation.Linear(0.6f, 1, 1));
+                        colorTemp.Control.SetCurve(relativePath, type, $"{MATERIAL_ANIMATION_KEY_PREFIX}{SHADER_KEY_LILTOON_COLOR}.g", Utils.Animation.Linear(0.95f, 1, 0.8f));
+                        colorTemp.Control.SetCurve(relativePath, type, $"{MATERIAL_ANIMATION_KEY_PREFIX}{SHADER_KEY_LILTOON_COLOR}.b", Utils.Animation.Linear(1, 1,0.6f));
+                        colorTemp.Control.SetCurve(relativePath, type, $"{MATERIAL_ANIMATION_KEY_PREFIX}{SHADER_KEY_LILTOON_COLOR}.a", Utils.Animation.Constant(1));
+
+                        baseColor.SetCurve(relativePath, type, $"{MATERIAL_ANIMATION_KEY_PREFIX}{SHADER_KEY_LILTOON_MainHSVG}.x", Utils.Animation.Constant(sat.x));
+                        baseColor.SetCurve(relativePath, type, $"{MATERIAL_ANIMATION_KEY_PREFIX}{SHADER_KEY_LILTOON_MainHSVG}.y", Utils.Animation.Constant(sat.y));
+                        baseColor.SetCurve(relativePath, type, $"{MATERIAL_ANIMATION_KEY_PREFIX}{SHADER_KEY_LILTOON_MainHSVG}.z", Utils.Animation.Constant(sat.z));
+                        baseColor.SetCurve(relativePath, type, $"{MATERIAL_ANIMATION_KEY_PREFIX}{SHADER_KEY_LILTOON_MainHSVG}.w", Utils.Animation.Constant(sat.w));
+                        
+                        
+                        saturation.Control.SetCurve(relativePath, type, $"{MATERIAL_ANIMATION_KEY_PREFIX}{SHADER_KEY_LILTOON_MainHSVG}.y", Utils.Animation.Linear(0, 2));
+
                         unlit.Default.SetCurve(relativePath, type, $"{MATERIAL_ANIMATION_KEY_PREFIX}{SHADER_KEY_LILTOON_UNLIT}", Utils.Animation.Constant(0));
                         unlit.Control.SetCurve(relativePath, type, $"{MATERIAL_ANIMATION_KEY_PREFIX}{SHADER_KEY_LILTOON_UNLIT}", Utils.Animation.Linear(0.0f, 1.0f));
                     }
@@ -226,6 +228,10 @@ namespace io.github.azukimochi
             param.parameters.Add(new ParameterConfig() { nameOrPrefix = ParameterName_Toggle, saved = parameters.IsValueSave, defaultValue = parameters.IsDefaultUse ? 1 : 0, syncType = ParameterSyncType.Bool });
             param.parameters.Add(new ParameterConfig() { nameOrPrefix = ParameterName_Value, saved = parameters.IsValueSave, defaultValue = parameters.DefaultLightValue, syncType = ParameterSyncType.Float });
 
+            if (parameters.AllowColorTemp || parameters.AllowSaturationControl)
+            {
+                AddLayer(fx, "BaseColor", baseColor);
+            }
             if (parameters.AllowSaturationControl)
             {
                 AddLayer(fx, "Saturation", saturation.Default, saturation.Control, ParameterName_Saturation);
@@ -244,7 +250,7 @@ namespace io.github.azukimochi
 
             if (parameters.AllowColorTemp)
             {
-                AddLayer(fx, "ColorTemp", colortemp.Default, colortemp.Control, ParameterName_ColorTemp);
+                AddLayer(fx, "ColorTemp", colorTemp.Default, colorTemp.Control, ParameterName_ColorTemp);
 
                 fx.AddParameter(new AnimatorControllerParameter() { name = ParameterName_ColorTemp, defaultFloat = 0.5f, type = AnimatorControllerParameterType.Float });
                 param.parameters.Add(new ParameterConfig() { nameOrPrefix = ParameterName_ColorTemp, saved = parameters.IsValueSave, defaultValue = 0.5f, syncType = ParameterSyncType.Float });
@@ -303,6 +309,16 @@ namespace io.github.azukimochi
             }
 
             return result;
+        }
+
+        private static void AddLayer(AnimatorController fx, string name, AnimationClip @default)
+        {
+            var layer = new AnimatorControllerLayer() { name = name, defaultWeight = 1, stateMachine = new AnimatorStateMachine().HideInHierarchy().AddTo(fx) };
+            var stateMachine = layer.stateMachine;
+            var defaultState = new AnimatorState() { name = "Default", writeDefaultValues = false, motion = @default }.HideInHierarchy().AddTo(fx);
+
+            stateMachine.AddState(defaultState, stateMachine.entryPosition + new Vector3(-20, 50));
+            fx.AddLayer(layer);
         }
 
         private static void AddLayer(AnimatorController fx, string name, AnimationClip @default, AnimationClip control, string parameterName)
