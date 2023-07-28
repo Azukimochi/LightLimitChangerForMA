@@ -66,7 +66,7 @@ namespace io.github.azukimochi
             EditorGUILayout.PropertyField(MinLightValue, Localization.G("MinLight[0-10]"));
             EditorGUILayout.PropertyField(DefaultLightValue, Localization.G("DefaultLight[0-1]"));
 
-            EditorGUILayout.PropertyField(AllowColorTempControl, Localization.G("Allow Color Temperature Ctrl(Exp)"));
+            EditorGUILayout.PropertyField(AllowColorTempControl, Localization.G("Allow Color Temperature Ctrl"));
             EditorGUILayout.PropertyField(AllowSaturationControl, Localization.G("Allow Saturation Control"));
             EditorGUILayout.PropertyField(AllowUnlitControl, Localization.G("Allow Unlit Control"));
             EditorGUILayout.PropertyField(AddResetButton, Localization.G("Add Reset Button"));
