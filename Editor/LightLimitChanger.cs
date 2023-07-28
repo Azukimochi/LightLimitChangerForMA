@@ -31,7 +31,7 @@ namespace io.github.azukimochi
         {
             var window = GetWindow<LightLimitChanger>(Title);
             var pos = window.position;
-            pos.size = new Vector2(380, 500);
+            pos.size = new Vector2(380, 510);
             window.position = pos;
             //window.maxSize = new Vector2(1000, 450);
         }
@@ -64,7 +64,7 @@ namespace io.github.azukimochi
 
                 var param = Parameters;
 
-                using (new Utils.GroupScope(Localization.S("Parameter"), 180))
+                using (new Utils.GroupScope(Localization.S("Parameter"), 200))
                 {
                     
 
@@ -76,9 +76,9 @@ namespace io.github.azukimochi
                     param.DefaultLightValue = EditorGUILayout.FloatField(Localization.G("DefaultLight[0-1]", "Initial brightness setting"), param.DefaultLightValue);
 
                 }
-                using (new Utils.GroupScope(Localization.S("Options"), 180))
+                using (new Utils.GroupScope(Localization.S("Options"), 200))
                 {
-                    param.AllowColorTemp = EditorGUILayout.Toggle(Localization.G("Allow Color Temperature Control", "You can enable the Color Temperature adjustment function"), param.AllowColorTemp);
+                    param.AllowColorTemp = EditorGUILayout.Toggle(Localization.G("Allow Color Temperature Ctrl(Exp)", "You can enable the Color Temperature adjustment function"), param.AllowColorTemp);
                     param.AllowSaturationControl = EditorGUILayout.Toggle(Localization.G("Allow Saturation Control", "You can enable the saturation adjustment function"), param.AllowSaturationControl);
                     param.AllowUnlitControl = EditorGUILayout.Toggle(Localization.G("Allow Unlit Control", "You can enable the Unlit adjustment function (Liltoon/Sunao Only)"), param.AllowUnlitControl);
                     param.AddResetButton = EditorGUILayout.Toggle(Localization.G("Add Reset Button", "Add a reset button to return the parameter to the set value"), param.AddResetButton);

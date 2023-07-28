@@ -28,7 +28,7 @@ namespace io.github.azukimochi
             { "Advanced Setting", "詳細設定"},
             { "Target Shader", "対象シェーダー" },
             { "Target Shader must be selected", "対象シェーダーを選択してください" },
-            { "Allow Color Temperature Control", "色温度調整を有効にする"},
+            { "Allow Color Temperature Ctrl(Exp)", "色温度調整を有効にする(試験的)"},
             { "Allow Saturation Control", "彩度調整を有効にする" },
             { "Allow Unlit Control", "Unlit調整を有効にする" },
             { "Add Reset Button", "リセットボタンを追加する" },
