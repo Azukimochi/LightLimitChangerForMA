@@ -97,7 +97,7 @@ namespace io.github.azukimochi
             light.Default.AddTo(fx);
             light.Control.AddTo(fx);
 
-            if (parameters.AllowColorTemp)
+            if (parameters.AllowColorTempControl)
             {
                 colorTemp.Default.AddTo(fx);
                 colorTemp.Control.AddTo(fx);
@@ -258,7 +258,7 @@ namespace io.github.azukimochi
             param.parameters.Add(new ParameterConfig() { nameOrPrefix = ParameterName_Toggle, saved = parameters.IsValueSave, defaultValue = parameters.IsDefaultUse ? 1 : 0, syncType = ParameterSyncType.Bool });
             param.parameters.Add(new ParameterConfig() { nameOrPrefix = ParameterName_Value, saved = parameters.IsValueSave, defaultValue = parameters.DefaultLightValue, syncType = ParameterSyncType.Float });
 
-            if (parameters.AllowColorTemp || parameters.AllowSaturationControl)
+            if (parameters.AllowColorTempControl || parameters.AllowSaturationControl)
             {
                 AddLayer(fx, "BaseColor", baseColor);
             }
@@ -278,7 +278,7 @@ namespace io.github.azukimochi
                 param.parameters.Add(new ParameterConfig() { nameOrPrefix = ParameterName_Unlit, saved = parameters.IsValueSave, defaultValue = 0.0f, syncType = ParameterSyncType.Float });
             }
 
-            if (parameters.AllowColorTemp)
+            if (parameters.AllowColorTempControl)
             {
                 AddLayer(fx, "ColorTemp", colorTemp.Default, colorTemp.Control, ParameterName_ColorTemp);
 
@@ -431,7 +431,7 @@ namespace io.github.azukimochi
 
             var dr = on.AddStateMachineBehaviour<VRCAvatarParameterDriver>();
             dr.parameters.Add(new VRC.SDKBase.VRC_AvatarParameterDriver.Parameter() { type = VRC.SDKBase.VRC_AvatarParameterDriver.ChangeType.Set, name = ParameterName_Value, value = settings.Parameters.DefaultLightValue });
-            if (settings.Parameters.AllowColorTemp)
+            if (settings.Parameters.AllowColorTempControl)
                 dr.parameters.Add(new VRC.SDKBase.VRC_AvatarParameterDriver.Parameter() { type = VRC.SDKBase.VRC_AvatarParameterDriver.ChangeType.Set, name = ParameterName_ColorTemp, value = 0.5f });
             if (settings.Parameters.AllowSaturationControl)
                 dr.parameters.Add(new VRC.SDKBase.VRC_AvatarParameterDriver.Parameter() { type = VRC.SDKBase.VRC_AvatarParameterDriver.ChangeType.Set, name = ParameterName_Saturation, value = 0.5f });
@@ -477,7 +477,7 @@ namespace io.github.azukimochi
                 },
             }.AddTo(fx);
 
-            if (parameters.AllowColorTemp)
+            if (parameters.AllowColorTempControl)
             {
                 mainMenu.controls.Add(new VRCExpressionsMenu.Control()
                 {
