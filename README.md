@@ -3,10 +3,12 @@
 Liltoonの明るさの下限/上限のアニメーションを生成するツールです。  
 MAで使用できるPrefab形式で生成するため、非破壊かつアバターのFXへ変更を加えません。
 
+こちらで配布中
+#### https://mochis-factory.booth.pm/items/4864776
+
 ### 使い方
 
 ＊Modular Avaterを前提としています  
-＊Liltoonにのみ対応しています  
 
 【起動方法】
 Unity上部メニュー
@@ -22,14 +24,11 @@ Avaterの欄にアバターをドラッグ＆ドロップします。
 【アバターからの削除方法】
 アバター内に追加されたLight Limit Changerオブジェクトを削除
 
-【パラメータの解説】
-DefaultUse：初期状態で適用状態か否か
-SaveValue：アバターにパラメータを保持するか
-MaxLight：明るさメニューの上限値
-MinLight：明るさメニューの下限値
-DefaultLight：明るさの初期値
+【更新履歴】
+https://github.com/Azukimochi/LightLimitChangerForMA/releases
 
-![image](https://github.com/Azukimochi/LightLimitChangerForMA/assets/103747350/6101720b-8726-4539-b7be-c15a1b6f7e0d)
+![image](https://github.com/Azukimochi/LightLimitChangerForMA/assets/103747350/525c3023-59f5-4e5f-87bb-c7daeef8b7e8)
+
 
 
 
