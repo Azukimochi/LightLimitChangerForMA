@@ -257,6 +257,8 @@ namespace io.github.azukimochi
             private static readonly Keyframe[] _buffer2 = new Keyframe[2];
             private static readonly Keyframe[] _buffer3 = new Keyframe[3];
 
+            private const float TimeEnd = 1 / 60f;
+
             public static AnimationCurve Constant(float value)
             {
                 var curve = _singleton;
@@ -276,22 +278,28 @@ namespace io.github.azukimochi
                 {
                     return _singleton = AnimationCurve.Linear(0, start, 1 / 60f, end);
                 }
-                _buffer2[0] = new Keyframe(0, start);
-                _buffer2[1] = new Keyframe(1 / 60f, end);
+                float tangent = (end - start) / TimeEnd;
+                _buffer2[0] = new Keyframe(0, start, 0, tangent);
+                _buffer2[1] = new Keyframe(TimeEnd, end, tangent, 0);
                 curve.keys = _buffer2;
                 return curve;
             }
             public static AnimationCurve Linear(float start, float mid, float end)
             {
                 var curve = _singleton;
+                float tangent = (mid - start) / TimeEnd;
+                float tangent2 = (end - mid) / TimeEnd;
+                _buffer3[0] = new Keyframe(0, start, 0, tangent);
+                _buffer3[1] = new Keyframe(TimeEnd, mid, tangent, tangent2);
+                _buffer3[2] = new Keyframe(TimeEnd * 2, end, tangent2, 0);
                 if (curve == null)
                 {
-                    return _singleton = AnimationCurve.Linear(0, start, 2 / 60f, end);
+                    curve = _singleton = new AnimationCurve(_buffer3);
                 }
-                _buffer3[0] = new Keyframe(0, start);
-                _buffer3[1] = new Keyframe(1 / 60f, mid);
-                _buffer3[2] = new Keyframe(2 / 60f, end);
-                curve.keys = _buffer3;
+                else
+                {
+                    curve.keys = _buffer3;
+                }
                 return curve;
             }
         }
