@@ -142,14 +142,15 @@ namespace io.github.azukimochi
         {
             if (_titleCache == null)
             {
-                _titleCache = new GUIContent($"{LightLimitChanger.Title} {GetVersion()}");
+                _titleCache = new GUIContent($"{LightLimitChanger.Title} {GetVersion()} 更新履歴");
             }
             using (var foldout = new FoldoutHeaderGroupScope(ref _isVersionInfoFoldoutOpen, _titleCache))
             {
                 if (foldout.IsOpen)
                 {
+                    DrawWebButton("GitHub", "https://github.com/Azukimochi/LightLimitChangerForMA/releases");
+                    DrawWebButton("X|Twitter", "https://twitter.com/search?q=from%3Aazukimochi25%20%23LightLimitChanger&src=typed_query&f=live");
                     DrawWebButton("BOOTH", "https://mochis-factory.booth.pm/items/4864776");
-                    DrawWebButton("GitHub", "https://github.com/Azukimochi/LightLimitChangerForMA");
                 }
             }
         }
@@ -254,6 +255,7 @@ namespace io.github.azukimochi
             private static AnimationCurve _singleton;
             private static readonly Keyframe[] _buffer1 = new Keyframe[1];
             private static readonly Keyframe[] _buffer2 = new Keyframe[2];
+            private static readonly Keyframe[] _buffer3 = new Keyframe[3];
 
             public static AnimationCurve Constant(float value)
             {
@@ -277,6 +279,19 @@ namespace io.github.azukimochi
                 _buffer2[0] = new Keyframe(0, start);
                 _buffer2[1] = new Keyframe(1 / 60f, end);
                 curve.keys = _buffer2;
+                return curve;
+            }
+            public static AnimationCurve Linear(float start, float mid, float end)
+            {
+                var curve = _singleton;
+                if (curve == null)
+                {
+                    return _singleton = AnimationCurve.Linear(0, start, 2 / 60f, end);
+                }
+                _buffer3[0] = new Keyframe(0, start);
+                _buffer3[1] = new Keyframe(1 / 60f, mid);
+                _buffer3[2] = new Keyframe(2 / 60f, end);
+                curve.keys = _buffer3;
                 return curve;
             }
         }

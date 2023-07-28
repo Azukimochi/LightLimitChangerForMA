@@ -22,6 +22,7 @@ namespace io.github.azukimochi
         private SerializedProperty MaxLightValue;
         private SerializedProperty MinLightValue;
         private SerializedProperty TargetShader;
+        private SerializedProperty AllowColorTempControl;
         private SerializedProperty AllowSaturationControl;
         private SerializedProperty AllowUnlitControl;
         private SerializedProperty AddResetButton;
@@ -41,6 +42,7 @@ namespace io.github.azukimochi
             MaxLightValue =                 parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.MaxLightValue));
             MinLightValue =                 parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.MinLightValue));
             TargetShader =                  parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.TargetShader));
+            AllowColorTempControl =        parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.AllowColorTempControl));
             AllowSaturationControl =        parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.AllowSaturationControl));
             AllowUnlitControl =             parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.AllowUnlitControl));
             AddResetButton =                parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.AddResetButton));
@@ -64,6 +66,7 @@ namespace io.github.azukimochi
             EditorGUILayout.PropertyField(MinLightValue, Localization.G("MinLight[0-10]"));
             EditorGUILayout.PropertyField(DefaultLightValue, Localization.G("DefaultLight[0-1]"));
 
+            EditorGUILayout.PropertyField(AllowColorTempControl, Localization.G("Allow Color Temperature Ctrl"));
             EditorGUILayout.PropertyField(AllowSaturationControl, Localization.G("Allow Saturation Control"));
             EditorGUILayout.PropertyField(AllowUnlitControl, Localization.G("Allow Unlit Control"));
             EditorGUILayout.PropertyField(AddResetButton, Localization.G("Add Reset Button"));
