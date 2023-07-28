@@ -20,8 +20,8 @@ namespace io.github.azukimochi
         private const string SHADER_KEY_LILTOON_UNLIT = "_AsUnlit";
         private const string SHADER_KEY_LILTOON_MainHSVG = "_MainTexHSVG";
         private const string SHADER_KEY_LILTOON_COLOR = "_Color";
-        private const string SHADER_KEY_LILTOON_COLOR2ND = "_Color 2nd";
-        private const string SHADER_KEY_LILTOON_COLOR3RD = "_Color 3rd";
+        private const string SHADER_KEY_LILTOON_COLOR2ND = "_Color2nd";
+        private const string SHADER_KEY_LILTOON_COLOR3RD = "_Color3rd";
 
         private const string SHADER_KEY_LILTOON_BASECOLOR = "_Base Color";
         
