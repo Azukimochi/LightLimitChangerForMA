@@ -488,7 +488,7 @@ namespace io.github.azukimochi
             if (settings.Parameters.AllowSaturationControl)
                 dr.parameters.Add(new VRC.SDKBase.VRC_AvatarParameterDriver.Parameter() { type = VRC.SDKBase.VRC_AvatarParameterDriver.ChangeType.Set, name = ParameterName_Saturation, value = 0.5f });
             if (settings.Parameters.AllowUnlitControl)
-                dr.parameters.Add(new VRC.SDKBase.VRC_AvatarParameterDriver.Parameter() { type = VRC.SDKBase.VRC_AvatarParameterDriver.ChangeType.Set, name = ParameterName_Unlit, value = 0.05f });
+                dr.parameters.Add(new VRC.SDKBase.VRC_AvatarParameterDriver.Parameter() { type = VRC.SDKBase.VRC_AvatarParameterDriver.ChangeType.Set, name = ParameterName_Unlit, value = 0.0f });
             stateMachine.AddState(off, stateMachine.entryPosition + new Vector3(-20, 50));
             stateMachine.AddState(on, stateMachine.entryPosition + new Vector3(-20, 100));
 
