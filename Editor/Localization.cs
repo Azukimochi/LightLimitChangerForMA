@@ -32,6 +32,7 @@ namespace io.github.azukimochi
             { "Allow Saturation Control", "彩度調整を有効にする" },
             { "Allow Unlit Control", "Unlit調整を有効にする" },
             { "Add Reset Button", "リセットボタンを追加する" },
+            { "Allow Override Poiyomi AnimatedFlag", "PoiyomiのAnimatedフラグを上書きする"},
             { "Exclude EditorOnly", "EditorOnlyを除外する" },
             { "Generate At Build/PlayMode", "ビルド・実行時に生成する" },
             { "Generate", "生成" },
@@ -54,6 +55,7 @@ namespace io.github.azukimochi
             { "You can enable the saturation adjustment function", "彩度の調整機能を有効化することができます"},
             { "You can enable the Unlit adjustment function (Liltoon/Sunao Only)", "Unlit の調整機能を有効化することができます(Liltoon/Sunao Only)" },
             { "Add a reset button to return the parameter to the set value", "パラメータを設定値に戻すリセットボタンを追加します" },
+            { "Override Animated flag in Poiyomi shader (breaking change)","PoiyomiシェーダーのAnimatedフラグを上書きします(注意:破壊的変更）"},
             { "Exclude objects marked with EditorOnly tag from animation", "EditorOnlyタグに設定されているオブジェクトをアニメーションから除外します" },
             { "Automatically generate animations at build/play mode", "ビルド・実行時にアニメーションを自動生成します" },
         };

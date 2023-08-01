@@ -269,6 +269,33 @@ namespace io.github.azukimochi
                         colorTemp.Control.SetCurve(relativePath, type, $"{MATERIAL_ANIMATION_KEY_PREFIX}{SHADER_KEY_POIYOMI_COLOR}.g", Utils.Animation.Linear(color.g * 0.95f, color.g, color.g *0.8f));
                         colorTemp.Control.SetCurve(relativePath, type, $"{MATERIAL_ANIMATION_KEY_PREFIX}{SHADER_KEY_POIYOMI_COLOR}.b", Utils.Animation.Linear(color.b, color.b,color.b * 0.6f));
                         colorTemp.Control.SetCurve(relativePath, type, $"{MATERIAL_ANIMATION_KEY_PREFIX}{SHADER_KEY_POIYOMI_COLOR}.a", Utils.Animation.Constant(color.a));
+                        
+                        //_ColorAnimated: 1
+                        //_LightingCapAnimated: 1
+                        //_LightingMinLightBrightnessAnimated: 1
+                        //_SaturationAnimated: 1
+                        /*
+                        material.SetFloat("_ColorAnimated",1);
+                        material.SetFloat("_LightingCapAnimated",1);
+                        material.SetFloat("_LightingMinLightBrightnessAnimated",1);
+                        material.SetFloat("_SaturationAnimated",1);
+                        */
+
+                        if (parameters.AllowOverridePoiyomiAnimTag)
+                        {
+                            material.SetOverrideTag("_ColorAnimated","1");
+                            material.SetOverrideTag("_LightingCapAnimated","1");
+                            material.SetOverrideTag("_LightingMinLightBrightnessAnimated","1");
+                            material.SetOverrideTag("_SaturationAnimated","1");
+                        }
+                        else
+                        {
+                            material.SetOverrideTag("_ColorAnimated","");
+                            material.SetOverrideTag("_LightingCapAnimated","");
+                            material.SetOverrideTag("_LightingMinLightBrightnessAnimated","");
+                            material.SetOverrideTag("_SaturationAnimated","");
+                        }
+                        
                     }
                 }
             }

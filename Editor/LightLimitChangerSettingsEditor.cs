@@ -25,6 +25,7 @@ namespace io.github.azukimochi
         private SerializedProperty AllowColorTempControl;
         private SerializedProperty AllowSaturationControl;
         private SerializedProperty AllowUnlitControl;
+        private SerializedProperty AllowOverridePoiyomiAnimTag;
         private SerializedProperty AddResetButton;
         private SerializedProperty GenerateAtBuild;
         private SerializedProperty ExcludeEditorOnly;
@@ -45,6 +46,8 @@ namespace io.github.azukimochi
             AllowColorTempControl =        parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.AllowColorTempControl));
             AllowSaturationControl =        parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.AllowSaturationControl));
             AllowUnlitControl =             parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.AllowUnlitControl));
+            AllowOverridePoiyomiAnimTag =
+                parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.AllowOverridePoiyomiAnimTag));
             AddResetButton =                parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.AddResetButton));
             GenerateAtBuild =               parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.GenerateAtBuild));
             ExcludeEditorOnly =             parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.ExcludeEditorOnly));
@@ -70,6 +73,8 @@ namespace io.github.azukimochi
             EditorGUILayout.PropertyField(AllowSaturationControl, Localization.G("Allow Saturation Control"));
             EditorGUILayout.PropertyField(AllowUnlitControl, Localization.G("Allow Unlit Control"));
             EditorGUILayout.PropertyField(AddResetButton, Localization.G("Add Reset Button"));
+            EditorGUILayout.PropertyField(AllowOverridePoiyomiAnimTag,
+                Localization.G("Allow Override Poiyomi AnimatedFlag"));
 
             using (var group = new Utils.FoldoutHeaderGroupScope(ref _isOptionFoldoutOpen, Localization.G("Options")))
             {

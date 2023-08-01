@@ -135,7 +135,7 @@ namespace io.github.azukimochi
             return packageInfo.version ?? ":: Failed get current version";
         }
 
-        private static bool _isVersionInfoFoldoutOpen = false;
+        private static bool _isVersionInfoFoldoutOpen = true;
         private static GUIContent _titleCache = null;
 
         public static void ShowVersionInfo()
@@ -150,7 +150,6 @@ namespace io.github.azukimochi
                 {
                     DrawWebButton("GitHub", "https://github.com/Azukimochi/LightLimitChangerForMA/releases");
                     DrawWebButton("X|Twitter", "https://twitter.com/search?q=from%3Aazukimochi25%20%23LightLimitChanger&src=typed_query&f=live");
-                    DrawWebButton("BOOTH", "https://mochis-factory.booth.pm/items/4864776");
                 }
             }
         }
