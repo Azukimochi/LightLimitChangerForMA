@@ -2,15 +2,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEditor;
 using UnityEditor.Animations;
 using UnityEngine;
 using VRC.Core;
 using VRC.SDK3.Avatars.Components;
 using VRC.SDK3.Avatars.ScriptableObjects;
-using static UnityEngine.UI.CanvasScaler;
 
 namespace io.github.azukimochi
 {
@@ -242,6 +239,12 @@ namespace io.github.azukimochi
                     }
                     if (key.HasFlag(Shaders.Poiyomi))
                     {
+                        if (parameters.AllowSaturationControl)
+                        {
+                            material.SetFloat("_MainColorAdjustToggle", 1);
+                            material.EnableKeyword($"{"_MainColorAdjustToggle".ToUpperInvariant()}_ON");
+                        }
+
                         var (min, max, sat, color) =
                         (
                             material.GetFloat(SHADER_KEY_POIYOMI_LightingMinLightBrightness),
