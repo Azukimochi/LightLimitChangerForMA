@@ -2,8 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEditor;
 using UnityEditor.Animations;
 using UnityEngine;
@@ -38,6 +36,9 @@ namespace io.github.azukimochi
         private const string SHADER_KEY_POIYOMI_MainColorAdjustToggle = "_MainColorAdjustToggle";
         private const string SHADER_KEY_POIYOMI_Saturation = "_Saturation";
         private const string SHADER_KEY_POIYOMI_COLOR = "_Color";
+
+        private const string Poiyomi_Animated_Suffix = "Animated";
+        private const string Poiyomi_Flag_IsAnimated = "1";
 
         private const string MATERIAL_ANIMATION_KEY_PREFIX = "material.";
 
@@ -238,6 +239,12 @@ namespace io.github.azukimochi
                     }
                     if (key.HasFlag(Shaders.Poiyomi))
                     {
+                        if (parameters.AllowSaturationControl)
+                        {
+                            material.SetFloat("_MainColorAdjustToggle", 1);
+                            material.EnableKeyword($"{"_MainColorAdjustToggle".ToUpperInvariant()}_ON");
+                        }
+
                         var (min, max, sat, color) =
                         (
                             material.GetFloat(SHADER_KEY_POIYOMI_LightingMinLightBrightness),
@@ -269,32 +276,6 @@ namespace io.github.azukimochi
                         colorTemp.Control.SetCurve(relativePath, type, $"{MATERIAL_ANIMATION_KEY_PREFIX}{SHADER_KEY_POIYOMI_COLOR}.g", Utils.Animation.Linear(color.g * 0.95f, color.g, color.g *0.8f));
                         colorTemp.Control.SetCurve(relativePath, type, $"{MATERIAL_ANIMATION_KEY_PREFIX}{SHADER_KEY_POIYOMI_COLOR}.b", Utils.Animation.Linear(color.b, color.b,color.b * 0.6f));
                         colorTemp.Control.SetCurve(relativePath, type, $"{MATERIAL_ANIMATION_KEY_PREFIX}{SHADER_KEY_POIYOMI_COLOR}.a", Utils.Animation.Constant(color.a));
-                        
-                        //_ColorAnimated: 1
-                        //_LightingCapAnimated: 1
-                        //_LightingMinLightBrightnessAnimated: 1
-                        //_SaturationAnimated: 1
-                        /*
-                        material.SetFloat("_ColorAnimated",1);
-                        material.SetFloat("_LightingCapAnimated",1);
-                        material.SetFloat("_LightingMinLightBrightnessAnimated",1);
-                        material.SetFloat("_SaturationAnimated",1);
-                        */
-
-                        if (parameters.AllowOverridePoiyomiAnimTag)
-                        {
-                            material.SetOverrideTag("_ColorAnimated","1");
-                            material.SetOverrideTag("_LightingCapAnimated","1");
-                            material.SetOverrideTag("_LightingMinLightBrightnessAnimated","1");
-                            material.SetOverrideTag("_SaturationAnimated","1");
-                        }
-                        else
-                        {
-                            material.SetOverrideTag("_ColorAnimated","");
-                            material.SetOverrideTag("_LightingCapAnimated","");
-                            material.SetOverrideTag("_LightingMinLightBrightnessAnimated","");
-                            material.SetOverrideTag("_SaturationAnimated","");
-                        }
                         
                     }
                 }
@@ -337,6 +318,92 @@ namespace io.github.azukimochi
                 fx.AddParameter(new AnimatorControllerParameter() { name = ParameterName_ColorTemp, defaultFloat = 0.5f, type = AnimatorControllerParameterType.Float });
                 param.parameters.Add(new ParameterConfig() { nameOrPrefix = ParameterName_ColorTemp, saved = parameters.IsValueSave, defaultValue = 0.5f, syncType = ParameterSyncType.Float });
             }
+        }
+
+        public static void ConfigurePoiyomiAnimated(VRCAvatarDescriptor avatar, LightLimitChangerSettings settings)
+        {
+            var renderers = avatar.GetComponentsInChildren<Renderer>(true).Where(x => (x is MeshRenderer || x is SkinnedMeshRenderer) && x.tag != "EditorOnly");
+
+            var originalFlags = new Dictionary<Material, Dictionary<string, string>>();
+            var clonedMaterialMap = new Dictionary<Material, Material>();
+            var parameters = settings.Parameters;
+
+            foreach (var renderer in renderers)
+            {
+                foreach (var material in renderer.sharedMaterials)
+                {
+                    if (material == null || material.shader == null || GetShaderType(material.shader) != Shaders.Poiyomi) 
+                        continue;
+
+                    TrySetAnimated(SHADER_KEY_POIYOMI_LightingCap);
+                    TrySetAnimated(SHADER_KEY_POIYOMI_LightingMinLightBrightness);
+
+                    if (parameters.AllowColorTempControl)
+                    {
+                        TrySetAnimated(SHADER_KEY_POIYOMI_COLOR);
+                    }
+                    if (parameters.AllowSaturationControl)
+                    {
+                        TrySetAnimated(SHADER_KEY_POIYOMI_Saturation);
+                    }
+
+                    void TrySetAnimated(string property)
+                    {
+                        var name = $"{property}{Poiyomi_Animated_Suffix}";
+                        if (material.TrySetTag(name, Poiyomi_Flag_IsAnimated, out var original))
+                        {
+                            var map = originalFlags.GetOrAdd(material, _ => new Dictionary<string, string>());
+                            if (!map.ContainsKey(name))
+                            {
+                                map.Add(name, original);
+                            }
+                        }
+                    }
+                }
+            }
+
+            BuildManager.PoiyomiOriginalFlags = originalFlags;
+
+            AssetDatabase.SaveAssets();
+
+        }
+
+        public static void ResetPoiyomiAnimated(LightLimitChangerSettings settings)
+        {
+            var dict = BuildManager.PoiyomiOriginalFlags;
+
+            if (dict != null)
+            {
+                foreach(var x in dict)
+                {
+                    var mat = x.Key;
+                    foreach(var y in x.Value)
+                    {
+                        mat.SetOverrideTag(y.Key, y.Value);
+                    }
+                }
+            }
+        }
+
+        private static bool TrySetTag(this Material material, string tag, string value, out string original)
+        {
+            original = material.GetTag(tag, false, "");
+            var flag = value != original;
+            if (flag)
+            {
+                material.SetOverrideTag(tag, value);
+            }
+            return flag;
+        }
+
+        private static TValue GetOrAdd<TKey, TValue>(this Dictionary<TKey, TValue> dictionary, TKey key, Func<TKey, TValue> valueFactory)
+        {
+            if (!dictionary.TryGetValue(key, out var value))
+            {
+                value = valueFactory(key);
+                dictionary.Add(key, value);
+            }
+            return value;
         }
 
         private static Shaders GetShaderType(Shader shader)

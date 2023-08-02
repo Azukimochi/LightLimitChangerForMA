@@ -55,14 +55,14 @@ namespace io.github.azukimochi
             { "You can enable the saturation adjustment function", "彩度の調整機能を有効化することができます"},
             { "You can enable the Unlit adjustment function (Liltoon/Sunao Only)", "Unlit の調整機能を有効化することができます(Liltoon/Sunao Only)" },
             { "Add a reset button to return the parameter to the set value", "パラメータを設定値に戻すリセットボタンを追加します" },
-            { "Override Animated flag in Poiyomi shader (breaking change)","PoiyomiシェーダーのAnimatedフラグを上書きします(注意:破壊的変更）"},
+            { "Automatically set animation flags at build time","ビルド時に自動的にアニメーションフラグをセットします"},
             { "Exclude objects marked with EditorOnly tag from animation", "EditorOnlyタグに設定されているオブジェクトをアニメーションから除外します" },
             { "Automatically generate animations at build/play mode", "ビルド・実行時にアニメーションを自動生成します" },
         };
 
         public static string S(string text)
         {
-            if(text != null)
+            if (text != null)
             {
                 if (_SelectedLanguage == 0 && _LocalizedText.TryGetValue(text, out var res))
                     return res;

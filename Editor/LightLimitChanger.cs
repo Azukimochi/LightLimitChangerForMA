@@ -66,8 +66,6 @@ namespace io.github.azukimochi
 
                 using (new Utils.GroupScope(Localization.S("Parameter"), 250))
                 {
-                    
-
                     param.IsDefaultUse = EditorGUILayout.Toggle(Localization.G("DefaultUse", "Use the light animation in the initial state"), param.IsDefaultUse);
                     param.IsValueSave = EditorGUILayout.Toggle(Localization.G("SaveValue", "Keep brightness changes in the avatar"), param.IsValueSave);
                     param.OverwriteDefaultLightMinMax = EditorGUILayout.Toggle(Localization.G("Overwrite Default Min/Max", "Override the default avatar brightness with the lower and upper limit parameters below"), param.OverwriteDefaultLightMinMax);
@@ -97,7 +95,7 @@ namespace io.github.azukimochi
                             param.ExcludeEditorOnly = EditorGUILayout.Toggle(Localization.G("Exclude EditorOnly", "Exclude objects marked with EditorOnly tag from animation"), param.ExcludeEditorOnly);
                             param.GenerateAtBuild = EditorGUILayout.Toggle(Localization.G("Generate At Build/PlayMode", "Automatically generate animations at build/play mode"), param.GenerateAtBuild);
                             param.AllowOverridePoiyomiAnimTag = EditorGUILayout.Toggle(
-                                Localization.G("Allow Override Poiyomi AnimatedFlag", "Override Animated flag in Poiyomi shader (breaking change)"), param.AllowOverridePoiyomiAnimTag);
+                                Localization.G("Allow Override Poiyomi AnimatedFlag", "Automatically set animation flags at build time"), param.AllowOverridePoiyomiAnimTag);
                         }
                     }
                 }

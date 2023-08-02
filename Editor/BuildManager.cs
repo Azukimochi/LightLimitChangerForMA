@@ -1,4 +1,6 @@
-﻿using nadena.dev.modular_avatar.core.editor;
+﻿using System.Collections.Generic;
+using System.IO;
+using nadena.dev.modular_avatar.core.editor;
 using UnityEditor;
 using UnityEngine;
 using VRC.SDK3.Avatars.Components;
@@ -17,21 +19,33 @@ namespace io.github.azukimochi
 
         public int callbackOrder => new AvatarProcessor().callbackOrder - 1;
 
-        void IVRCSDKPostprocessAvatarCallback.OnPostprocessAvatar()
-        {
-        }
+        internal static Dictionary<Material, Dictionary<string, string>> PoiyomiOriginalFlags;
 
         bool IVRCSDKPreprocessAvatarCallback.OnPreprocessAvatar(GameObject avatarGameObject)
         {
-            if (avatarGameObject.TryGetComponentInChildren<LightLimitChangerSettings>(out var settings))
+            var avatar = avatarGameObject.GetComponent<VRCAvatarDescriptor>();
+            if (avatar.TryGetComponentInChildren<LightLimitChangerSettings>(out var settings))
             {
                 if (settings.Parameters.GenerateAtBuild)
                 {
-                    LightLimitGenerator.Generate(avatarGameObject.GetComponent<VRCAvatarDescriptor>(), settings);
+                    LightLimitGenerator.Generate(avatar, settings);
                 }
+                if (settings.Parameters.AllowOverridePoiyomiAnimTag)
+                {
+                    LightLimitGenerator.ConfigurePoiyomiAnimated(avatar, settings);
+                }
+
             }
 
             return true;
+        }
+
+        void IVRCSDKPostprocessAvatarCallback.OnPostprocessAvatar()
+        {
+            foreach (var settings in GameObject.FindObjectsOfType<LightLimitChangerSettings>())
+            {
+                LightLimitGenerator.ResetPoiyomiAnimated(settings);
+            }
         }
     }
 
