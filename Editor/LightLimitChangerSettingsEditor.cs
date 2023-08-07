@@ -62,29 +62,29 @@ namespace io.github.azukimochi
             serializedObject.Update();
             EditorGUI.BeginChangeCheck();
 
-            EditorGUILayout.PropertyField(IsDefaultUse, Localization.G("DefaultUse"));
-            EditorGUILayout.PropertyField(IsValueSave, Localization.G("SaveValue"));
-            EditorGUILayout.PropertyField(OverwriteDefaultLightMinMax, Localization.G("Overwrite Default Min/Max"));
-            EditorGUILayout.PropertyField(MaxLightValue, Localization.G("MaxLight[0-10]"));
-            EditorGUILayout.PropertyField(MinLightValue, Localization.G("MinLight[0-10]"));
-            EditorGUILayout.PropertyField(DefaultLightValue, Localization.G("DefaultLight[0-1]"));
+            EditorGUILayout.PropertyField(IsDefaultUse, Localization.G("label.use_default"));
+            EditorGUILayout.PropertyField(IsValueSave, Localization.G("label.save_value"));
+            EditorGUILayout.PropertyField(OverwriteDefaultLightMinMax, Localization.G("label.override_min_max"));
+            EditorGUILayout.PropertyField(MaxLightValue, Localization.G("label.light_max"));
+            EditorGUILayout.PropertyField(MinLightValue, Localization.G("label.light_min"));
+            EditorGUILayout.PropertyField(DefaultLightValue, Localization.G("label.light_default"));
 
-            EditorGUILayout.PropertyField(AllowColorTempControl, Localization.G("Allow Color Temperature Ctrl"));
-            EditorGUILayout.PropertyField(AllowSaturationControl, Localization.G("Allow Saturation Control"));
-            EditorGUILayout.PropertyField(AllowUnlitControl, Localization.G("Allow Unlit Control"));
-            EditorGUILayout.PropertyField(AddResetButton, Localization.G("Add Reset Button"));
+            EditorGUILayout.PropertyField(AllowColorTempControl, Localization.G("label.allow_color_tmp"));
+            EditorGUILayout.PropertyField(AllowSaturationControl, Localization.G("label.allow_saturation"));
+            EditorGUILayout.PropertyField(AllowUnlitControl, Localization.G("label.allow_unlit"));
+            EditorGUILayout.PropertyField(AddResetButton, Localization.G("label.allow_reset"));
             EditorGUILayout.PropertyField(AllowOverridePoiyomiAnimTag,
-                Localization.G("Allow Override Poiyomi AnimatedFlag"));
+                Localization.G("label.allow_override_poiyomi"));
 
-            using (var group = new Utils.FoldoutHeaderGroupScope(ref _isOptionFoldoutOpen, Localization.G("Options")))
+            using (var group = new Utils.FoldoutHeaderGroupScope(ref _isOptionFoldoutOpen, Localization.G("category.select_option")))
             {
                 if (group.IsOpen)
                 {
-                    TargetShader.intValue = EditorGUILayout.MaskField(Localization.G("Target Shader"), TargetShader.intValue, TargetShader.enumNames);
+                    TargetShader.intValue = EditorGUILayout.MaskField(Localization.G("label.target_shader"), TargetShader.intValue, TargetShader.enumNames);
 
-                    EditorGUILayout.PropertyField(ExcludeEditorOnly, Localization.G("Exclude EditorOnly"));
+                    EditorGUILayout.PropertyField(ExcludeEditorOnly, Localization.G("label.allow_editor_only"));
                     EditorGUILayout.Separator();
-                    EditorGUILayout.PropertyField(GenerateAtBuild, Localization.G("Generate At Build/PlayMode"));
+                    EditorGUILayout.PropertyField(GenerateAtBuild, Localization.G("label.allow_gen_playmode"));
 
                     EditorGUILayout.Separator();
                     EditorGUI.BeginDisabledGroup(true);
