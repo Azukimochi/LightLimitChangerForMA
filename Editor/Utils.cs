@@ -8,6 +8,7 @@ using System;
 using UnityEditor.Animations;
 using VRC.SDK3.Avatars.Components;
 using System.Reflection;
+using UnityEngine.UIElements;
 
 namespace io.github.azukimochi
 {
@@ -166,7 +167,10 @@ namespace io.github.azukimochi
             var position = EditorGUI.IndentedRect(EditorGUILayout.GetControlRect());
             var icon = EditorGUIUtility.IconContent("BuildSettings.Web.Small");
             icon.text = text;
+            
             var style = new GUIStyle(EditorStyles.label) { padding = new RectOffset() };
+            style.normal.textColor = style.focused.textColor;
+            style.hover.textColor = style.focused.textColor;
             if (GUI.Button(position, icon, style))
             {
                 Application.OpenURL(URL);
