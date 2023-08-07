@@ -385,25 +385,62 @@ namespace io.github.azukimochi
             }
         }
 
-        private static bool TrySetTag(this Material material, string tag, string value, out string original)
+        private static void ConfigureResetParameters(LightLimitChangerSettings settings)
         {
-            original = material.GetTag(tag, false, "");
-            var flag = value != original;
-            if (flag)
-            {
-                material.SetOverrideTag(tag, value);
-            }
-            return flag;
-        }
+            if (!settings.Parameters.AddResetButton)
+                return;
 
-        private static TValue GetOrAdd<TKey, TValue>(this Dictionary<TKey, TValue> dictionary, TKey key, Func<TKey, TValue> valueFactory)
-        {
-            if (!dictionary.TryGetValue(key, out var value))
+            var fx = settings.FX;
+
+            AnimatorStateMachine stateMachine;
+            var layer = new AnimatorControllerLayer()
             {
-                value = valueFactory(key);
-                dictionary.Add(key, value);
-            }
-            return value;
+                name = "Reset",
+                stateMachine = stateMachine = new AnimatorStateMachine().HideInHierarchy().AddTo(fx),
+                defaultWeight = 1,
+            };
+            var blank = new AnimationClip() { name = "Blank" }.HideInHierarchy().AddTo(fx);
+            var off = new AnimatorState() { name = "Off", writeDefaultValues = false, motion = blank }.HideInHierarchy().AddTo(fx);
+            var on = new AnimatorState() { name = "On", writeDefaultValues = false, motion = blank }.HideInHierarchy().AddTo(fx);
+
+            var cond = new AnimatorCondition[] { new AnimatorCondition() { mode = AnimatorConditionMode.If, parameter = ParameterName_Reset } };
+
+            var t = new AnimatorStateTransition()
+            {
+                destinationState = on,
+                duration = 0,
+                hasExitTime = false,
+                conditions = cond
+            }.HideInHierarchy().AddTo(fx);
+
+            off.AddTransition(t);
+
+            cond[0].mode = AnimatorConditionMode.IfNot;
+            t = new AnimatorStateTransition()
+            {
+                destinationState = off,
+                duration = 0,
+                hasExitTime = false,
+                conditions = cond
+            }.HideInHierarchy().AddTo(fx);
+
+            on.AddTransition(t);
+
+            var dr = on.AddStateMachineBehaviour<VRCAvatarParameterDriver>();
+            dr.parameters.Add(new VRC.SDKBase.VRC_AvatarParameterDriver.Parameter() { type = VRC.SDKBase.VRC_AvatarParameterDriver.ChangeType.Set, name = ParameterName_Value, value = settings.Parameters.DefaultLightValue });
+            if (settings.Parameters.AllowColorTempControl)
+                dr.parameters.Add(new VRC.SDKBase.VRC_AvatarParameterDriver.Parameter() { type = VRC.SDKBase.VRC_AvatarParameterDriver.ChangeType.Set, name = ParameterName_ColorTemp, value = 0.5f });
+            if (settings.Parameters.AllowSaturationControl)
+                dr.parameters.Add(new VRC.SDKBase.VRC_AvatarParameterDriver.Parameter() { type = VRC.SDKBase.VRC_AvatarParameterDriver.ChangeType.Set, name = ParameterName_Saturation, value = 0.5f });
+            if (settings.Parameters.AllowUnlitControl)
+                dr.parameters.Add(new VRC.SDKBase.VRC_AvatarParameterDriver.Parameter() { type = VRC.SDKBase.VRC_AvatarParameterDriver.ChangeType.Set, name = ParameterName_Unlit, value = 0.0f });
+            stateMachine.AddState(off, stateMachine.entryPosition + new Vector3(-20, 50));
+            stateMachine.AddState(on, stateMachine.entryPosition + new Vector3(-20, 100));
+
+            fx.AddParameter(ParameterName_Reset, AnimatorControllerParameterType.Bool);
+            settings.gameObject.GetOrAddComponent<ModularAvatarParameters>().parameters.Add(new ParameterConfig() { nameOrPrefix = ParameterName_Reset, syncType = ParameterSyncType.Bool, localOnly = true, saved = false });
+
+            fx.AddLayer(layer);
         }
 
         private static Shaders GetShaderType(Shader shader)
@@ -505,64 +542,6 @@ namespace io.github.azukimochi
 
             fx.AddLayer(layer);
 
-        }
-
-        private static void ConfigureResetParameters(LightLimitChangerSettings settings)
-        {
-            if (!settings.Parameters.AddResetButton)
-                return;
-
-            var fx = settings.FX;
-
-            AnimatorStateMachine stateMachine;
-            var layer = new AnimatorControllerLayer()
-            {
-                name = "Reset",
-                stateMachine = stateMachine = new AnimatorStateMachine().HideInHierarchy().AddTo(fx),
-                defaultWeight = 1,
-            };
-            var blank = new AnimationClip() { name = "Blank" }.HideInHierarchy().AddTo(fx);
-            var off = new AnimatorState() { name = "Off", writeDefaultValues = false, motion = blank }.HideInHierarchy().AddTo(fx);
-            var on = new AnimatorState() { name = "On", writeDefaultValues = false, motion = blank }.HideInHierarchy().AddTo(fx);
-
-            var cond = new AnimatorCondition[] { new AnimatorCondition() { mode = AnimatorConditionMode.If, parameter = ParameterName_Reset } };
-
-            var t = new AnimatorStateTransition()
-            {
-                destinationState = on,
-                duration = 0,
-                hasExitTime = false,
-                conditions = cond
-            }.HideInHierarchy().AddTo(fx);
-
-            off.AddTransition(t);
-
-            cond[0].mode = AnimatorConditionMode.IfNot;
-            t = new AnimatorStateTransition()
-            {
-                destinationState = off,
-                duration = 0,
-                hasExitTime = false,
-                conditions = cond
-            }.HideInHierarchy().AddTo(fx);
-
-            on.AddTransition(t);
-
-            var dr = on.AddStateMachineBehaviour<VRCAvatarParameterDriver>();
-            dr.parameters.Add(new VRC.SDKBase.VRC_AvatarParameterDriver.Parameter() { type = VRC.SDKBase.VRC_AvatarParameterDriver.ChangeType.Set, name = ParameterName_Value, value = settings.Parameters.DefaultLightValue });
-            if (settings.Parameters.AllowColorTempControl)
-                dr.parameters.Add(new VRC.SDKBase.VRC_AvatarParameterDriver.Parameter() { type = VRC.SDKBase.VRC_AvatarParameterDriver.ChangeType.Set, name = ParameterName_ColorTemp, value = 0.5f });
-            if (settings.Parameters.AllowSaturationControl)
-                dr.parameters.Add(new VRC.SDKBase.VRC_AvatarParameterDriver.Parameter() { type = VRC.SDKBase.VRC_AvatarParameterDriver.ChangeType.Set, name = ParameterName_Saturation, value = 0.5f });
-            if (settings.Parameters.AllowUnlitControl)
-                dr.parameters.Add(new VRC.SDKBase.VRC_AvatarParameterDriver.Parameter() { type = VRC.SDKBase.VRC_AvatarParameterDriver.ChangeType.Set, name = ParameterName_Unlit, value = 0.0f });
-            stateMachine.AddState(off, stateMachine.entryPosition + new Vector3(-20, 50));
-            stateMachine.AddState(on, stateMachine.entryPosition + new Vector3(-20, 100));
-
-            fx.AddParameter(ParameterName_Reset, AnimatorControllerParameterType.Bool);
-            settings.gameObject.GetOrAddComponent<ModularAvatarParameters>().parameters.Add(new ParameterConfig() { nameOrPrefix = ParameterName_Reset, syncType = ParameterSyncType.Bool, localOnly = true, saved = false });
-
-            fx.AddLayer(layer);
         }
 
         private static VRCExpressionsMenu CreateMenu(AnimatorController fx, LightLimitChangerParameters parameters)

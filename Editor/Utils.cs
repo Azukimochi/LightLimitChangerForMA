@@ -118,6 +118,27 @@ namespace io.github.azukimochi
 
         public static IEnumerable<string> EnumeratePropertyNames(this Shader shader) => Enumerable.Range(0, shader.GetPropertyCount()).Select(shader.GetPropertyName);
 
+        public static bool TrySetTag(this Material material, string tag, string value, out string original)
+        {
+            original = material.GetTag(tag, false, "");
+            var flag = value != original;
+            if (flag)
+            {
+                material.SetOverrideTag(tag, value);
+            }
+            return flag;
+        }
+
+        public static TValue GetOrAdd<TKey, TValue>(this Dictionary<TKey, TValue> dictionary, TKey key, Func<TKey, TValue> valueFactory)
+        {
+            if (!dictionary.TryGetValue(key, out var value))
+            {
+                value = valueFactory(key);
+                dictionary.Add(key, value);
+            }
+            return value;
+        }
+
         private static MethodInfo _GetGeneratedAssetsFolder = typeof(nadena.dev.modular_avatar.core.editor.AvatarProcessor).Assembly.GetTypes().FirstOrDefault(x => x.Name == "Util")?.GetMethod(nameof(GetGeneratedAssetsFolder), BindingFlags.Static | BindingFlags.NonPublic);
 
         public static string GetGeneratedAssetsFolder()
