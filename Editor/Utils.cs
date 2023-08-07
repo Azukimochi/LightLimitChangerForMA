@@ -8,12 +8,13 @@ using System;
 using UnityEditor.Animations;
 using VRC.SDK3.Avatars.Components;
 using System.Reflection;
+using Object = UnityEngine.Object;
 
 namespace io.github.azukimochi
 {
     internal static class Utils
     {
-        public static void ClearSubAssets(this UnityEngine.Object obj)
+        public static void ClearSubAssets(this Object obj)
         {
             var path = AssetDatabase.GetAssetPath(obj);
             if (path != null)
@@ -59,16 +60,7 @@ namespace io.github.azukimochi
             return component;
         }
 
-        public static VRCAvatarDescriptor FindAvatarFromParent(this GameObject obj)
-        {
-            var tr = obj.transform;
-            VRCAvatarDescriptor avatar = null;
-            while(tr != null && (avatar = tr.GetComponent<VRCAvatarDescriptor>()) == null)
-            {
-                tr = tr.parent;
-            }
-            return avatar;
-        }
+        public static VRCAvatarDescriptor FindAvatarFromParent(this GameObject obj) => obj.GetComponentInParent<VRCAvatarDescriptor>();
 
         public static IEnumerable<Transform> EnumerateChildren(this Transform tr)
         {
@@ -79,17 +71,19 @@ namespace io.github.azukimochi
             }
         }
 
-        public static T AddTo<T>(this T obj, UnityEngine.Object asset) where T : UnityEngine.Object
+        public static T AddTo<T>(this T obj, Object asset) where T : Object
         {
             AssetDatabase.AddObjectToAsset(obj, asset);
             return obj;
         }
 
-        public static T HideInHierarchy<T>(this T obj) where T : UnityEngine.Object
+        public static T HideInHierarchy<T>(this T obj) where T : Object
         {
             obj.hideFlags |= HideFlags.HideInHierarchy;
             return obj;
         }
+
+        public static T Clone<T>(this T obj) where T : Object => Object.Instantiate(obj);
 
         public static string GetRelativePath(this Transform transform, Transform root, bool includeRelativeTo = false)
         {
@@ -117,17 +111,6 @@ namespace io.github.azukimochi
         private static string[] _relativePathBuffer;
 
         public static IEnumerable<string> EnumeratePropertyNames(this Shader shader) => Enumerable.Range(0, shader.GetPropertyCount()).Select(shader.GetPropertyName);
-
-        public static bool TrySetTag(this Material material, string tag, string value, out string original)
-        {
-            original = material.GetTag(tag, false, "");
-            var flag = value != original;
-            if (flag)
-            {
-                material.SetOverrideTag(tag, value);
-            }
-            return flag;
-        }
 
         public static TValue GetOrAdd<TKey, TValue>(this Dictionary<TKey, TValue> dictionary, TKey key, Func<TKey, TValue> valueFactory)
         {
