@@ -84,6 +84,23 @@ namespace io.github.azukimochi
             var parameters = settings.Parameters;
             var targets = new Dictionary<Shaders, List<(Renderer Renderer, Material Material)>>();
 
+            AnimatorControllerContainer[] animatorControllerContainers = null;
+            if (BuildManager.IsRunning)
+            {
+                // アバターに含まれるAnimatorControllerを全列挙する
+                // 漏れがありそう
+                animatorControllerContainers = 
+                    avatar.baseAnimationLayers.Select((x, i) => new AnimatorControllerContainer(x.animatorController, y =>
+                    {
+                        x.animatorController = y;
+                        avatar.baseAnimationLayers[i] = x;
+                    }))
+                    .Concat(avatar.GetComponentsInChildren<Animator>(true).Where(x => !settings.Parameters.ExcludeEditorOnly || x.tag != "EditorOnly").Select(x => new AnimatorControllerContainer(x.runtimeAnimatorController, y => x.runtimeAnimatorController = y)))
+                    .Concat(avatar.GetComponentsInChildren<ModularAvatarMergeAnimator>(true).Where(x => !settings.Parameters.ExcludeEditorOnly || x.tag != "EditorOnly").Select(x => new AnimatorControllerContainer(x.animator, y => x.animator = y)))
+                    .Where(x => x.Controller != null)
+                    .ToArray();
+            }
+
             Dictionary<Material, Material> materialMapping = null;
 
             foreach (var renderer in avatar.GetComponentsInChildren<Renderer>(true))
@@ -124,27 +141,50 @@ namespace io.github.azukimochi
                 }
             }
 
+            HashSet<Material> poiyomiMaterials = new HashSet<Material>();
+
             // Find materials in animations and replace it.
             if (BuildManager.IsRunning)
             {
                 var mapper = new AnimatorControllerMapper(materialMapping, fx);
+                bool needAnimatorCloniong = false;
 
-                var containers = avatar.baseAnimationLayers.Select((x, i) => new AnimatorControllerContainer(x.animatorController, y => 
+                foreach (var container in animatorControllerContainers)
                 {
-                    x.animatorController = y;
-                    avatar.baseAnimationLayers[i] = x;
-                }))
-                    .Concat(avatar.GetComponentsInChildren<Animator>().Select(x => new AnimatorControllerContainer(x.runtimeAnimatorController, y => x.runtimeAnimatorController = y)))
-                    .Concat(avatar.GetComponentsInChildren<ModularAvatarMergeAnimator>().Select(x => new AnimatorControllerContainer(x.animator, y => x.animator = y)))
-                    .Where(x => x.Controller != null);
+                    var controller = container.Controller;
+                    foreach (var anim in controller.animationClips)
+                    {
+                        var binds = AnimationUtility.GetObjectReferenceCurveBindings(anim);
+                        foreach (var bind in binds)
+                        {
+                            var curves = AnimationUtility.GetObjectReferenceCurve(anim, bind);
+                            foreach (var curve in curves)
+                            {
+                                var material = curve.value as Material;
+                                var type = GetShaderType(material.shader);
+                                if (material != null && (type & parameters.TargetShader) != 0)
+                                {
+                                    var clone = material.Clone().AddTo(fx);
+                                    if (!materialMapping.ContainsKey(material))
+                                        materialMapping.Add(material, clone);
+                                    poiyomiMaterials.Add(clone);
 
-                foreach(var container in containers)
-                {
-                    var controller = mapper.MapController(container.Controller);
-                    if (controller != null)
-                        container.Replace(controller);
+                                    needAnimatorCloniong = true;
+                                }
+                            }
+                        }
+                    }
                 }
 
+                if (needAnimatorCloniong)
+                {
+                    foreach (var container in animatorControllerContainers)
+                    {
+                        var controller = mapper.MapController(container.Controller);
+                        if (controller != null)
+                            container.Replace(controller);
+                    }
+                }
             }
 
             AnimationClip baseColor = new AnimationClip() { name = "BaseColor" };
@@ -294,26 +334,7 @@ namespace io.github.azukimochi
                     }
                     if (key.HasFlag(Shaders.Poiyomi))
                     {
-                        if (parameters.AllowOverridePoiyomiAnimTag && BuildManager.IsRunning)
-                        {
-                            TrySetAnimated(SHADER_KEY_POIYOMI_LightingCap);
-                            TrySetAnimated(SHADER_KEY_POIYOMI_LightingMinLightBrightness);
-
-                            if (parameters.AllowColorTempControl)
-                            {
-                                TrySetAnimated(SHADER_KEY_POIYOMI_COLOR);
-                            }
-                            if (parameters.AllowSaturationControl)
-                            {
-                                TrySetAnimated(SHADER_KEY_POIYOMI_Saturation);
-                            }
-
-                            void TrySetAnimated(string property)
-                            {
-                                var name = $"{property}{Poiyomi_Animated_Suffix}";
-                                material.SetOverrideTag(name, Poiyomi_Flag_IsAnimated);
-                            }
-                        }
+                        poiyomiMaterials.Add(material);
 
                         if (parameters.AllowSaturationControl)
                         {
@@ -353,6 +374,30 @@ namespace io.github.azukimochi
                         colorTemp.Control.SetCurve(relativePath, type, $"{MATERIAL_ANIMATION_KEY_PREFIX}{SHADER_KEY_POIYOMI_COLOR}.b", Utils.Animation.Linear(color.b, color.b,color.b * 0.6f));
                         colorTemp.Control.SetCurve(relativePath, type, $"{MATERIAL_ANIMATION_KEY_PREFIX}{SHADER_KEY_POIYOMI_COLOR}.a", Utils.Animation.Constant(color.a));
                         
+                    }
+                }
+            }
+
+            if (parameters.AllowOverridePoiyomiAnimTag && BuildManager.IsRunning)
+            {
+                foreach(var material in poiyomiMaterials)
+                {
+                    TrySetAnimated(SHADER_KEY_POIYOMI_LightingCap);
+                    TrySetAnimated(SHADER_KEY_POIYOMI_LightingMinLightBrightness);
+
+                    if (parameters.AllowColorTempControl)
+                    {
+                        TrySetAnimated(SHADER_KEY_POIYOMI_COLOR);
+                    }
+                    if (parameters.AllowSaturationControl)
+                    {
+                        TrySetAnimated(SHADER_KEY_POIYOMI_Saturation);
+                    }
+
+                    void TrySetAnimated(string property)
+                    {
+                        var name = $"{property}{Poiyomi_Animated_Suffix}";
+                        material.SetOverrideTag(name, Poiyomi_Flag_IsAnimated);
                     }
                 }
             }
@@ -741,7 +786,7 @@ namespace io.github.azukimochi
 
                     var newClip = new AnimationClip
                     {
-                        name = $"rebased {clip.name}"
+                        name = $"remapped {clip.name}"
                     };
 
                     bool changed = false;
@@ -816,7 +861,7 @@ namespace io.github.azukimochi
                 if (o is AnimationClip clip)
                 {
                     var newClip = new AnimationClip();
-                    newClip.name = $"rebased {clip.name}";
+                    newClip.name = $"remapped {clip.name}";
                     bool changed = false;
 
                     foreach (var binding in AnimationUtility.GetObjectReferenceCurveBindings(clip))
