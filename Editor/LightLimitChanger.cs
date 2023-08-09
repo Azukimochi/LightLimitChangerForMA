@@ -50,10 +50,10 @@ namespace io.github.azukimochi
             _scrollPosition = GUILayout.BeginScrollView(_scrollPosition);
             using (new Utils.DisabledScope(EditorApplication.isPlaying))
             {
-                using (new Utils.GroupScope(Localization.S("Select Avatar"), 180))
+                using (new Utils.GroupScope(Localization.S("category.select_avatar"), 180))
                 {
                     EditorGUI.BeginChangeCheck();
-                    TargetAvatar = EditorGUILayout.ObjectField(Localization.G("Avatar", "Set the avatar to generate animation"), TargetAvatar, typeof(VRCAvatarDescriptor), true) as VRCAvatarDescriptor;
+                    TargetAvatar = EditorGUILayout.ObjectField(Localization.G("label.avatar", "tip.select_avatar"), TargetAvatar, typeof(VRCAvatarDescriptor), true) as VRCAvatarDescriptor;
                     if (EditorGUI.EndChangeCheck())
                     {
                         Parameters = TargetAvatar != null && TargetAvatar.TryGetComponentInChildren<LightLimitChangerSettings>(out var settings)
@@ -64,38 +64,38 @@ namespace io.github.azukimochi
 
                 var param = Parameters;
 
-                using (new Utils.GroupScope(Localization.S("Parameter"), 250))
+                using (new Utils.GroupScope(Localization.S("category.select_parameter"), 250))
                 {
-                    param.IsDefaultUse = EditorGUILayout.Toggle(Localization.G("DefaultUse", "Use the light animation in the initial state"), param.IsDefaultUse);
-                    param.IsValueSave = EditorGUILayout.Toggle(Localization.G("SaveValue", "Keep brightness changes in the avatar"), param.IsValueSave);
-                    param.OverwriteDefaultLightMinMax = EditorGUILayout.Toggle(Localization.G("Overwrite Default Min/Max", "Override the default avatar brightness with the lower and upper limit parameters below"), param.OverwriteDefaultLightMinMax);
-                    param.MaxLightValue = EditorGUILayout.FloatField(Localization.G("MaxLight[0-10]", "Brightness upper limit setting"), param.MaxLightValue);
-                    param.MinLightValue = EditorGUILayout.FloatField(Localization.G("MinLight[0-10]", "Brightness lower limit setting"), param.MinLightValue);
-                    param.DefaultLightValue = EditorGUILayout.FloatField(Localization.G("DefaultLight[0-1]", "Initial brightness setting"), param.DefaultLightValue);
+                    param.IsDefaultUse = EditorGUILayout.Toggle(Localization.G("label.use_default", "tip.use_default"), param.IsDefaultUse);
+                    param.IsValueSave = EditorGUILayout.Toggle(Localization.G("label.save_value", "tip.save_value"), param.IsValueSave);
+                    param.OverwriteDefaultLightMinMax = EditorGUILayout.Toggle(Localization.G("label.override_min_max", "tip.override_min_max"), param.OverwriteDefaultLightMinMax);
+                    param.MaxLightValue = EditorGUILayout.FloatField(Localization.G("label.light_max", "tip.light_max"), param.MaxLightValue);
+                    param.MinLightValue = EditorGUILayout.FloatField(Localization.G("label.light_min", "tip.light_min"), param.MinLightValue);
+                    param.DefaultLightValue = EditorGUILayout.FloatField(Localization.G("label.light_default", "tip.light_default"), param.DefaultLightValue);
 
                 }
-                using (new Utils.GroupScope(Localization.S("Options"), 250))
+                using (new Utils.GroupScope(Localization.S("category.select_option"), 250))
                 {
-                    param.AllowColorTempControl = EditorGUILayout.Toggle(Localization.G("Allow Color Temperature Ctrl", "You can enable the Color Temperature adjustment function"), param.AllowColorTempControl);
-                    param.AllowSaturationControl = EditorGUILayout.Toggle(Localization.G("Allow Saturation Control", "You can enable the saturation adjustment function"), param.AllowSaturationControl);
-                    param.AllowUnlitControl = EditorGUILayout.Toggle(Localization.G("Allow Unlit Control", "You can enable the Unlit adjustment function (Liltoon/Sunao Only)"), param.AllowUnlitControl);
-                    param.AddResetButton = EditorGUILayout.Toggle(Localization.G("Add Reset Button", "Add a reset button to return the parameter to the set value"), param.AddResetButton);
+                    param.AllowColorTempControl = EditorGUILayout.Toggle(Localization.G("label.allow_color_tmp", "tip.allow_color_tmp"), param.AllowColorTempControl);
+                    param.AllowSaturationControl = EditorGUILayout.Toggle(Localization.G("label.allow_saturation", "tip.allow_saturation"), param.AllowSaturationControl);
+                    param.AllowUnlitControl = EditorGUILayout.Toggle(Localization.G("label.allow_unlit", "tip.allow_unlit"), param.AllowUnlitControl);
+                    param.AddResetButton = EditorGUILayout.Toggle(Localization.G("label.allow_reset", "tip.allow_reset"), param.AddResetButton);
                     
 
-                    using (var group = new Utils.FoldoutHeaderGroupScope(ref _isOptionFoldoutOpen, Localization.G("Advanced Setting")))
+                    using (var group = new Utils.FoldoutHeaderGroupScope(ref _isOptionFoldoutOpen, Localization.G("category.select_advanced")))
                     {
                         if (group.IsOpen)
                         {
                             EditorGUI.BeginChangeCheck();
-                            param.TargetShader = (Shaders)EditorGUILayout.MaskField(Localization.G("Target Shader", "You can choose which shader to control"), (int)param.TargetShader, _targetShaderLabels);
+                            param.TargetShader = (Shaders)EditorGUILayout.MaskField(Localization.G("label.target_shader", "tip.target_shader"), (int)param.TargetShader, _targetShaderLabels);
                             if (EditorGUI.EndChangeCheck())
                             {
-                                infoLabel = param.TargetShader == 0 ? Localization.S("Target Shader must be selected") : string.Empty;
+                                infoLabel = param.TargetShader == 0 ? Localization.S("info.shader_must_select") : string.Empty;
                             }
-                            param.ExcludeEditorOnly = EditorGUILayout.Toggle(Localization.G("Exclude EditorOnly", "Exclude objects marked with EditorOnly tag from animation"), param.ExcludeEditorOnly);
-                            param.GenerateAtBuild = EditorGUILayout.Toggle(Localization.G("Generate At Build/PlayMode", "Automatically generate animations at build/play mode"), param.GenerateAtBuild);
+                            param.ExcludeEditorOnly = EditorGUILayout.Toggle(Localization.G("label.allow_editor_only", "tip.allow_editor_only"), param.ExcludeEditorOnly);
+                            param.GenerateAtBuild = EditorGUILayout.Toggle(Localization.G("label.allow_gen_playmode", "tip.allow_gen_playmode"), param.GenerateAtBuild);
                             param.AllowOverridePoiyomiAnimTag = EditorGUILayout.Toggle(
-                                Localization.G("Allow Override Poiyomi AnimatedFlag", "Automatically set animation flags at build time"), param.AllowOverridePoiyomiAnimTag);
+                                Localization.G("label.allow_override_poiyomi", "tip.allow_override_poiyomi"), param.AllowOverridePoiyomiAnimTag);
                         }
                     }
                 }
@@ -106,21 +106,21 @@ namespace io.github.azukimochi
                     string buttonLabel;
                     {
                         buttonLabel = TargetAvatar != null && TargetAvatar.TryGetComponentInChildren<LightLimitChangerSettings>(out var settings) && settings.IsValid()
-                        ? "Regenerate"
-                        : "Generate";
+                        ? "info.re_generate"
+                        : "info.generate";
                     }
 
                     if (GUILayout.Button(Localization.S(buttonLabel)))
                     {
-                        infoLabel = Localization.S( "Processing");
+                        infoLabel = Localization.S( "info.process");
                         try
                         {
                             GenerateAssets();
-                            infoLabel = Localization.S("Complete");
+                            infoLabel = Localization.S("info.complete");
                         }
                         catch (Exception e)
                         {
-                            infoLabel = $"{Localization.S("Error")}: {e.Message}";
+                            infoLabel = $"{Localization.S("info.error")}: {e.Message}";
                         }
                     }
                 }
@@ -144,10 +144,10 @@ namespace io.github.azukimochi
             if (settings == null || !settings.IsValid())
             {
                 var fileName = $"{TargetAvatar.name}_{DateTime.Now:yyyyMMddHHmmss}_{GUID.Generate()}.controller";
-                var savePath = EditorUtility.SaveFilePanelInProject(Localization.S("Save"), System.IO.Path.GetFileNameWithoutExtension(fileName), System.IO.Path.GetExtension(fileName).Trim('.'), Localization.S("Save Location"));
+                var savePath = EditorUtility.SaveFilePanelInProject(Localization.S("info.save"), System.IO.Path.GetFileNameWithoutExtension(fileName), System.IO.Path.GetExtension(fileName).Trim('.'), Localization.S("info.save_location"));
                 if (string.IsNullOrEmpty(savePath))
                 {
-                    throw new Exception(Localization.S("Cancelled"));
+                    throw new Exception(Localization.S("info.cancelled"));
                 }
 
                 var fx = new AnimatorController() { name = System.IO.Path.GetFileName(fileName) };
