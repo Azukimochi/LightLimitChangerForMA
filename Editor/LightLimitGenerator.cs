@@ -254,12 +254,12 @@ namespace io.github.azukimochi
                     var material = dict[Shaders.lilToon];
                     var (min, max, color, color2nd, color3rd, sat) =
                     (
-                        material.GetFloat(SHADER_KEY_LILTOON_LightMinLimit),
-                        material.GetFloat(SHADER_KEY_LILTOON_LightMaxLimit),
-                        material.GetColor(SHADER_KEY_LILTOON_COLOR),
-                        material.GetColor(SHADER_KEY_LILTOON_COLOR2ND),
-                        material.GetColor(SHADER_KEY_LILTOON_COLOR3RD),
-                        material.GetVector(SHADER_KEY_LILTOON_MainHSVG)
+                        material.GetValue(SHADER_KEY_LILTOON_LightMinLimit, 0.0f),
+                        material.GetValue(SHADER_KEY_LILTOON_LightMaxLimit, 1.0f),
+                        material.GetValue(SHADER_KEY_LILTOON_COLOR, new Color(0.0f, 0.0f, 0.0f)),
+                        material.GetValue(SHADER_KEY_LILTOON_COLOR2ND, new Color(0.0f, 0.0f, 0.0f)),
+                        material.GetValue(SHADER_KEY_LILTOON_COLOR3RD, new Color(0.0f, 0.0f, 0.0f)),
+                        material.GetValue(SHADER_KEY_LILTOON_MainHSVG, new Vector4(0.0f,0.0f,0.0f, 0.0f))
                     );
 
                     if (parameters.OverwriteDefaultLightMinMax)
@@ -322,11 +322,11 @@ namespace io.github.azukimochi
                     var material = dict[Shaders.Sunao];
                     var (min, dir, point, sh, color) =
                     (
-                        material.GetFloat(SHADER_KEY_SUNAO_MinimumLight),
-                        material.GetFloat(SHADER_KEY_SUNAO_DirectionalLight),
-                        material.GetFloat(SHADER_KEY_SUNAO_PointLight),
-                        material.GetFloat(SHADER_KEY_SUNAO_SHLight),
-                        material.GetColor(SHADER_KEY_SUNAO_COLOR)
+                        material.GetValue(SHADER_KEY_SUNAO_MinimumLight, 0.0f),
+                        material.GetValue(SHADER_KEY_SUNAO_DirectionalLight, 1.0f),
+                        material.GetValue(SHADER_KEY_SUNAO_PointLight, 1.0f),
+                        material.GetValue(SHADER_KEY_SUNAO_SHLight, 1.0f),
+                        material.GetValue(SHADER_KEY_SUNAO_COLOR, new Color(0.0f,0.0f,0.0f))
                     );
 
                     if (parameters.OverwriteDefaultLightMinMax)
@@ -371,10 +371,10 @@ namespace io.github.azukimochi
 
                     var (min, max, sat, color) =
                     (
-                        material.GetFloat(SHADER_KEY_POIYOMI_LightingMinLightBrightness),
-                        material.GetFloat(SHADER_KEY_POIYOMI_LightingCap),
-                        material.GetFloat(SHADER_KEY_POIYOMI_Saturation), // `_MainColorAdjustToggle` が有効になってないと取得に失敗する
-                        material.GetColor(SHADER_KEY_POIYOMI_COLOR)
+                        material.GetValue(SHADER_KEY_POIYOMI_LightingMinLightBrightness, 0.0f),
+                        material.GetValue(SHADER_KEY_POIYOMI_LightingCap, 0.0f),
+                        material.GetValue(SHADER_KEY_POIYOMI_Saturation, 0.0f), // `_MainColorAdjustToggle` が有効になってないと取得に失敗する 
+                        material.GetValue(SHADER_KEY_POIYOMI_COLOR, new Color(0,0,0))
                     );
 
                     if (parameters.OverwriteDefaultLightMinMax)
