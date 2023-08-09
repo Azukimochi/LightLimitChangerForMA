@@ -122,6 +122,26 @@ namespace io.github.azukimochi
             return value;
         }
 
+        public static T GetValue<T>(this Material material, string name, T defaultValue = default)
+        {
+            if (material != null && material.HasProperty(name))
+            {
+                if (typeof(T) == typeof(float))
+                    return (T)(object)material.GetFloat(name);
+
+                else if (typeof(T) == typeof(int))
+                    return (T)(object)material.GetInt(name);
+
+                else if (typeof(T) == typeof(Color))
+                    return (T)(object)material.GetColor(name);
+
+                else if (typeof(T) == typeof(Vector4))
+                    return (T)(object)material.GetVector(name);
+
+            }
+            return defaultValue;
+        }
+
         private static MethodInfo _GetGeneratedAssetsFolder = typeof(nadena.dev.modular_avatar.core.editor.AvatarProcessor).Assembly.GetTypes().FirstOrDefault(x => x.Name == "Util")?.GetMethod(nameof(GetGeneratedAssetsFolder), BindingFlags.Static | BindingFlags.NonPublic);
 
         public static string GetGeneratedAssetsFolder()

@@ -336,7 +336,7 @@ namespace io.github.azukimochi
                     {
                         poiyomiMaterials.Add(material);
 
-                        if (parameters.AllowSaturationControl)
+                        if (parameters.AllowSaturationControl && BuildManager.IsRunning)
                         {
                             material.SetFloat("_MainColorAdjustToggle", 1);
                             material.EnableKeyword($"{"_MainColorAdjustToggle".ToUpperInvariant()}_ON");
@@ -346,7 +346,7 @@ namespace io.github.azukimochi
                         (
                             material.GetFloat(SHADER_KEY_POIYOMI_LightingMinLightBrightness),
                             material.GetFloat(SHADER_KEY_POIYOMI_LightingCap),
-                            material.GetFloat(SHADER_KEY_POIYOMI_Saturation),
+                            material.GetValue(SHADER_KEY_POIYOMI_Saturation, 0f), // `_MainColorAdjustToggle` が有効になってないと取得に失敗する
                             material.GetColor(SHADER_KEY_POIYOMI_COLOR)
                         );
 
