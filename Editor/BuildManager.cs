@@ -14,15 +14,29 @@ namespace io.github.azukimochi
         static BuildManager()
         {
             // 多分これが一番早いと思います
-            LightLimitChangerSettings.OnAwake = default(BuildManager).BuildOnPlayMode;
+            LightLimitChangerSettings.OnAwake = OnPlayModeEnter;
         }
 
         public int callbackOrder => new AvatarProcessor().callbackOrder - 1;
 
+        internal static bool IsRunning { get; private set; }
+
         internal static Dictionary<Material, Dictionary<string, string>> PoiyomiOriginalFlags;
+
+        private static void OnPlayModeEnter(LightLimitChangerSettings settings)
+        {
+            VRCAvatarDescriptor avatar;
+            IsRunning = true;
+            if (settings.Parameters.GenerateAtBuild && (avatar = settings.gameObject.FindAvatarFromParent()) != null)
+            {
+                LightLimitGenerator.Generate(avatar, settings);
+            }
+            IsRunning = false;
+        }
 
         bool IVRCSDKPreprocessAvatarCallback.OnPreprocessAvatar(GameObject avatarGameObject)
         {
+            IsRunning = true;
             var avatar = avatarGameObject.GetComponent<VRCAvatarDescriptor>();
             if (avatar.TryGetComponentInChildren<LightLimitChangerSettings>(out var settings))
             {
@@ -30,34 +44,14 @@ namespace io.github.azukimochi
                 {
                     LightLimitGenerator.Generate(avatar, settings);
                 }
-                if (settings.Parameters.AllowOverridePoiyomiAnimTag)
-                {
-                    LightLimitGenerator.ConfigurePoiyomiAnimated(avatar, settings);
-                }
-
             }
 
+            IsRunning = false;
             return true;
         }
 
         void IVRCSDKPostprocessAvatarCallback.OnPostprocessAvatar()
         {
-            foreach (var settings in GameObject.FindObjectsOfType<LightLimitChangerSettings>())
-            {
-                LightLimitGenerator.ResetPoiyomiAnimated(settings);
-            }
-        }
-    }
-
-    internal static class BuildManagerHelper
-    {
-        public static void BuildOnPlayMode(this BuildManager _, LightLimitChangerSettings settings)
-        {
-            VRCAvatarDescriptor avatar;
-            if (settings.Parameters.GenerateAtBuild && (avatar = settings.gameObject.FindAvatarFromParent()) != null)
-            {
-                LightLimitGenerator.Generate(avatar, settings);
-            }
         }
     }
 }

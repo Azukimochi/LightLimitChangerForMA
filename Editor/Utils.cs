@@ -9,12 +9,13 @@ using UnityEditor.Animations;
 using VRC.SDK3.Avatars.Components;
 using System.Reflection;
 using UnityEngine.UIElements;
+using Object = UnityEngine.Object;
 
 namespace io.github.azukimochi
 {
     internal static class Utils
     {
-        public static void ClearSubAssets(this UnityEngine.Object obj)
+        public static void ClearSubAssets(this Object obj)
         {
             var path = AssetDatabase.GetAssetPath(obj);
             if (path != null)
@@ -60,16 +61,7 @@ namespace io.github.azukimochi
             return component;
         }
 
-        public static VRCAvatarDescriptor FindAvatarFromParent(this GameObject obj)
-        {
-            var tr = obj.transform;
-            VRCAvatarDescriptor avatar = null;
-            while(tr != null && (avatar = tr.GetComponent<VRCAvatarDescriptor>()) == null)
-            {
-                tr = tr.parent;
-            }
-            return avatar;
-        }
+        public static VRCAvatarDescriptor FindAvatarFromParent(this GameObject obj) => obj.GetComponentInParent<VRCAvatarDescriptor>();
 
         public static IEnumerable<Transform> EnumerateChildren(this Transform tr)
         {
@@ -80,17 +72,19 @@ namespace io.github.azukimochi
             }
         }
 
-        public static T AddTo<T>(this T obj, UnityEngine.Object asset) where T : UnityEngine.Object
+        public static T AddTo<T>(this T obj, Object asset) where T : Object
         {
             AssetDatabase.AddObjectToAsset(obj, asset);
             return obj;
         }
 
-        public static T HideInHierarchy<T>(this T obj) where T : UnityEngine.Object
+        public static T HideInHierarchy<T>(this T obj) where T : Object
         {
             obj.hideFlags |= HideFlags.HideInHierarchy;
             return obj;
         }
+
+        public static T Clone<T>(this T obj) where T : Object => Object.Instantiate(obj);
 
         public static string GetRelativePath(this Transform transform, Transform root, bool includeRelativeTo = false)
         {
@@ -118,6 +112,36 @@ namespace io.github.azukimochi
         private static string[] _relativePathBuffer;
 
         public static IEnumerable<string> EnumeratePropertyNames(this Shader shader) => Enumerable.Range(0, shader.GetPropertyCount()).Select(shader.GetPropertyName);
+
+        public static TValue GetOrAdd<TKey, TValue>(this Dictionary<TKey, TValue> dictionary, TKey key, Func<TKey, TValue> valueFactory)
+        {
+            if (!dictionary.TryGetValue(key, out var value))
+            {
+                value = valueFactory(key);
+                dictionary.Add(key, value);
+            }
+            return value;
+        }
+
+        public static T GetValue<T>(this Material material, string name, T defaultValue = default)
+        {
+            if (material != null && material.HasProperty(name))
+            {
+                if (typeof(T) == typeof(float))
+                    return (T)(object)material.GetFloat(name);
+
+                else if (typeof(T) == typeof(int))
+                    return (T)(object)material.GetInt(name);
+
+                else if (typeof(T) == typeof(Color))
+                    return (T)(object)material.GetColor(name);
+
+                else if (typeof(T) == typeof(Vector4))
+                    return (T)(object)material.GetVector(name);
+
+            }
+            return defaultValue;
+        }
 
         private static MethodInfo _GetGeneratedAssetsFolder = typeof(nadena.dev.modular_avatar.core.editor.AvatarProcessor).Assembly.GetTypes().FirstOrDefault(x => x.Name == "Util")?.GetMethod(nameof(GetGeneratedAssetsFolder), BindingFlags.Static | BindingFlags.NonPublic);
 
