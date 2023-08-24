@@ -51,8 +51,6 @@ namespace io.github.azukimochi
         private const string ParameterName_ColorTemp = "LightLimitColorTemp";
         private const string ParameterName_Reset = "LightLimitReset";
 
-        private const bool isDifferentColor = false;
-
         public static void Generate(VRCAvatarDescriptor avatar, LightLimitChangerSettings settings)
         {
             var fx = settings.FX;
