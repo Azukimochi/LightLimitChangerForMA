@@ -160,6 +160,21 @@ namespace io.github.azukimochi
 
             settings.Parameters = Parameters;
             LightLimitGenerator.Generate(avatar, settings);
+            if (Parameters.AllowColorTempControl || Parameters.AllowSaturationControl)
+            {
+                string PreferenceKey = "io.github.azukimochi.light-limit-changer.lang";
+
+                if (EditorPrefs.GetInt(PreferenceKey, 1) == 1)
+                {
+                    EditorUtility.DisplayDialog(
+                        "上級者向け設定使用中",
+                        "焼き込みなどの前処理を行わないと不具合が起きる可能性があります。", "OK");
+                }
+                else 
+                    EditorUtility.DisplayDialog(
+                        "Now using Advanced setting",
+                        "If you do not perform preprocessing such as burning, problems may occur.", "OK");
+            }
         }
     }
 }
