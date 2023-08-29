@@ -9,7 +9,7 @@ using VRC.SDKBase;
 namespace io.github.azukimochi
 {
     [DisallowMultipleComponent]
-    [DefaultExecutionOrder(-10000)]
+    [DefaultExecutionOrder(-100000)]
     public sealed class LightLimitChangerSettings : MonoBehaviour, IEditorOnly
     {
         public AnimatorController FX;
