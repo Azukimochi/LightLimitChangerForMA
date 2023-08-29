@@ -167,13 +167,13 @@ namespace io.github.azukimochi
         {
             if (_titleCache == null)
             {
-                _titleCache = new GUIContent($"{LightLimitChanger.Title} {GetVersion()} 更新履歴");
+                _titleCache = new GUIContent($"{LightLimitChanger.Title} {GetVersion()}");
             }
             using (var foldout = new FoldoutHeaderGroupScope(ref _isVersionInfoFoldoutOpen, _titleCache))
             {
                 if (foldout.IsOpen)
                 {
-                    DrawWebButton("GitHub", "https://github.com/Azukimochi/LightLimitChangerForMA/releases");
+                    DrawWebButton("Light Limit Changer OfficialSite", "https://azukimochi.github.io/LLC-Docs/");
                     DrawWebButton("X|Twitter", "https://twitter.com/search?q=from%3Aazukimochi25%20%23LightLimitChanger&src=typed_query&f=live");
                 }
             }
