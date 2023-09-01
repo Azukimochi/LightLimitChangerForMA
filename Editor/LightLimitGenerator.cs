@@ -170,24 +170,27 @@ namespace io.github.azukimochi
                         {
                             if (bind.type.BaseType == typeof(Renderer))
                             {
-                                var renderer = (Renderer)GameObject.Find(bind.path).GetComponent(bind.type);
-                                var curves = AnimationUtility.GetObjectReferenceCurve(anim, bind);
-                                foreach (var curve in curves)
+                                var renderer = GameObject.Find(bind.path)?.GetComponent(bind.type) as Renderer;
+                                if (renderer != null)
                                 {
-                                    var material = curve.value as Material;
-                                    var type = GetShaderType(material.shader);
-                                    if (material != null && (type & parameters.TargetShader) != 0)
+                                    var curves = AnimationUtility.GetObjectReferenceCurve(anim, bind);
+                                    foreach (var curve in curves)
                                     {
-                                        var clone = material.Clone().AddTo(fx);
-                                        if (!materialMapping.ContainsKey(material))
-                                            materialMapping.Add(material, clone);
+                                        var material = curve.value as Material;
+                                        Shaders type;
+                                        if (material != null && ((type = GetShaderType(material.shader)) & parameters.TargetShader) != 0)
+                                        {
+                                            var clone = material.Clone().AddTo(fx);
+                                            if (!materialMapping.ContainsKey(material))
+                                                materialMapping.Add(material, clone);
 
-                                        if (type == Shaders.Poiyomi)
-                                            poiyomiMaterials.Add(clone);
+                                            if (type == Shaders.Poiyomi)
+                                                poiyomiMaterials.Add(clone);
 
-                                        AddTarget(renderer, type, material);
+                                            AddTarget(renderer, type, material);
 
-                                        needAnimatorCloniong = true;
+                                            needAnimatorCloniong = true;
+                                        }
                                     }
                                 }
                             }
