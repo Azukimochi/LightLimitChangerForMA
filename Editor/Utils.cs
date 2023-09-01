@@ -8,7 +8,8 @@ using System;
 using UnityEditor.Animations;
 using VRC.SDK3.Avatars.Components;
 using System.Reflection;
-using UnityEngine.UIElements;
+using VRC.Core.Pool;
+
 using Object = UnityEngine.Object;
 
 namespace io.github.azukimochi
@@ -328,6 +329,20 @@ namespace io.github.azukimochi
                     curve.keys = _buffer3;
                 }
                 return curve;
+            }
+        }
+
+        public static class ArrayPool<T>
+        {
+            public static T[] Rent(int minimumSize)
+            {
+                var size = 16 << (int)(Math.Log((uint)minimumSize - 1 | 15, 2) - 3);
+                return ArrayPool.Get<T>(size).Array;
+            }
+
+            public static void Return(T[] array)
+            {
+                ArrayPool.Release(array);
             }
         }
     }
