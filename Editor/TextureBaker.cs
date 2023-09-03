@@ -31,7 +31,6 @@ namespace io.github.azukimochi
 
         private readonly Material _material;
 
-
         public Texture Texture { get => _material?.GetTexture(_TexturePropertyID); set => _material?.SetTexture(_TexturePropertyID, value); }
 
         public Texture Mask { get => _material?.GetTexture(_MaskPropertyID); set => _material?.SetTexture(_MaskPropertyID, value); }

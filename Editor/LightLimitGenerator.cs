@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
 using UnityEditor.Animations;
-using UnityEditor.Rendering;
 using UnityEngine;
 using VRC.Core;
 using VRC.SDK3.Avatars.Components;
@@ -85,85 +84,45 @@ namespace io.github.azukimochi
             var parameters = settings.Parameters;
             var targets = new Dictionary<Renderer, Dictionary<Shaders, Material>>();
 
-            void AddTarget(Renderer renderer, Shaders type, Material material)
-            {
-                var dict = targets.GetOrAdd(renderer, _ => new Dictionary<Shaders, Material>());
-                if (!dict.ContainsKey(type))
-                    dict.Add(type, material);
+            AnimationClip baseColor = new AnimationClip() { name = "BaseColor" };
+            var light = CreateAnimationClips("Light");
+            var saturation = CreateAnimationClips("Saturation");
+            var unlit = CreateAnimationClips("Unlit");
+            var colorTemp = CreateAnimationClips("ColorTemp");
 
-                // 基準値を取るためにマテリアルを保持してるけど、ベイクなりしてプロパティをノーマライズするとなると別に要らない気もしてくる
+            light.AddTo(fx);
+
+            if (parameters.AllowColorTempControl)
+            {
+                colorTemp.AddTo(fx);
+            }
+            if (parameters.AllowSaturationControl)
+            {
+                baseColor.AddTo(fx);
+                saturation.AddTo(fx);
+            }
+            if (parameters.AllowUnlitControl)
+            {
+                unlit.AddTo(fx);
             }
 
-            AnimatorControllerContainer[] animatorControllerContainers = null;
             if (BuildManager.IsRunning)
             {
-                // アバターに含まれるAnimatorControllerを全列挙する
-                // 漏れがありそう
-                animatorControllerContainers = 
-                    avatar.baseAnimationLayers.Select((x, i) => new AnimatorControllerContainer(x.animatorController, y =>
-                    {
-                        x.animatorController = y;
-                        avatar.baseAnimationLayers[i] = x;
-                    }))
-                    .Concat(avatar.GetComponentsInChildren<Animator>(true).Where(x => !settings.Parameters.ExcludeEditorOnly || x.tag != "EditorOnly").Select(x => new AnimatorControllerContainer(x.runtimeAnimatorController, y => x.runtimeAnimatorController = y)))
-                    .Concat(avatar.GetComponentsInChildren<ModularAvatarMergeAnimator>(true).Where(x => !settings.Parameters.ExcludeEditorOnly || x.tag != "EditorOnly").Select(x => new AnimatorControllerContainer(x.animator, y => x.animator = y)))
-                    .Where(x => x.Controller != null)
-                    .ToArray();
-            }
-
-            Dictionary<Material, Material> materialMapping = null;
-            HashSet<Material> poiyomiMaterials = new HashSet<Material>();
-
-            foreach (var renderer in avatar.GetComponentsInChildren<Renderer>(true))
-            {
-                if ((renderer is MeshRenderer || renderer is SkinnedMeshRenderer) && (!settings.Parameters.ExcludeEditorOnly || renderer.tag != "EditorOnly"))
+                var objectMapper = ObjectMapper.Create();
+                var components = avatar.GetComponentsInChildren<Component>().Where(x => !(x is Transform)).Select(x => new SerializedObject(x)).ToArray();
+                objectMapper.MapObject<Material>(components, x =>
                 {
-                    var materials = renderer.sharedMaterials;
-                    bool materialsHasChanged = false;
-                    for (int i = 0; i < materials.Length; i++)
-                    {
-                        Material material = materials[i];
-                        if (material != null)
-                        {
-                            var shaderType = GetShaderType(material?.shader);
-                            if ((shaderType & parameters.TargetShader) != 0)
-                            {
-                                if (BuildManager.IsRunning)
-                                {
-                                    if (!(materialMapping ?? (materialMapping = new Dictionary<Material, Material>())).TryGetValue(material, out var clone))
-                                    {
-                                        clone = material.Clone().AddTo(fx);
-                                        materialMapping.Add(material, clone);
-                                    }
+                    x = x.Clone().AddTo(fx);
+                    MaterialNormalizer.Normalize(x);
+                    return x;
+                });
 
-                                    material = materials[i] = clone;
-                                    materialsHasChanged = true;
-                                }
-
-                                AddTarget(renderer, shaderType, material);
-
-                                if (shaderType == Shaders.Poiyomi)
-                                    poiyomiMaterials.Add(material);
-                            }
-                        }
-                    }
-                    if (materialsHasChanged)
-                    {
-                        renderer.sharedMaterials = materials;
-                    }
-                }
-            }
-
-            // Find materials in animations and replace it.
-            if (BuildManager.IsRunning)
-            {
-                var mapper = new AnimatorControllerMapper(materialMapping, fx);
+                var animatorMapper = new AnimatorControllerMapper(objectMapper.MappedObjects, fx);
                 bool needAnimatorCloniong = false;
 
-                foreach (var container in animatorControllerContainers)
+                objectMapper.MapObject<RuntimeAnimatorController>(components, x =>
                 {
-                    var controller = container.Controller;
-                    foreach (var anim in controller.animationClips)
+                    foreach (var anim in x.animationClips)
                     {
                         var binds = AnimationUtility.GetObjectReferenceCurveBindings(anim);
                         foreach (var bind in binds)
@@ -177,97 +136,50 @@ namespace io.github.azukimochi
                                     foreach (var curve in curves)
                                     {
                                         var material = curve.value as Material;
-                                        Shaders type;
-                                        if (material != null && ((type = GetShaderType(material.shader)) & parameters.TargetShader) != 0)
+                                        if ((GetShaderType(material?.shader) & parameters.TargetShader) != 0)
                                         {
-                                            var clone = material.Clone().AddTo(fx);
-                                            if (!materialMapping.ContainsKey(material))
-                                                materialMapping.Add(material, clone);
-
-                                            if (type == Shaders.Poiyomi)
-                                                poiyomiMaterials.Add(clone);
-
-                                            AddTarget(renderer, type, material);
-
                                             needAnimatorCloniong = true;
+                                            goto EndSearchAniamtions;
                                         }
                                     }
                                 }
                             }
                         }
                     }
-                }
 
-                if (needAnimatorCloniong)
-                {
-                    foreach (var container in animatorControllerContainers)
+                    EndSearchAniamtions:
+                    if (needAnimatorCloniong)
                     {
-                        var controller = mapper.MapController(container.Controller);
-                        if (controller != null)
-                            container.Replace(controller);
+                        return animatorMapper.MapController(x);
                     }
-                }
+                    else
+                    {
+                        return null;
+                    }
+                });
             }
 
-            AnimationClip baseColor = new AnimationClip() { name = "BaseColor" };
-            (AnimationClip Default, AnimationClip Control) light = (new AnimationClip() { name = "Default Light" }, new AnimationClip() { name = "Change Light" });
-            (AnimationClip Default, AnimationClip Control) saturation = (new AnimationClip() { name = "Default Saturation" }, new AnimationClip() { name = "Change Saturation" });
-            (AnimationClip Default, AnimationClip Control) unlit = (new AnimationClip() { name = "Default Unlit" }, new AnimationClip() { name = "Change Unlit" });
-            (AnimationClip Default, AnimationClip Control) colorTemp = (new AnimationClip() { name = "Default ColorTemp" }, new AnimationClip() { name = "Change ColorTemp" });
-
-            light.Default.AddTo(fx);
-            light.Control.AddTo(fx);
-
-            if (parameters.AllowColorTempControl)
+            foreach(var renderer in avatar.GetComponentsInChildren<Renderer>())
             {
-                colorTemp.Default.AddTo(fx);
-                colorTemp.Control.AddTo(fx);
-            }
-            if (parameters.AllowSaturationControl)
-            {
-                baseColor.AddTo(fx);
-                saturation.Default.AddTo(fx);
-                saturation.Control.AddTo(fx);
-            }
-            if (parameters.AllowUnlitControl)
-            {
-                unlit.Default.AddTo(fx);
-                unlit.Control.AddTo(fx);
-            }
-
-            foreach (var target in targets)
-            {
-                var renderer = target.Key;
-                var dict = target.Value;
-                Shaders key = 0;
-                foreach(var shaderType in dict.Keys)
-                {
-                    key |= shaderType;
-                }
-
-                key &= parameters.TargetShader;
-                if (key == 0)
-                    continue;
-
                 var relativePath = renderer.transform.GetRelativePath(avatar.transform);
                 var type = renderer.GetType();
 
-                if (key.HasFlag(Shaders.lilToon))
-                {
-                    var material = dict[Shaders.lilToon];
-                    var (min, max, color, color2nd, color3rd, sat) =
+                var (min, max, color, color2nd, color3rd, hsvg, dir, point, sh, sat) =
                     (
-                        material.GetValue(SHADER_KEY_LILTOON_LightMinLimit, 0.0f),
-                        material.GetValue(SHADER_KEY_LILTOON_LightMaxLimit, 1.0f),
-                        material.GetValue(SHADER_KEY_LILTOON_COLOR, new Color(0.0f, 0.0f, 0.0f)),
-                        material.GetValue(SHADER_KEY_LILTOON_COLOR2ND, new Color(0.0f, 0.0f, 0.0f)),
-                        material.GetValue(SHADER_KEY_LILTOON_COLOR3RD, new Color(0.0f, 0.0f, 0.0f)),
-                        material.GetValue(SHADER_KEY_LILTOON_MainHSVG, new Vector4(0.0f,0.0f,0.0f, 0.0f))
+                        0f,
+                        1f,
+                        Color.white,
+                        Color.white,
+                        Color.white,
+                        new Vector4(0, 1, 1, 1),
+                        1f,
+                        1f,
+                        1f,
+                        0f
                     );
 
-                    if (parameters.OverwriteDefaultLightMinMax)
-                        (min, max) = (parameters.MinLightValue, parameters.MaxLightValue);
-
+                if (parameters.TargetShader.HasFlag(Shaders.lilToon))
+                {
                     light.Default.SetCurve(relativePath, type, $"{MATERIAL_ANIMATION_KEY_PREFIX}{SHADER_KEY_LILTOON_LightMinLimit}", Utils.Animation.Constant(min));
                     light.Default.SetCurve(relativePath, type, $"{MATERIAL_ANIMATION_KEY_PREFIX}{SHADER_KEY_LILTOON_LightMaxLimit}", Utils.Animation.Constant(max));
 
@@ -304,37 +216,19 @@ namespace io.github.azukimochi
                     colorTemp.Control.SetCurve(relativePath, type, $"{MATERIAL_ANIMATION_KEY_PREFIX}{SHADER_KEY_LILTOON_COLOR3RD}.b", Utils.Animation.Linear(color3rd.b, color3rd.b, color3rd.b * 0.6f));
                     colorTemp.Control.SetCurve(relativePath, type, $"{MATERIAL_ANIMATION_KEY_PREFIX}{SHADER_KEY_LILTOON_COLOR3RD}.a", Utils.Animation.Constant(color3rd.a));
 
-                    //colorTemp.Control.SetCurve(relativePath, type, $"{MATERIAL_ANIMATION_KEY_PREFIX}{SHADER_KEY_LILTOON_COLOR}.r", Utils.Animation.Linear(0.6f, 1, 1));
-                    //colorTemp.Control.SetCurve(relativePath, type, $"{MATERIAL_ANIMATION_KEY_PREFIX}{SHADER_KEY_LILTOON_COLOR}.g", Utils.Animation.Linear(0.95f, 1, 0.8f));
-                    //colorTemp.Control.SetCurve(relativePath, type, $"{MATERIAL_ANIMATION_KEY_PREFIX}{SHADER_KEY_LILTOON_COLOR}.b", Utils.Animation.Linear(1, 1,0.6f));
-                    //colorTemp.Control.SetCurve(relativePath, type, $"{MATERIAL_ANIMATION_KEY_PREFIX}{SHADER_KEY_LILTOON_COLOR}.a", Utils.Animation.Constant(1));
-
-                    baseColor.SetCurve(relativePath, type, $"{MATERIAL_ANIMATION_KEY_PREFIX}{SHADER_KEY_LILTOON_MainHSVG}.x", Utils.Animation.Constant(sat.x));
-                    baseColor.SetCurve(relativePath, type, $"{MATERIAL_ANIMATION_KEY_PREFIX}{SHADER_KEY_LILTOON_MainHSVG}.y", Utils.Animation.Constant(sat.y));
-                    baseColor.SetCurve(relativePath, type, $"{MATERIAL_ANIMATION_KEY_PREFIX}{SHADER_KEY_LILTOON_MainHSVG}.z", Utils.Animation.Constant(sat.z));
-                    baseColor.SetCurve(relativePath, type, $"{MATERIAL_ANIMATION_KEY_PREFIX}{SHADER_KEY_LILTOON_MainHSVG}.w", Utils.Animation.Constant(sat.w));
-
+                    baseColor.SetCurve(relativePath, type, $"{MATERIAL_ANIMATION_KEY_PREFIX}{SHADER_KEY_LILTOON_MainHSVG}.x", Utils.Animation.Constant(hsvg.x));
+                    baseColor.SetCurve(relativePath, type, $"{MATERIAL_ANIMATION_KEY_PREFIX}{SHADER_KEY_LILTOON_MainHSVG}.y", Utils.Animation.Constant(hsvg.y));
+                    baseColor.SetCurve(relativePath, type, $"{MATERIAL_ANIMATION_KEY_PREFIX}{SHADER_KEY_LILTOON_MainHSVG}.z", Utils.Animation.Constant(hsvg.z));
+                    baseColor.SetCurve(relativePath, type, $"{MATERIAL_ANIMATION_KEY_PREFIX}{SHADER_KEY_LILTOON_MainHSVG}.w", Utils.Animation.Constant(hsvg.w));
 
                     saturation.Control.SetCurve(relativePath, type, $"{MATERIAL_ANIMATION_KEY_PREFIX}{SHADER_KEY_LILTOON_MainHSVG}.y", Utils.Animation.Linear(0, 2));
 
                     unlit.Default.SetCurve(relativePath, type, $"{MATERIAL_ANIMATION_KEY_PREFIX}{SHADER_KEY_LILTOON_UNLIT}", Utils.Animation.Constant(0));
                     unlit.Control.SetCurve(relativePath, type, $"{MATERIAL_ANIMATION_KEY_PREFIX}{SHADER_KEY_LILTOON_UNLIT}", Utils.Animation.Linear(0.0f, 1.0f));
                 }
-                if (key.HasFlag(Shaders.Sunao))
+
+                if (parameters.TargetShader.HasFlag(Shaders.Sunao))
                 {
-                    var material = dict[Shaders.Sunao];
-                    var (min, dir, point, sh, color) =
-                    (
-                        material.GetValue(SHADER_KEY_SUNAO_MinimumLight, 0.0f),
-                        material.GetValue(SHADER_KEY_SUNAO_DirectionalLight, 1.0f),
-                        material.GetValue(SHADER_KEY_SUNAO_PointLight, 1.0f),
-                        material.GetValue(SHADER_KEY_SUNAO_SHLight, 1.0f),
-                        material.GetValue(SHADER_KEY_SUNAO_COLOR, new Color(0.0f,0.0f,0.0f))
-                    );
-
-                    if (parameters.OverwriteDefaultLightMinMax)
-                        min = parameters.MinLightValue;
-
                     light.Default.SetCurve(relativePath, type, $"{MATERIAL_ANIMATION_KEY_PREFIX}{SHADER_KEY_SUNAO_MinimumLight}", Utils.Animation.Constant(min));
                     light.Default.SetCurve(relativePath, type, $"{MATERIAL_ANIMATION_KEY_PREFIX}{SHADER_KEY_SUNAO_DirectionalLight}", Utils.Animation.Constant(dir));
                     light.Default.SetCurve(relativePath, type, $"{MATERIAL_ANIMATION_KEY_PREFIX}{SHADER_KEY_SUNAO_PointLight}", Utils.Animation.Constant(point));
@@ -360,29 +254,10 @@ namespace io.github.azukimochi
                     colorTemp.Control.SetCurve(relativePath, type, $"{MATERIAL_ANIMATION_KEY_PREFIX}{SHADER_KEY_SUNAO_COLOR}.g", Utils.Animation.Linear(color.g * 0.95f, color.g, color.g * 0.8f));
                     colorTemp.Control.SetCurve(relativePath, type, $"{MATERIAL_ANIMATION_KEY_PREFIX}{SHADER_KEY_SUNAO_COLOR}.b", Utils.Animation.Linear(color.b, color.b, color.b * 0.6f));
                     colorTemp.Control.SetCurve(relativePath, type, $"{MATERIAL_ANIMATION_KEY_PREFIX}{SHADER_KEY_SUNAO_COLOR}.a", Utils.Animation.Constant(color.a));
-
                 }
-                if (key.HasFlag(Shaders.Poiyomi))
+
+                if (parameters.TargetShader.HasFlag(Shaders.Poiyomi))
                 {
-                    var material = dict[Shaders.Poiyomi];
-                    if (parameters.AllowSaturationControl && BuildManager.IsRunning)
-                    {
-                        material.SetFloat(SHADER_KEY_POIYOMI_MainColorAdjustToggle, 1);
-                        material.EnableKeyword($"{SHADER_KEY_POIYOMI_MainColorAdjustToggle.ToUpperInvariant()}_ON");
-                        material.EnableKeyword("COLOR_GRADING_HDR");
-                    }
-
-                    var (min, max, sat, color) =
-                    (
-                        material.GetValue(SHADER_KEY_POIYOMI_LightingMinLightBrightness, 0.0f),
-                        material.GetValue(SHADER_KEY_POIYOMI_LightingCap, 0.0f),
-                        material.GetValue(SHADER_KEY_POIYOMI_Saturation, 0.0f), // `_MainColorAdjustToggle` が有効になってないと取得に失敗する 
-                        material.GetValue(SHADER_KEY_POIYOMI_COLOR, new Color(0,0,0))
-                    );
-
-                    if (parameters.OverwriteDefaultLightMinMax)
-                        (min, max) = (parameters.MinLightValue, parameters.MaxLightValue);
-
                     light.Default.SetCurve(relativePath, type, $"{MATERIAL_ANIMATION_KEY_PREFIX}{SHADER_KEY_POIYOMI_LightingMinLightBrightness}", Utils.Animation.Constant(min));
                     light.Default.SetCurve(relativePath, type, $"{MATERIAL_ANIMATION_KEY_PREFIX}{SHADER_KEY_POIYOMI_LightingCap}", Utils.Animation.Constant(max));
 
@@ -403,30 +278,6 @@ namespace io.github.azukimochi
                     colorTemp.Control.SetCurve(relativePath, type, $"{MATERIAL_ANIMATION_KEY_PREFIX}{SHADER_KEY_POIYOMI_COLOR}.g", Utils.Animation.Linear(color.g * 0.95f, color.g, color.g * 0.8f));
                     colorTemp.Control.SetCurve(relativePath, type, $"{MATERIAL_ANIMATION_KEY_PREFIX}{SHADER_KEY_POIYOMI_COLOR}.b", Utils.Animation.Linear(color.b, color.b, color.b * 0.6f));
                     colorTemp.Control.SetCurve(relativePath, type, $"{MATERIAL_ANIMATION_KEY_PREFIX}{SHADER_KEY_POIYOMI_COLOR}.a", Utils.Animation.Constant(color.a));
-                }
-            }
-
-            if (parameters.AllowOverridePoiyomiAnimTag && BuildManager.IsRunning)
-            {
-                foreach(var material in poiyomiMaterials)
-                {
-                    TrySetAnimated(SHADER_KEY_POIYOMI_LightingCap);
-                    TrySetAnimated(SHADER_KEY_POIYOMI_LightingMinLightBrightness);
-
-                    if (parameters.AllowColorTempControl)
-                    {
-                        TrySetAnimated(SHADER_KEY_POIYOMI_COLOR);
-                    }
-                    if (parameters.AllowSaturationControl)
-                    {
-                        TrySetAnimated(SHADER_KEY_POIYOMI_Saturation);
-                    }
-
-                    void TrySetAnimated(string property)
-                    {
-                        var name = $"{property}{Poiyomi_Animated_Suffix}";
-                        material.SetOverrideTag(name, Poiyomi_Flag_IsAnimated);
-                    }
                 }
             }
 
@@ -527,7 +378,7 @@ namespace io.github.azukimochi
             fx.AddLayer(layer);
         }
 
-        private static Shaders GetShaderType(Shader shader)
+        internal static Shaders GetShaderType(Shader shader)
         {
             Shaders result = 0;
             if (shader == null)
@@ -629,34 +480,32 @@ namespace io.github.azukimochi
 
         private static VRCExpressionsMenu CreateMenu(AnimatorController fx, LightLimitChangerParameters parameters)
         {
-            var mainMenu = new VRCExpressionsMenu
+            var mainMenu = ScriptableObject.CreateInstance<VRCExpressionsMenu>().AddTo(fx);
+            mainMenu.name = "Main Menu";
+            mainMenu.controls = new List<VRCExpressionsMenu.Control>
             {
-                name = "Main Menu",
-                controls = new List<VRCExpressionsMenu.Control>
+                new VRCExpressionsMenu.Control
                 {
-                    new VRCExpressionsMenu.Control
+                    name = "Enable",
+                    type = VRCExpressionsMenu.Control.ControlType.Toggle,
+                    parameter = new VRCExpressionsMenu.Control.Parameter
                     {
-                        name = "Enable",
-                        type = VRCExpressionsMenu.Control.ControlType.Toggle,
-                        parameter = new VRCExpressionsMenu.Control.Parameter
-                        {
-                            name = ParameterName_Toggle,
-                        },
-                    },
-                    new VRCExpressionsMenu.Control
-                    {
-                        name = "Light",
-                        type = VRCExpressionsMenu.Control.ControlType.RadialPuppet,
-                        subParameters = new VRCExpressionsMenu.Control.Parameter[]
-                        {
-                            new VRCExpressionsMenu.Control.Parameter
-                            {
-                                name = ParameterName_Value
-                            }
-                        },
+                        name = ParameterName_Toggle,
                     },
                 },
-            }.AddTo(fx);
+                new VRCExpressionsMenu.Control
+                {
+                    name = "Light",
+                    type = VRCExpressionsMenu.Control.ControlType.RadialPuppet,
+                    subParameters = new VRCExpressionsMenu.Control.Parameter[]
+                    {
+                        new VRCExpressionsMenu.Control.Parameter
+                        {
+                            name = ParameterName_Value
+                        }
+                    },
+                },
+            };
 
             if (parameters.AllowColorTempControl)
             {
@@ -741,15 +590,79 @@ namespace io.github.azukimochi
             return fx;
         }
 
-        private struct AnimatorControllerContainer
-        {
-            public readonly RuntimeAnimatorController Controller;
-            public readonly Action<RuntimeAnimatorController> Replace;
+        private static (AnimationClip Default, AnimationClip Control) CreateAnimationClips(string name)
+            => (new AnimationClip() { name = $"Default {name}" }, new AnimationClip() { name = $"Change {name}" });
 
-            public AnimatorControllerContainer(RuntimeAnimatorController controller, Action<RuntimeAnimatorController> replaceAction)
+        private static (T, T) AddTo<T>(this (T, T) tuple, Object asset) where T : Object
+            => (tuple.Item1.AddTo(asset), tuple.Item2.AddTo(asset));
+
+        internal struct ObjectMapper
+        {
+            public Dictionary<Object, Object> MappedObjects { get; }
+
+            private ObjectMapper(Dictionary<Object, Object> map) => MappedObjects = map;
+
+            public static ObjectMapper Create() => new ObjectMapper(new Dictionary<Object, Object>());
+
+            public void MapObject<T>(SerializedObject[] objects, Func<T, T> factory) where T : Object
             {
-                Controller = controller;
-                Replace = replaceAction;
+                foreach (var serializedObject in objects)
+                {
+                    bool enterChildren = true;
+                    var p = serializedObject.GetIterator();
+                    while (p.Next(enterChildren))
+                    {
+                        if (p.propertyType == SerializedPropertyType.ObjectReference)
+                        {
+                            if (p.objectReferenceValue is T obj)
+                            {
+                                if (!MappedObjects.TryGetValue(obj, out var mapped))
+                                {
+                                    mapped = factory(obj);
+                                    if (mapped == null)
+                                        continue;
+                                    MappedObjects.Add(obj, mapped);
+                                }
+                                p.objectReferenceValue = mapped;
+                            }
+                        }
+
+                        switch (p.propertyType)
+                        {
+                            case SerializedPropertyType.String:
+                            case SerializedPropertyType.Integer:
+                            case SerializedPropertyType.Boolean:
+                            case SerializedPropertyType.Float:
+                            case SerializedPropertyType.Color:
+                            case SerializedPropertyType.ObjectReference:
+                            case SerializedPropertyType.LayerMask:
+                            case SerializedPropertyType.Enum:
+                            case SerializedPropertyType.Vector2:
+                            case SerializedPropertyType.Vector3:
+                            case SerializedPropertyType.Vector4:
+                            case SerializedPropertyType.Rect:
+                            case SerializedPropertyType.ArraySize:
+                            case SerializedPropertyType.Character:
+                            case SerializedPropertyType.AnimationCurve:
+                            case SerializedPropertyType.Bounds:
+                            case SerializedPropertyType.Gradient:
+                            case SerializedPropertyType.Quaternion:
+                            case SerializedPropertyType.FixedBufferSize:
+                            case SerializedPropertyType.Vector2Int:
+                            case SerializedPropertyType.Vector3Int:
+                            case SerializedPropertyType.RectInt:
+                            case SerializedPropertyType.BoundsInt:
+                                enterChildren = false;
+                                break;
+                            case SerializedPropertyType.Generic:
+                            case SerializedPropertyType.ExposedReference:
+                            case SerializedPropertyType.ManagedReference:
+                            default:
+                                enterChildren = true;
+                                break;
+                        }
+                    }
+                }
             }
         }
 
@@ -758,13 +671,13 @@ namespace io.github.azukimochi
         // Copyright (c) 2022 anatawa12
         internal class AnimatorControllerMapper
         {
-            private readonly Dictionary<Material, Material> _mapping;
+            private readonly Dictionary<Object, Object> _mapping;
             private readonly Dictionary<Object, Object> _cache = new Dictionary<Object, Object>();
             private readonly Object _rootArtifact;
             private bool _mapped = false;
 
 
-            public AnimatorControllerMapper(Dictionary<Material, Material> mapping,Object rootArtifact)
+            public AnimatorControllerMapper(Dictionary<Object, Object> mapping, Object rootArtifact)
             {
                 _rootArtifact = rootArtifact;
                 _mapping = mapping;

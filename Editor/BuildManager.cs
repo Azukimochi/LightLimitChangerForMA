@@ -13,7 +13,6 @@ namespace io.github.azukimochi
     {
         static BuildManager()
         {
-            // 多分これが一番早いと思います
             LightLimitChangerSettings.OnAwake = OnPlayModeEnter;
         }
 
