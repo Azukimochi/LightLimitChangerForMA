@@ -66,8 +66,14 @@ namespace io.github.azukimochi
             if (!saveTo.Directory.Exists)
                 saveTo.Directory.Create();
 
+            var (width, height) = (32, 32);
             var source = Texture;
-            var rt = RenderTexture.GetTemporary(source.width, source.height);
+            if (source != null)
+            {
+                (width, height) = (source.width, source.height);
+            }
+
+            var rt = RenderTexture.GetTemporary(width, height);
 
             var temp = RenderTexture.active;
             // BlitするとRenderTexture.activeに勝手に入れられてしまうらしい
@@ -77,7 +83,7 @@ namespace io.github.azukimochi
             var request = AsyncGPUReadback.Request(rt);
             request.WaitForCompletion();
 
-            var data = ImageConversion.EncodeNativeArrayToPNG(request.GetData<Color>(), rt.graphicsFormat, (uint)source.width, (uint)source.height);
+            var data = ImageConversion.EncodeNativeArrayToPNG(request.GetData<Color>(), rt.graphicsFormat, (uint)width, (uint)height);
             unsafe
             {
                 using (var fs = saveTo.Create())
@@ -96,12 +102,28 @@ namespace io.github.azukimochi
 
             AssetDatabase.ImportAsset(path);
 
-            var srcImporter = AssetImporter.GetAtPath(AssetDatabase.GetAssetPath(source)) as TextureImporter;
-            var dstImporter = AssetImporter.GetAtPath(path) as TextureImporter;
-            if (srcImporter != null && dstImporter != null)
+            if (source != null)
             {
-                EditorUtility.CopySerialized(srcImporter, dstImporter);
-                dstImporter.SaveAndReimport();
+                var srcImporter = AssetImporter.GetAtPath(AssetDatabase.GetAssetPath(source)) as TextureImporter;
+                var dstImporter = AssetImporter.GetAtPath(path) as TextureImporter;
+                if (srcImporter != null && dstImporter != null)
+                {
+                    EditorUtility.CopySerialized(srcImporter, dstImporter);
+                    dstImporter.streamingMipmaps = true;
+                    dstImporter.SaveAndReimport();
+                }
+            }
+            else
+            {
+                var importer = AssetImporter.GetAtPath(path) as TextureImporter;
+                if (importer != null)
+                {
+                    importer.streamingMipmaps = true;
+                    importer.maxTextureSize = 32;
+                    importer.textureCompression = TextureImporterCompression.Compressed;
+                    importer.crunchedCompression = true;
+                    importer.SaveAndReimport();
+                }
             }
 
             var dest = AssetDatabase.LoadAssetAtPath<Texture2D>(path);

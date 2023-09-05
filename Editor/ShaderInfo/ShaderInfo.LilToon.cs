@@ -36,10 +36,11 @@ namespace io.github.azukimochi
                 bool result = false;
 
                 // MainTexture
-                var tex = material.GetTexture(PropertyIDs[_MainTex]);
-                if (tex != null)
                 {
-                    textureBaker.Texture = tex;
+                    var tex = material.GetTexture(PropertyIDs[_MainTex]);
+                    if (tex != null)
+                        textureBaker.Texture = tex;
+
                     bool isColorAdjusted = false;
 
                     // MainColor
@@ -101,8 +102,6 @@ namespace io.github.azukimochi
                 }
 
                 // 2nd Texture
-                tex = material.GetTexture(PropertyIDs[_Main2ndTex]);
-                if (tex != null)
                 {
                     if (bakeFlag)
                     {
@@ -110,7 +109,9 @@ namespace io.github.azukimochi
                         bakeFlag = false;
                     }
 
-                    textureBaker.Texture = tex;
+                    var tex = material.GetTexture(PropertyIDs[_Main2ndTex]);
+                    if (tex != null)
+                        textureBaker.Texture = tex;
 
                     var id = PropertyIDs[_Color2nd];
                     if (DefaultParameters[id] != material.GetColor(id))
@@ -128,8 +129,6 @@ namespace io.github.azukimochi
                 }
 
                 // 3rd Texture
-                tex = material.GetTexture(PropertyIDs[_Main3rdTex]);
-                if (tex != null)
                 {
                     if (bakeFlag)
                     {
@@ -137,7 +136,9 @@ namespace io.github.azukimochi
                         bakeFlag = false;
                     }
 
-                    textureBaker.Texture = tex;
+                    var tex = material.GetTexture(PropertyIDs[_Main3rdTex]);
+                    if (tex != null)
+                        textureBaker.Texture = tex;
 
                     var id = PropertyIDs[_Color3rd];
                     if (DefaultParameters[id] != material.GetColor(id))

@@ -145,7 +145,7 @@ namespace io.github.azukimochi
 
             foreach(var renderer in avatar.GetComponentsInChildren<Renderer>(true))
             {
-                if (!(renderer is MeshRenderer || renderer is SkinnedMeshRenderer) || settings.Parameters.ExcludeEditorOnly && renderer.tag == "EditorOnly")
+                if (!(renderer is MeshRenderer || renderer is SkinnedMeshRenderer) || (settings.Parameters.ExcludeEditorOnly && renderer.tag == "EditorOnly"))
                 {
                     continue;
                 }
@@ -180,7 +180,15 @@ namespace io.github.azukimochi
                     SetColorTemperature(true, ShaderInfo.LilToon._Color2nd);
                     SetColorTemperature(true, ShaderInfo.LilToon._Color3rd);
 
+                    saturation.Default.SetCurve(relativePath, type, $"{AnimationKeyPrefix}{ShaderInfo.LilToon._MainTexHSVG}.x", Utils.Animation.Constant(hsvg.x));
+                    saturation.Default.SetCurve(relativePath, type, $"{AnimationKeyPrefix}{ShaderInfo.LilToon._MainTexHSVG}.y", Utils.Animation.Constant(hsvg.y));
+                    saturation.Default.SetCurve(relativePath, type, $"{AnimationKeyPrefix}{ShaderInfo.LilToon._MainTexHSVG}.z", Utils.Animation.Constant(hsvg.z));
+                    saturation.Default.SetCurve(relativePath, type, $"{AnimationKeyPrefix}{ShaderInfo.LilToon._MainTexHSVG}.w", Utils.Animation.Constant(hsvg.w));
+
+                    saturation.Control.SetCurve(relativePath, type, $"{AnimationKeyPrefix}{ShaderInfo.LilToon._MainTexHSVG}.x", Utils.Animation.Constant(hsvg.x));
                     saturation.Control.SetCurve(relativePath, type, $"{AnimationKeyPrefix}{ShaderInfo.LilToon._MainTexHSVG}.y", Utils.Animation.Linear(0, 2));
+                    saturation.Control.SetCurve(relativePath, type, $"{AnimationKeyPrefix}{ShaderInfo.LilToon._MainTexHSVG}.z", Utils.Animation.Constant(hsvg.z));
+                    saturation.Control.SetCurve(relativePath, type, $"{AnimationKeyPrefix}{ShaderInfo.LilToon._MainTexHSVG}.w", Utils.Animation.Constant(hsvg.w));
 
                     unlit.Default.SetCurve(relativePath, type, $"{AnimationKeyPrefix}{ShaderInfo.LilToon._AsUnlit}", Utils.Animation.Constant(0));
                     unlit.Control.SetCurve(relativePath, type, $"{AnimationKeyPrefix}{ShaderInfo.LilToon._AsUnlit}", Utils.Animation.Linear(0.0f, 1.0f));

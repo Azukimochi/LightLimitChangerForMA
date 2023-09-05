@@ -2,7 +2,7 @@
 {
     Properties
     {
-        [NoScaleOffset][MainTexture] _MainTex ("Texture", 2D) = "black" {}
+        [NoScaleOffset][MainTexture] _MainTex ("Texture", 2D) = "white" {}
         [NoScaleOffset] _Mask ("Mask", 2D) = "white" {}
         [NoScaleOffset] _GradationMap("Gradation", 2D) = "white" {}
         [HDR][MainColor] _Color ("Color", Color) = (1, 1, 1, 1)

@@ -113,7 +113,7 @@ namespace io.github.azukimochi
 
         protected static Texture2D BakeTexture(TextureBaker baker)
         {
-            var path = Path.Combine(Utils.GetGeneratedAssetsFolder(), $"{baker.Texture.name}_{GUID.Generate()}.png");
+            var path = Path.Combine(Utils.GetGeneratedAssetsFolder(), $"{baker.Texture?.name ?? $"{baker.Color}"}_{GUID.Generate()}.png");
             return baker.Bake(path);
         }
 

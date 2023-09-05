@@ -29,10 +29,11 @@ namespace io.github.azukimochi
             {
                 bool result = false;
                 bool bakeFlag = false;
-                var tex = material.GetTexture(PropertyIDs[_MainTex]);
-                if (tex != null) 
+
                 {
-                    textureBaker.Texture = tex;
+                    var tex = material.GetTexture(PropertyIDs[_MainTex]);
+                    if (tex != null)
+                        textureBaker.Texture = tex;
 
                     {
                         var id = PropertyIDs[_Color];

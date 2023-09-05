@@ -30,10 +30,10 @@ namespace io.github.azukimochi
             {
                 bool bakeFlag = false;
                 textureBaker.IsPoiyomiMode = true;
-                var tex = material.GetTexture(PropertyIDs[_MainTex]);
-                if (tex != null)
                 {
-                    textureBaker.Texture = tex;
+                    var tex = material.GetTexture(PropertyIDs[_MainTex]);
+                    if (tex != null)
+                        textureBaker.Texture = tex;
 
                     {
                         var id = PropertyIDs[_Color];
