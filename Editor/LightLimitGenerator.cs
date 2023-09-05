@@ -25,9 +25,9 @@ namespace io.github.azukimochi
 
         public static void Generate(VRCAvatarDescriptor avatar, LightLimitChangerSettings settings)
         {
-            var fx = settings.FX;
+            var fx = settings.FX as AnimatorController;
             if (fx == null)
-                fx = settings.FX = CreateTemporaryAsset();
+                settings.FX = fx = CreateTemporaryAsset();
 
             var obj = settings.gameObject;
             fx.parameters = Array.Empty<AnimatorControllerParameter>();
@@ -53,7 +53,7 @@ namespace io.github.azukimochi
 
         private static void ConfigureControls(VRCAvatarDescriptor avatar, LightLimitChangerSettings settings)
         {
-            var fx = settings.FX;
+            var fx = settings.FX as AnimatorController;
             var parameters = settings.Parameters;
 
             if (BuildManager.IsRunning)
@@ -293,7 +293,7 @@ namespace io.github.azukimochi
             if (!settings.Parameters.AddResetButton)
                 return;
 
-            var fx = settings.FX;
+            var fx = settings.FX as AnimatorController;
 
             AnimatorStateMachine stateMachine;
             var layer = new AnimatorControllerLayer()

@@ -144,15 +144,25 @@ namespace io.github.azukimochi
             return defaultValue;
         }
 
-        private static MethodInfo _GetGeneratedAssetsFolder = typeof(nadena.dev.modular_avatar.core.editor.AvatarProcessor).Assembly.GetTypes().FirstOrDefault(x => x.Name == "Util")?.GetMethod(nameof(GetGeneratedAssetsFolder), BindingFlags.Static | BindingFlags.NonPublic);
-
+        // https://github.com/bdunderscore/modular-avatar/blob/b15520271455350cf728bc1b95b874dc30682eb2/Packages/nadena.dev.modular-avatar/Editor/Util.cs#L162C9-L178C10
+        // Originally under MIT License
+        // Copyright (c) 2022 bd_
         public static string GetGeneratedAssetsFolder()
         {
-            var method = _GetGeneratedAssetsFolder;
-            if (method != null)
-                return method.Invoke(null, null) as string;
+            var path = "Assets/999_Modular_Avatar_Generated";
 
-            return AssetDatabase.GUIDToAssetPath(AssetDatabase.CreateFolder("Assets/", "_LightLimitChangerTemporary"));
+            var pathParts = path.Split('/');
+
+            for (int i = 1; i < pathParts.Length; i++)
+            {
+                var subPath = string.Join("/", pathParts, 0, i + 1);
+                if (!AssetDatabase.IsValidFolder(subPath))
+                {
+                    AssetDatabase.CreateFolder(string.Join("/", pathParts, 0, i), pathParts[i]);
+                }
+            }
+
+            return path;
         }
 
         public static string GetVersion()

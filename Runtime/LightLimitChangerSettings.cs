@@ -1,8 +1,4 @@
-﻿#if UNITY_EDITOR
-
-using System;
-using UnityEditor;
-using UnityEditor.Animations;
+﻿using System;
 using UnityEngine;
 using VRC.SDKBase;
 
@@ -12,7 +8,7 @@ namespace io.github.azukimochi
     [DefaultExecutionOrder(-100010)]
     public sealed class LightLimitChangerSettings : MonoBehaviour, IEditorOnly
     {
-        public AnimatorController FX;
+        public RuntimeAnimatorController FX;
         public LightLimitChangerParameters Parameters = LightLimitChangerParameters.Default;
 
         public static Action<LightLimitChangerSettings> OnAwake;
@@ -30,14 +26,7 @@ namespace io.github.azukimochi
                 obj.SetActive(false);
                 OnAwake?.Invoke(this);
                 DestroyImmediate(this);
-                obj.SetActive(true);
             }
-        }
-
-        private void Start()
-        {
         }
     }
 }
-
-#endif
