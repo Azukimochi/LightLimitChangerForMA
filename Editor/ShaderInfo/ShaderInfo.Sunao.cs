@@ -56,7 +56,7 @@ namespace io.github.azukimochi
 
                     if (bakeFlag)
                     {
-                        material.SetTexture(PropertyIDs.MainTex, BakeTexture(textureBaker));
+                        material.SetTexture(PropertyIDs.MainTex, textureBaker.Bake());
                     }
 
                     result |= bakeFlag;

@@ -102,7 +102,7 @@ namespace io.github.azukimochi
                     // Run Bake
                     if (bakeFlag)
                     {
-                        material.SetTexture(PropertyIDs.MainTex, BakeTexture(textureBaker));
+                        material.SetTexture(PropertyIDs.MainTex, textureBaker.Bake());
                     }
 
                     result |= bakeFlag;
@@ -126,7 +126,7 @@ namespace io.github.azukimochi
 
                     if (bakeFlag)
                     {
-                        material.SetTexture(PropertyIDs.Main2ndTex, BakeTexture(textureBaker));
+                        material.SetTexture(PropertyIDs.Main2ndTex, textureBaker.Bake());
                     }
 
                     result |= bakeFlag;
@@ -150,7 +150,7 @@ namespace io.github.azukimochi
 
                     if (bakeFlag)
                     {
-                        material.SetTexture(PropertyIDs.Main3rdTex, BakeTexture(textureBaker));
+                        material.SetTexture(PropertyIDs.Main3rdTex, textureBaker.Bake());
                     }
                     result |= bakeFlag;
                 }

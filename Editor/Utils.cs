@@ -339,19 +339,5 @@ namespace io.github.azukimochi
                 return curve;
             }
         }
-
-        public static class ArrayPool<T>
-        {
-            public static T[] Rent(int minimumSize)
-            {
-                var size = 16 << (int)(Math.Log((uint)minimumSize - 1 | 15, 2) - 3);
-                return ArrayPool.Get<T>(size).Array;
-            }
-
-            public static void Return(T[] array)
-            {
-                ArrayPool.Release(array);
-            }
-        }
     }
 }

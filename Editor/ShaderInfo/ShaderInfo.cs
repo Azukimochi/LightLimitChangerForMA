@@ -79,12 +79,6 @@ namespace io.github.azukimochi
             return result;
         }
 
-        protected static Texture2D BakeTexture(TextureBaker baker)
-        {
-            var path = Path.Combine(Utils.GetGeneratedAssetsFolder(), $"{baker.Texture?.name ?? $"{baker.Color}"}_{GUID.Generate()}.png");
-            return baker.Bake(path);
-        }
-
         public Shaders ShaderType { get; private set; }
 
         public abstract bool TryNormalizeMaterial(Material material, TextureBaker textureBaker);

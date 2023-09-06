@@ -59,7 +59,7 @@ namespace io.github.azukimochi
                 var objectMapper = new ObjectMapper(fx);
                 var components = avatar.GetComponentsInChildren<Component>().Where(x => !(x is Transform)).Select(x => new SerializedObject(x)).ToArray();
 
-                using (var baker = new TextureBaker())
+                using (var baker = new TextureBaker(fx))
                 {
                     objectMapper.MapObject(components, obj =>
                     {

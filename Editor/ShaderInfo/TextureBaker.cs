@@ -20,8 +20,15 @@ namespace io.github.azukimochi
         private static readonly int _HSVGPropertyID = Shader.PropertyToID($"_{nameof(HSVG)}");
         private static readonly int _GradationStrengthPropertyID = Shader.PropertyToID($"_{nameof(GradationStrength)}");
 
-        private Material _material = new Material(_shader);
         private Dictionary<BakedTextureParameters, Texture2D> _cache = new Dictionary<BakedTextureParameters, Texture2D>();
+        private Material _material = new Material(_shader);
+        private Object _rootArtifact;
+
+        public TextureBaker(Object rootArtifact)
+        {
+            _rootArtifact = rootArtifact;
+        }
+
 
         public Texture Texture { get => _material?.GetTexture(_TexturePropertyID); set => _material?.SetTexture(_TexturePropertyID, value); }
 
@@ -47,7 +54,7 @@ namespace io.github.azukimochi
             GradationStrength = 0; 
         }
 
-        public Texture2D Bake(string path)
+        public Texture2D Bake()
         {
             if (_material == null)
                 return null;
@@ -58,14 +65,6 @@ namespace io.github.azukimochi
                 return value;
             }
 
-            var absolutePath = Path.Combine(Path.GetDirectoryName(Application.dataPath), path);
-            var saveTo = new FileInfo(absolutePath);
-            if (saveTo.Exists)
-                return null;
-
-            if (!saveTo.Directory.Exists)
-                saveTo.Directory.Create();
-
             var (width, height) = (32, 32);
             var source = Texture;
             if (source != null)
@@ -73,62 +72,31 @@ namespace io.github.azukimochi
                 (width, height) = (source.width, source.height);
             }
 
+            var dest = new Texture2D(width, height, TextureFormat.RGBA32, false);
             var rt = RenderTexture.GetTemporary(width, height);
-
             var temp = RenderTexture.active;
-            // BlitするとRenderTexture.activeに勝手に入れられてしまうらしい
-            Graphics.Blit(source, rt, _material);
-            RenderTexture.active = temp;
-
-            var request = AsyncGPUReadback.Request(rt);
-            request.WaitForCompletion();
-
-            var data = ImageConversion.EncodeNativeArrayToPNG(request.GetData<Color>(), rt.graphicsFormat, (uint)width, (uint)height);
-            unsafe
+            try
             {
-                using (var fs = saveTo.Create())
-                {
-                    var buffer = Utils.ArrayPool<byte>.Rent(data.Length);
-                    fixed(byte* p = buffer)
-                    {
-                        UnsafeUtility.MemCpy(p, data.GetUnsafeReadOnlyPtr(), data.Length);
-                    }
-                    fs.Write(buffer, 0, data.Length);
-                    Utils.ArrayPool<byte>.Return(buffer);
-                }
+                Graphics.Blit(source, rt, _material);
+
+                var request = AsyncGPUReadback.Request(rt);
+                request.WaitForCompletion();
+                dest.LoadRawTextureData(request.GetData<Color>());
+                dest.Apply();
+
+                var format = (source as Texture2D)?.format ?? (Color.a == 1 ? TextureFormat.DXT1Crunched : TextureFormat.DXT5);
+                int quality = (AssetImporter.GetAtPath(AssetDatabase.GetAssetPath(source)) as TextureImporter)?.compressionQuality ?? 50;
+                EditorUtility.CompressTexture(dest, format, quality);
+
+                _cache.Add(key, dest);
+                dest.AddTo(_rootArtifact);
+                return dest;
             }
-
-            RenderTexture.ReleaseTemporary(rt);
-
-            AssetDatabase.ImportAsset(path);
-
-            if (source != null)
+            finally
             {
-                var srcImporter = AssetImporter.GetAtPath(AssetDatabase.GetAssetPath(source)) as TextureImporter;
-                var dstImporter = AssetImporter.GetAtPath(path) as TextureImporter;
-                if (srcImporter != null && dstImporter != null)
-                {
-                    EditorUtility.CopySerialized(srcImporter, dstImporter);
-                    dstImporter.streamingMipmaps = true;
-                    dstImporter.SaveAndReimport();
-                }
+                RenderTexture.active = temp;
+                RenderTexture.ReleaseTemporary(rt);
             }
-            else
-            {
-                var importer = AssetImporter.GetAtPath(path) as TextureImporter;
-                if (importer != null)
-                {
-                    importer.streamingMipmaps = true;
-                    importer.maxTextureSize = 32;
-                    importer.textureCompression = TextureImporterCompression.Compressed;
-                    importer.crunchedCompression = true;
-                    importer.SaveAndReimport();
-                }
-            }
-
-            var dest = AssetDatabase.LoadAssetAtPath<Texture2D>(path);
-            _cache.Add(key, dest);
-            return dest;
         }
 
         public void Dispose()
