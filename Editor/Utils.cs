@@ -1,6 +1,4 @@
-﻿#if UNITY_EDITOR
-
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using System.Linq;
@@ -357,5 +355,3 @@ namespace io.github.azukimochi
         }
     }
 }
-
-#endif
