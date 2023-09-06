@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Xml.Linq;
 using UnityEngine;
 
 namespace io.github.azukimochi
@@ -17,48 +16,51 @@ namespace io.github.azukimochi
             public const string _Color = nameof(_Color);
             public const string _MainTex = nameof(_MainTex);
 
+            private static class PropertyIDs
+            {
+                public static readonly int LightingMinLightBrightness = Shader.PropertyToID(_LightingMinLightBrightness);
+                public static readonly int LightingCap = Shader.PropertyToID(_LightingCap);
+                public static readonly int MainColorAdjustToggle = Shader.PropertyToID(_MainColorAdjustToggle);
+                public static readonly int Saturation = Shader.PropertyToID(_Saturation);
+                public static readonly int Color = Shader.PropertyToID(_Color);
+                public static readonly int MainTex = Shader.PropertyToID(_MainTex);
+            }
+
+            private static class DefaultParameters
+            {
+                public static readonly float Saturation = 0;
+                public static readonly Color Color = Color.white;
+            }
+
             private const string Animated_Suffix = "Animated";
             private const string Flag_IsAnimated = "1";
-
-            public override string[] ShaderParameters { get; } = { _LightingMinLightBrightness, _LightingCap, _MainColorAdjustToggle, _Saturation, _Color, _MainTex };
-
-            public override Shaders ShaderType => Shaders.Poiyomi;
-
-            protected override string DefaultShaderName => ".poiyomi/Poiyomi 8.1/Poiyomi Toon";
 
             public override bool TryNormalizeMaterial(Material material, TextureBaker textureBaker)
             {
                 bool bakeFlag = false;
                 textureBaker.IsPoiyomiMode = true;
                 {
-                    var tex = material.GetTexture(PropertyIDs[_MainTex]);
+                    var tex = material.GetTexture(PropertyIDs.MainTex);
                     if (tex != null)
                         textureBaker.Texture = tex;
 
+                    if (material.GetColor(PropertyIDs.Color) != DefaultParameters.Color)
                     {
-                        var id = PropertyIDs[_Color];
-                        if (DefaultParameters[id] != material.GetColor(id))
-                        {
-                            textureBaker.Color = material.GetColor(id);
-                            material.SetColor(id, DefaultParameters[id].Color);
-                            bakeFlag = true;
-                        }
+                        textureBaker.Color = material.GetColor(PropertyIDs.Color);
+                        material.SetColor(PropertyIDs.Color, DefaultParameters.Color);
+                        bakeFlag = true;
                     }
 
+                    if (material.GetFloat(PropertyIDs.Saturation) != DefaultParameters.Saturation)
                     {
-                        var id = PropertyIDs[_Saturation];
-                        if (DefaultParameters[id] != material.GetFloat(id))
-                        {
-                            var sat = material.GetFloat(id);
-                            textureBaker.HSVG = new Vector4(0, sat, 1, 1);
-                            material.SetFloat(id, DefaultParameters[id].Float);
-                            bakeFlag = true;
-                        }
+                        textureBaker.HSVG = new Vector4(0, material.GetFloat(PropertyIDs.Saturation), 1, 1);
+                        material.SetFloat(PropertyIDs.Saturation, DefaultParameters.Saturation);
+                        bakeFlag = true;
                     }
 
                     if (bakeFlag)
                     {
-                        material.SetTexture(PropertyIDs[_MainTex], BakeTexture(textureBaker));
+                        material.SetTexture(PropertyIDs.MainTex, BakeTexture(textureBaker));
                     }
                 }
 
@@ -67,11 +69,40 @@ namespace io.github.azukimochi
 
             public override bool IsTargetShader(Shader shader)
             {
-                return
-                    shader.name.IndexOf(nameof(Poiyomi), StringComparison.OrdinalIgnoreCase) != -1 ||
-                    ContainsParameter(shader);
+                return shader.name.Contains("poiyomi", StringComparison.OrdinalIgnoreCase);
             }
 
+            public override void SetControlAnimation(in ControlAnimationContainer container, in ControlAnimationParameters parameters)
+            {
+                switch (container.ControlType)
+                {
+                    case LightLimitControlType.Light:
+
+                        container.Default.SetParameterAnimation(parameters, _LightingMinLightBrightness, parameters.MinLightValue);
+                        container.Default.SetParameterAnimation(parameters, _LightingCap, parameters.MaxLightValue);
+
+                        container.Control.SetParameterAnimation(parameters, _LightingMinLightBrightness, parameters.MinLightValue, parameters.MaxLightValue);
+                        container.Control.SetParameterAnimation(parameters, _LightingCap, parameters.MinLightValue, parameters.MaxLightValue);
+
+                        break;
+
+                    case LightLimitControlType.Saturation:
+
+                        container.Default.SetParameterAnimation(parameters, _Saturation, DefaultParameters.Saturation);
+                        container.Control.SetParameterAnimation(parameters, _Saturation, -1, 1);
+
+                        break;
+
+                    case LightLimitControlType.ColorTemperature:
+
+                        container.Default.SetParameterAnimation(parameters, _Color, DefaultParameters.Color);
+                        container.Control.SetColorTempertureAnimation(parameters, _Color, DefaultParameters.Color);
+
+                        break;
+                }
+            }
+            
+            
             public static void EnableColorAdjust(Material material)
             {
                 material.SetFloat(_MainColorAdjustToggle, 1);

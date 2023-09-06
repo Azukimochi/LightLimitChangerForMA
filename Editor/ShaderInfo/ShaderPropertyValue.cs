@@ -41,13 +41,13 @@ namespace io.github.azukimochi
         [FieldOffset(0)]
         public readonly ShaderPropertyType Type;
 
-        [FieldOffset(sizeof(int))]
+        [FieldOffset(sizeof(ShaderPropertyType))]
         public readonly float Float;
 
-        [FieldOffset(sizeof(int))]
+        [FieldOffset(sizeof(ShaderPropertyType))]
         public readonly Color Color;
 
-        [FieldOffset(sizeof(int))]
+        [FieldOffset(sizeof(ShaderPropertyType))]
         public readonly Vector4 Vector;
 
         public override string ToString()

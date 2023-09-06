@@ -7,7 +7,6 @@ using System.Linq;
 using System;
 using UnityEditor.Animations;
 using VRC.SDK3.Avatars.Components;
-using System.Reflection;
 using VRC.Core.Pool;
 
 using Object = UnityEngine.Object;
@@ -87,6 +86,25 @@ namespace io.github.azukimochi
 
         public static T Clone<T>(this T obj) where T : Object => Object.Instantiate(obj);
 
+        public static IEnumerable<Material> GetAnimatedMaterials(this RuntimeAnimatorController runtimeAnimatorController)
+        {
+            foreach (var anim in runtimeAnimatorController.animationClips)
+            {
+                foreach (var bind in AnimationUtility.GetObjectReferenceCurveBindings(anim))
+                {
+                    if (bind.type == typeof(MeshRenderer) || bind.type == typeof(SkinnedMeshRenderer))
+                    {
+                        foreach (var curve in AnimationUtility.GetObjectReferenceCurve(anim, bind))
+                        {
+                            var material = curve.value as Material;
+                            if (material != null)
+                                yield return material;
+                        }
+                    }
+                }
+            }
+        }
+
         public static string GetRelativePath(this Transform transform, Transform root, bool includeRelativeTo = false)
         {
             var buffer = _relativePathBuffer;
@@ -112,36 +130,18 @@ namespace io.github.azukimochi
 
         private static string[] _relativePathBuffer;
 
-        public static IEnumerable<string> EnumeratePropertyNames(this Shader shader) => Enumerable.Range(0, shader.GetPropertyCount()).Select(shader.GetPropertyName);
-
-        public static TValue GetOrAdd<TKey, TValue>(this Dictionary<TKey, TValue> dictionary, TKey key, Func<TKey, TValue> valueFactory)
+        public static bool Contains(this string str, string value, StringComparison comparison)
         {
-            if (!dictionary.TryGetValue(key, out var value))
-            {
-                value = valueFactory(key);
-                dictionary.Add(key, value);
-            }
-            return value;
+            return str.IndexOf(value, comparison) != -1;
         }
 
-        public static T GetValue<T>(this Material material, string name, T defaultValue = default)
+        public static IEnumerable<int> EnumeratePropertyNameIDs(this Shader shader)
         {
-            if (material != null && material.HasProperty(name))
+            var count = shader.GetPropertyCount();
+            for (int i = 0; i < count; i++)
             {
-                if (typeof(T) == typeof(float))
-                    return (T)(object)material.GetFloat(name);
-
-                else if (typeof(T) == typeof(int))
-                    return (T)(object)material.GetInt(name);
-
-                else if (typeof(T) == typeof(Color))
-                    return (T)(object)material.GetColor(name);
-
-                else if (typeof(T) == typeof(Vector4))
-                    return (T)(object)material.GetVector(name);
-
+                yield return shader.GetPropertyNameId(i);
             }
-            return defaultValue;
         }
 
         // https://github.com/bdunderscore/modular-avatar/blob/b15520271455350cf728bc1b95b874dc30682eb2/Packages/nadena.dev.modular-avatar/Editor/Util.cs#L162C9-L178C10

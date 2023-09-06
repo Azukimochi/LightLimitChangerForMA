@@ -24,78 +24,85 @@ namespace io.github.azukimochi
             public const string _MainGradationStrength = nameof(_MainGradationStrength);
             public const string _MainColorAdjustMask = nameof(_MainColorAdjustMask);
 
-            public override string[] ShaderParameters { get; } = { _LightMinLimit, _LightMaxLimit, _AsUnlit, _MainTexHSVG, _Color, _Color2nd, _Color3rd, _MainTex, _Main2ndTex, _Main3rdTex, _MainGradationStrength, _MainGradationTex, _MainColorAdjustMask };
+            private static class PropertyIDs
+            {
+                public static readonly int LightMinLimit = Shader.PropertyToID(_LightMinLimit);
+                public static readonly int LightMaxLimit = Shader.PropertyToID(_LightMaxLimit);
+                public static readonly int AsUnlit = Shader.PropertyToID(_AsUnlit);
+                public static readonly int MainTexHSVG = Shader.PropertyToID(_MainTexHSVG);
+                public static readonly int Color = Shader.PropertyToID(_Color);
+                public static readonly int Color2nd = Shader.PropertyToID(_Color2nd);
+                public static readonly int Color3rd = Shader.PropertyToID(_Color3rd);
+                public static readonly int MainTex = Shader.PropertyToID(_MainTex);
+                public static readonly int Main2ndTex = Shader.PropertyToID(_Main2ndTex);
+                public static readonly int Main3rdTex = Shader.PropertyToID(_Main3rdTex);
+                public static readonly int MainGradationTex = Shader.PropertyToID(_MainGradationTex);
+                public static readonly int MainGradationStrength = Shader.PropertyToID(_MainGradationStrength);
+                public static readonly int MainColorAdjustMask = Shader.PropertyToID(_MainColorAdjustMask);
+            }
 
-            public override Shaders ShaderType => Shaders.lilToon;
-
-            protected override string DefaultShaderName => "lilToon";
+            private static class DefaultParameters
+            {
+                public static readonly Color Color = Color.white;
+                public static readonly Color Color2nd = Color.white;
+                public static readonly Color Color3rd = Color.white;
+                public static readonly Vector4 MainTexHSVG = new Vector4(0, 1, 1, 1);
+                public static readonly float MainGradationStrength = 0;
+            }
 
             public override bool TryNormalizeMaterial(Material material, TextureBaker textureBaker)
             {
-                bool bakeFlag = false;
                 bool result = false;
 
                 // MainTexture
                 {
-                    var tex = material.GetTexture(PropertyIDs[_MainTex]);
+                    bool bakeFlag = false;
+                    bool isColorAdjusted = false;
+
+                    var tex = material.GetTexture(PropertyIDs.MainTex);
                     if (tex != null)
                         textureBaker.Texture = tex;
 
-                    bool isColorAdjusted = false;
-
                     // MainColor
+                    if (material.GetColor(PropertyIDs.Color) != DefaultParameters.Color)
                     {
-                        var id = PropertyIDs[_Color];
-                        if (DefaultParameters[id] != material.GetColor(id))
-                        {
-                            textureBaker.Color = material.GetColor(id);
-                            material.SetColor(id, DefaultParameters[id].Color);
-                            bakeFlag = true;
-                        }
+                        textureBaker.Color = material.GetColor(PropertyIDs.Color);
+                        material.SetColor(PropertyIDs.Color, DefaultParameters.Color);
+                        bakeFlag = true;
                     }
 
                     // HSV / Gamma
+                    if (material.GetVector(PropertyIDs.MainTexHSVG) != DefaultParameters.MainTexHSVG)
                     {
-                        var id = PropertyIDs[_MainTexHSVG];
-                        if (DefaultParameters[id] != material.GetVector(id))
-                        {
-                            textureBaker.HSVG = material.GetVector(id);
-                            material.SetVector(id, DefaultParameters[id].Vector);
-                            bakeFlag = true;
-                            isColorAdjusted = true;
-                        }
+                        textureBaker.HSVG = material.GetVector(PropertyIDs.MainTexHSVG);
+                        material.SetVector(PropertyIDs.MainTexHSVG, DefaultParameters.MainTexHSVG);
+                        bakeFlag = true;
+                        isColorAdjusted = true;
                     }
 
                     // Gradation
+                    if (material.GetTexture(PropertyIDs.MainGradationTex) != null && material.GetFloat(PropertyIDs.MainGradationStrength) != DefaultParameters.MainGradationStrength)
                     {
-                        var id = PropertyIDs[_MainGradationTex];
-                        var id2 = PropertyIDs[_MainGradationStrength];
-                        if (material.GetTexture(id) != null && DefaultParameters[id2] != material.GetFloat(id2))
-                        {
-                            textureBaker.GradationMap = material.GetTexture(id);
-                            textureBaker.GradationStrength = material.GetFloat(id2);
-                            material.SetTexture(id, null);
-                            material.SetFloat(id2, DefaultParameters[id2].Float);
-                            bakeFlag = true;
-                            isColorAdjusted = true;
-                        }
+                        textureBaker.GradationMap = material.GetTexture(PropertyIDs.MainGradationTex);
+                        textureBaker.GradationStrength = material.GetFloat(PropertyIDs.MainGradationStrength);
+                        material.SetTexture(PropertyIDs.MainGradationTex, null);
+                        material.SetFloat(PropertyIDs.MainGradationStrength, DefaultParameters.MainGradationStrength);
+                        bakeFlag = true;
+                        isColorAdjusted = true;
                     }
 
                     // Color Adujust Mask
+                    if (isColorAdjusted && material.GetTexture(PropertyIDs.MainColorAdjustMask) != null)
                     {
-                        var id = PropertyIDs[_MainColorAdjustMask];
-                        if (material.GetTexture(id) != null && isColorAdjusted)
-                        {
-                            textureBaker.Mask = material.GetTexture(id);
-                            material.SetTexture(id, null);
-                            bakeFlag = true;
-                        }
+                        textureBaker.Mask = material.GetTexture(PropertyIDs.MainColorAdjustMask);
+                        material.SetTexture(PropertyIDs.MainColorAdjustMask, null);
+                        bakeFlag = true;
                     }
 
                     // Run Bake
                     if (bakeFlag)
                     {
-                        material.SetTexture(PropertyIDs[_MainTex], BakeTexture(textureBaker));
+                        material.SetTexture(PropertyIDs.MainTex, BakeTexture(textureBaker));
                     }
 
                     result |= bakeFlag;
@@ -103,54 +110,47 @@ namespace io.github.azukimochi
 
                 // 2nd Texture
                 {
-                    if (bakeFlag)
-                    {
-                        textureBaker.ResetParamerter();
-                        bakeFlag = false;
-                    }
+                    textureBaker.ResetParamerter();
+                    bool bakeFlag = false;
 
-                    var tex = material.GetTexture(PropertyIDs[_Main2ndTex]);
+                    var tex = material.GetTexture(PropertyIDs.Main2ndTex);
                     if (tex != null)
                         textureBaker.Texture = tex;
 
-                    var id = PropertyIDs[_Color2nd];
-                    if (DefaultParameters[id] != material.GetColor(id))
+                    if (material.GetColor(PropertyIDs.Color2nd) != DefaultParameters.Color2nd)
                     {
-                        textureBaker.Color = material.GetColor(id);
-                        material.SetColor(id, DefaultParameters[id].Color);
+                        textureBaker.Color = material.GetColor(PropertyIDs.Color2nd);
+                        material.SetColor(PropertyIDs.Color2nd, DefaultParameters.Color2nd);
                         bakeFlag = true;
                     }
 
                     if (bakeFlag)
                     {
-                        material.SetTexture(PropertyIDs[_Main2ndTex], BakeTexture(textureBaker));
+                        material.SetTexture(PropertyIDs.Main2ndTex, BakeTexture(textureBaker));
                     }
+
                     result |= bakeFlag;
                 }
 
                 // 3rd Texture
                 {
-                    if (bakeFlag)
-                    {
-                        textureBaker.ResetParamerter();
-                        bakeFlag = false;
-                    }
+                    textureBaker.ResetParamerter();
+                    bool bakeFlag = false;
 
-                    var tex = material.GetTexture(PropertyIDs[_Main3rdTex]);
+                    var tex = material.GetTexture(PropertyIDs.Main3rdTex);
                     if (tex != null)
                         textureBaker.Texture = tex;
 
-                    var id = PropertyIDs[_Color3rd];
-                    if (DefaultParameters[id] != material.GetColor(id))
+                    if (material.GetColor(PropertyIDs.Color3rd) != DefaultParameters.Color3rd)
                     {
-                        textureBaker.Color = material.GetColor(id);
-                        material.SetColor(id, DefaultParameters[id].Color);
+                        textureBaker.Color = material.GetColor(PropertyIDs.Color3rd);
+                        material.SetColor(PropertyIDs.Color3rd, DefaultParameters.Color3rd);
                         bakeFlag = true;
                     }
 
                     if (bakeFlag)
                     {
-                        material.SetTexture(PropertyIDs[_Main3rdTex], BakeTexture(textureBaker));
+                        material.SetTexture(PropertyIDs.Main3rdTex, BakeTexture(textureBaker));
                     }
                     result |= bakeFlag;
                 }
@@ -160,9 +160,62 @@ namespace io.github.azukimochi
 
             public override bool IsTargetShader(Shader shader)
             {
-                return
-                    shader.name.IndexOf(nameof(LilToon), StringComparison.OrdinalIgnoreCase) != -1 ||
-                    ContainsParameter(shader);
+                if (shader.name.Contains("lilToon", StringComparison.OrdinalIgnoreCase))
+                    return true;
+
+                // カスタムシェーダーの名前にlilToonが入ってない時のことを考慮して、パラメーターが含まれるかどうかをチェックする
+                if (_propertyIDsArrayCache == null)
+                {
+                    // 横着
+                    _propertyIDsArrayCache = typeof(PropertyIDs).GetFields().Select(x => (int)x.GetValue(null)).ToArray();
+                }
+                return _propertyIDsArrayCache.Intersect(shader.EnumeratePropertyNameIDs()).Count() == _propertyIDsArrayCache.Length;
+            }
+
+            private static int[] _propertyIDsArrayCache;
+
+            public override void SetControlAnimation(in ControlAnimationContainer container, in ControlAnimationParameters parameters)
+            {
+                switch(container.ControlType)
+                {
+                    case LightLimitControlType.Light:
+
+                        container.Default.SetParameterAnimation(parameters, _LightMinLimit, parameters.MinLightValue);
+                        container.Default.SetParameterAnimation(parameters, _LightMaxLimit, parameters.MaxLightValue);
+
+                        container.Control.SetParameterAnimation(parameters, _LightMinLimit, parameters.MinLightValue, parameters.MaxLightValue);
+                        container.Control.SetParameterAnimation(parameters, _LightMaxLimit, parameters.MinLightValue, parameters.MaxLightValue);
+
+                        break;
+
+                    case LightLimitControlType.Saturation:
+
+                        container.Default.SetParameterAnimation(parameters, _MainTexHSVG, DefaultParameters.MainTexHSVG);
+
+                        container.Control.SetParameterAnimation(parameters, _MainTexHSVG, DefaultParameters.MainTexHSVG, ~ShaderInfoUtility.IncludeField.Y);
+                        container.Control.SetParameterAnimation(parameters, $"{_MainTexHSVG}.y", 0, 2);
+
+                        break;
+
+                    case LightLimitControlType.Unlit:
+
+                        container.Default.SetParameterAnimation(parameters, _AsUnlit, 0);
+                        container.Control.SetParameterAnimation(parameters, _AsUnlit, 0, 1);
+
+                        break;
+
+                    case LightLimitControlType.ColorTemperature:
+
+                        container.Default.SetParameterAnimation(parameters, _Color   , DefaultParameters.Color);
+                        container.Default.SetParameterAnimation(parameters, _Color2nd, DefaultParameters.Color2nd);
+                        container.Default.SetParameterAnimation(parameters, _Color3rd, DefaultParameters.Color3rd);
+
+                        container.Control.SetColorTempertureAnimation(parameters, _Color);
+                        container.Control.SetColorTempertureAnimation(parameters, _Color2nd);
+                        container.Control.SetColorTempertureAnimation(parameters, _Color3rd);
+
+                        break;
+                }
             }
         }
     }
