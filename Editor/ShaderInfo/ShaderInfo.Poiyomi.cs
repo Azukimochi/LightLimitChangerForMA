@@ -101,8 +101,29 @@ namespace io.github.azukimochi
                         break;
                 }
             }
-            
-            
+
+            public override void AdditionalControl(Material material, in LightLimitChangerParameters parameters)
+            {
+                if (parameters.AllowSaturationControl || parameters.AllowColorTempControl)
+                {
+                    material.SetFloat(_MainColorAdjustToggle, 1);
+                    material.EnableKeyword($"{_MainColorAdjustToggle.ToUpperInvariant()}_ON");
+                    material.EnableKeyword("COLOR_GRADING_HDR");
+
+                    material.SetOverrideTag($"{_LightingCap}{Animated_Suffix}", Flag_IsAnimated);
+                    material.SetOverrideTag($"{_LightingMinLightBrightness}{Animated_Suffix}", Flag_IsAnimated);
+
+                    if (parameters.AllowColorTempControl)
+                    {
+                        material.SetOverrideTag($"{_Color}{Animated_Suffix}", Flag_IsAnimated);
+                    }
+                    if (parameters.AllowSaturationControl)
+                    {
+                        material.SetOverrideTag($"{_Saturation}{Animated_Suffix}", Flag_IsAnimated);
+                    }
+                }
+            }
+
             public static void EnableColorAdjust(Material material)
             {
                 material.SetFloat(_MainColorAdjustToggle, 1);

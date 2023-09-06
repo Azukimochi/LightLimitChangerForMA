@@ -80,7 +80,7 @@ namespace io.github.azukimochi
             {
                 if (group.IsOpen)
                 {
-                    TargetShader.intValue = EditorGUILayout.MaskField(Localization.G("label.target_shader"), TargetShader.intValue, TargetShader.enumNames);
+                    TargetShader.intValue = EditorGUILayout.MaskField(Localization.G("label.target_shader"), TargetShader.intValue, ShaderInfo.RegisteredShaderInfoNames);
 
                     EditorGUILayout.PropertyField(ExcludeEditorOnly, Localization.G("label.allow_editor_only"));
                     EditorGUILayout.Separator();

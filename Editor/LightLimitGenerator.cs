@@ -107,11 +107,7 @@ namespace io.github.azukimochi
                                 info.TryNormalizeMaterial(material, baker);
                             }
 
-                            if (info.ShaderType == Shaders.Poiyomi)
-                            {
-                                ShaderInfo.Poiyomi.EnableColorAdjust(material);
-                                ShaderInfo.Poiyomi.SetAnimatedFlags(material, parameters.AllowColorTempControl, parameters.AllowSaturationControl);
-                            }
+                            info.AdditionalControl(material, parameters);
 
                             return material;
                         }
@@ -155,9 +151,12 @@ namespace io.github.azukimochi
 
                 var controlParameters = new ControlAnimationParameters(relativePath, type, parameters.MinLightValue, parameters.MaxLightValue);
 
-                foreach(var x in ShaderInfo.ShaderInfos.Where(x => parameters.TargetShader.HasFlag(x.ShaderType)))
+                foreach (var x in ShaderInfo.RegisteredShaderInfos)
                 {
-                    foreach(ref readonly var container in animationContainers)
+                    if (!parameters.TargetShader.HasFlag(x.ShaderType))
+                        continue;
+
+                    foreach (ref readonly var container in animationContainers)
                     {
                         x.SetControlAnimation(container, controlParameters);
                     }

@@ -20,8 +20,6 @@ namespace io.github.azukimochi
 
         private const string GenerateObjectName = "Light Limit Changer";
 
-        private static readonly string[] _targetShaderLabels = Enum.GetNames(typeof(Shaders));
-
         private string infoLabel = "";
 
         [MenuItem("Tools/Modular Avatar/LightLimitChanger")]
@@ -85,7 +83,7 @@ namespace io.github.azukimochi
                         if (group.IsOpen)
                         {
                             EditorGUI.BeginChangeCheck();
-                            param.TargetShader = (Shaders)EditorGUILayout.MaskField(Localization.G("label.target_shader", "tip.target_shader"), (int)param.TargetShader, _targetShaderLabels);
+                            param.TargetShader = EditorGUILayout.MaskField(Localization.G("label.target_shader", "tip.target_shader"), param.TargetShader, ShaderInfo.RegisteredShaderInfoNames);
                             if (EditorGUI.EndChangeCheck())
                             {
                                 infoLabel = param.TargetShader == 0 ? Localization.S("info.shader_must_select") : string.Empty;

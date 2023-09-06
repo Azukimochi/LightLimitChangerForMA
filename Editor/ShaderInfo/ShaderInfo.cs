@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEditor;
@@ -21,36 +22,45 @@ namespace io.github.azukimochi
             // TODO: Register extended ShaderInfo from plugins
         }
 
-        public static void RegisterShaderInfo(ShaderInfo info)
+        private static void RegisterShaderInfo(ShaderInfo info)
         {
             var count = _ShaderInfoCount;
-            if (count >= _ShaderInfos.Length)
+            if (count >= _RegisteredShaderInfos.Length)
                 return;
 
-            _ShaderInfos[count] = info;
-            info.ShaderType = (Shaders)(1ul << count);
+            _RegisteredShaderInfos[count] = info;
+            info.ShaderType = 1 << _ShaderInfoCount;
             _ShaderInfoCount = count + 1;
         }
 
-        public static IEnumerable<ShaderInfo> ShaderInfos => _ShaderInfos.Take(_ShaderInfoCount);
+        public static ReadOnlySpan<ShaderInfo> RegisteredShaderInfos => _RegisteredShaderInfos.AsSpan(0, _ShaderInfoCount);
 
-        private static readonly ShaderInfo[] _ShaderInfos = new ShaderInfo[64];
+        private static readonly ShaderInfo[] _RegisteredShaderInfos = new ShaderInfo[31];
         private static int _ShaderInfoCount = 0;
+
+        public static string[] RegisteredShaderInfoNames
+        {
+            get
+            {
+                if (_registeredShaderInfoNames?.Length != _ShaderInfoCount)
+                {
+                    _registeredShaderInfoNames = _RegisteredShaderInfos.Take(_ShaderInfoCount).Select(x => x.Name).ToArray();
+                }
+                return _registeredShaderInfoNames;
+            }
+        }
+        private static string[] _registeredShaderInfoNames;
 
         public static bool TryGetShaderInfo(Material material, out ShaderInfo shaderInfo)
         {
-            if (material != null)
+            if (material?.shader != null)
             {
-                var shader = material.shader;
-                if (shader != null)
+                foreach (var info in RegisteredShaderInfos)
                 {
-                    foreach (var info in _ShaderInfos)
+                    if (info.IsTargetShader(material.shader))
                     {
-                        if (info.IsTargetShader(shader))
-                        {
-                            shaderInfo = info;
-                            return true;
-                        }
+                        shaderInfo = info;
+                        return true;
                     }
                 }
             }
@@ -58,28 +68,9 @@ namespace io.github.azukimochi
             return false;
         }
 
-        public static bool TryGetShaderInfo(Shaders shaderType, out ShaderInfo shaderInfo)
-        {
-            foreach (var info in _ShaderInfos)
-            {
-                if (info.ShaderType == shaderType)
-                {
-                    shaderInfo = info;
-                    return true;
-                }
-            }
-            shaderInfo = null;
-            return false;
-        }
+        public virtual string Name => GetType().Name;
 
-        public static bool TryGetShaderType(Material material, out Shaders shaderType)
-        {
-            bool result = TryGetShaderInfo(material, out var info);
-            shaderType = result ? info.ShaderType : 0;
-            return result;
-        }
-
-        public Shaders ShaderType { get; private set; }
+        public int ShaderType { get; private set; }
 
         public abstract bool TryNormalizeMaterial(Material material, TextureBaker textureBaker);
 
@@ -87,5 +78,6 @@ namespace io.github.azukimochi
 
         public abstract void SetControlAnimation(in ControlAnimationContainer container, in ControlAnimationParameters parameters);
 
+        public virtual void AdditionalControl(Material material, in LightLimitChangerParameters parameters) { }
     }
 }
