@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Remoting.Contexts;
 using UnityEditor;
 using UnityEditor.Animations;
 using UnityEngine;
@@ -21,14 +22,24 @@ namespace io.github.azukimochi
         private const string ParameterName_ColorTemp = "LightLimitColorTemp";
         private const string ParameterName_Reset = "LightLimitReset";
 
+        private struct BuildContext
+        {
+            public VRCAvatarDescriptor Avatar;
+            public GameObject Object;
+            public AnimatorController Controller;
+            public Object AssetContainer;
+            public LightLimitChangerParameters Parameters;
+        }
+
         public static void Generate(VRCAvatarDescriptor avatar, LightLimitChangerSettings settings)
         {
-            var fx = settings.FX as AnimatorController;
-            if (fx == null)
-                settings.FX = fx = CreateTemporaryAsset();
+            var container = settings.AssetContainer;
+            if (container == null)
+                settings.AssetContainer = container = CreateTemporaryAsset();
+
+            var fx = new AnimatorController().AddTo(container);
 
             var obj = settings.gameObject;
-            fx.parameters = Array.Empty<AnimatorControllerParameter>();
             var parameters = obj.UndoGetOrAddComponent<ModularAvatarParameters>(); 
             var menuInstaller = obj.UndoGetOrAddComponent<ModularAvatarMenuInstaller>();
             var mergeAnimator = obj.UndoGetOrAddComponent<ModularAvatarMergeAnimator>();
@@ -40,26 +51,35 @@ namespace io.github.azukimochi
             mergeAnimator.pathMode = MergeAnimatorPathMode.Absolute;
             mergeAnimator.matchAvatarWriteDefaults = true;
 
-            fx.ClearSubAssets();
-            fx.ClearLayers();
+            container.ClearSubAssets();
 
-            ConfigureControls(avatar, settings);
-            ConfigureResetParameters(settings);
+            var context = new BuildContext()
+            {
+                Avatar = avatar,
+                Controller = fx,
+                Object = obj,
+                AssetContainer = container,
+                Parameters = settings.Parameters,
+            };
+
+            ConfigureControls(context);
+            ConfigureResetParameters(context);
 
             AssetDatabase.SaveAssets();
         }
 
-        private static void ConfigureControls(VRCAvatarDescriptor avatar, LightLimitChangerSettings settings)
+        private static void ConfigureControls(in BuildContext context)
         {
-            var fx = settings.FX as AnimatorController;
-            var parameters = settings.Parameters;
+            var assetContainer = context.AssetContainer;
+            var fx = context.Controller;
+            var parameters = context.Parameters;
 
             if (BuildManager.IsRunning)
             {
-                var objectMapper = new ObjectMapper(fx);
-                var components = avatar.GetComponentsInChildren<Component>().Where(x => !(x is Transform)).Select(x => new SerializedObject(x)).ToArray();
+                var objectMapper = new ObjectMapper(assetContainer);
+                var components = context.Avatar.GetComponentsInChildren<Component>().Where(x => !(x is Transform)).Select(x => new SerializedObject(x)).ToArray();
 
-                using (var baker = new TextureBaker(fx))
+                using (var baker = new TextureBaker(assetContainer))
                 {
                     objectMapper.MapObject(components, obj =>
                     {
@@ -100,7 +120,7 @@ namespace io.github.azukimochi
                     {
                         if (ShaderInfo.TryGetShaderInfo(material, out var info) && parameters.TargetShader.HasFlag(info.ShaderType))
                         {
-                            material = material.Clone().AddTo(fx);
+                            material = material.Clone().AddTo(assetContainer);
                             if (parameters.AllowColorTempControl || parameters.AllowSaturationControl)
                             {
                                 baker.ResetParamerter();
@@ -139,14 +159,14 @@ namespace io.github.azukimochi
                 targetControl |= LightLimitControlType.Unlit;
             }
 
-            foreach(var renderer in avatar.GetComponentsInChildren<Renderer>(true))
+            foreach(var renderer in context.Avatar.GetComponentsInChildren<Renderer>(true))
             {
-                if (!(renderer is MeshRenderer || renderer is SkinnedMeshRenderer) || (settings.Parameters.ExcludeEditorOnly && renderer.CompareTag("EditorOnly")))
+                if (!(renderer is MeshRenderer || renderer is SkinnedMeshRenderer) || (parameters.ExcludeEditorOnly && renderer.CompareTag("EditorOnly")))
                 {
                     continue;
                 }
 
-                var relativePath = renderer.transform.GetRelativePath(avatar.transform);
+                var relativePath = renderer.transform.GetRelativePath(context.Avatar.transform);
                 var type = renderer.GetType();
 
                 var controlParameters = new ControlAnimationParameters(relativePath, type, parameters.MinLightValue, parameters.MaxLightValue);
@@ -163,8 +183,8 @@ namespace io.github.azukimochi
                 }
             }
 
-            var param = settings.gameObject.GetOrAddComponent<ModularAvatarParameters>();
-            fx.AddParameter(new AnimatorControllerParameter() { name = ParameterName_Toggle, defaultBool = parameters.IsDefaultUse, type = AnimatorControllerParameterType.Bool });
+            var param = context.Object.GetOrAddComponent<ModularAvatarParameters>();
+            context.Controller.AddParameter(new AnimatorControllerParameter() { name = ParameterName_Toggle, defaultBool = parameters.IsDefaultUse, type = AnimatorControllerParameterType.Bool });
             param.parameters.Add(new ParameterConfig() { nameOrPrefix = ParameterName_Toggle, saved = parameters.IsValueSave, defaultValue = parameters.IsDefaultUse ? 1 : 0, syncType = ParameterSyncType.Bool });
 
             foreach (ref readonly var container in animationContainers)
@@ -181,7 +201,7 @@ namespace io.github.azukimochi
                     if (parameterName is null)
                         continue;
 
-                    container.AddTo(fx);
+                    container.AddTo(assetContainer);
                     AddLayer(fx, container, parameterName);
 
                     fx.AddParameter(new AnimatorControllerParameter() { name = parameterName, defaultFloat = defaultValue, type = AnimatorControllerParameterType.Float });
@@ -190,23 +210,21 @@ namespace io.github.azukimochi
             }
         }
 
-        private static void ConfigureResetParameters(LightLimitChangerSettings settings)
+        private static void ConfigureResetParameters(in BuildContext context)
         {
-            if (!settings.Parameters.AddResetButton)
+            if (!context.Parameters.AddResetButton)
                 return;
-
-            var fx = settings.FX as AnimatorController;
 
             AnimatorStateMachine stateMachine;
             var layer = new AnimatorControllerLayer()
             {
                 name = "Reset",
-                stateMachine = stateMachine = new AnimatorStateMachine().HideInHierarchy().AddTo(fx),
+                stateMachine = stateMachine = new AnimatorStateMachine().HideInHierarchy().AddTo(context.AssetContainer),
                 defaultWeight = 1,
             };
-            var blank = new AnimationClip() { name = "Blank" }.HideInHierarchy().AddTo(fx);
-            var off = new AnimatorState() { name = "Off", writeDefaultValues = false, motion = blank }.HideInHierarchy().AddTo(fx);
-            var on = new AnimatorState() { name = "On", writeDefaultValues = false, motion = blank }.HideInHierarchy().AddTo(fx);
+            var blank = new AnimationClip() { name = "Blank" }.HideInHierarchy().AddTo(context.AssetContainer);
+            var off = new AnimatorState() { name = "Off", writeDefaultValues = false, motion = blank }.HideInHierarchy().AddTo(context.AssetContainer);
+            var on = new AnimatorState() { name = "On", writeDefaultValues = false, motion = blank }.HideInHierarchy().AddTo(context.AssetContainer);
 
             var cond = new AnimatorCondition[] { new AnimatorCondition() { mode = AnimatorConditionMode.If, parameter = ParameterName_Reset } };
 
@@ -216,7 +234,7 @@ namespace io.github.azukimochi
                 duration = 0,
                 hasExitTime = false,
                 conditions = cond
-            }.HideInHierarchy().AddTo(fx);
+            }.HideInHierarchy().AddTo(context.AssetContainer);
 
             off.AddTransition(t);
 
@@ -227,25 +245,25 @@ namespace io.github.azukimochi
                 duration = 0,
                 hasExitTime = false,
                 conditions = cond
-            }.HideInHierarchy().AddTo(fx);
+            }.HideInHierarchy().AddTo(context.AssetContainer);
 
             on.AddTransition(t);
 
             var dr = on.AddStateMachineBehaviour<VRCAvatarParameterDriver>();
-            dr.parameters.Add(new VRC.SDKBase.VRC_AvatarParameterDriver.Parameter() { type = VRC.SDKBase.VRC_AvatarParameterDriver.ChangeType.Set, name = ParameterName_Value, value = settings.Parameters.DefaultLightValue });
-            if (settings.Parameters.AllowColorTempControl)
+            dr.parameters.Add(new VRC.SDKBase.VRC_AvatarParameterDriver.Parameter() { type = VRC.SDKBase.VRC_AvatarParameterDriver.ChangeType.Set, name = ParameterName_Value, value = context.Parameters.DefaultLightValue });
+            if (context.Parameters.AllowColorTempControl)
                 dr.parameters.Add(new VRC.SDKBase.VRC_AvatarParameterDriver.Parameter() { type = VRC.SDKBase.VRC_AvatarParameterDriver.ChangeType.Set, name = ParameterName_ColorTemp, value = 0.5f });
-            if (settings.Parameters.AllowSaturationControl)
+            if (context.Parameters.AllowSaturationControl)
                 dr.parameters.Add(new VRC.SDKBase.VRC_AvatarParameterDriver.Parameter() { type = VRC.SDKBase.VRC_AvatarParameterDriver.ChangeType.Set, name = ParameterName_Saturation, value = 0.5f });
-            if (settings.Parameters.AllowUnlitControl)
+            if (context.Parameters.AllowUnlitControl)
                 dr.parameters.Add(new VRC.SDKBase.VRC_AvatarParameterDriver.Parameter() { type = VRC.SDKBase.VRC_AvatarParameterDriver.ChangeType.Set, name = ParameterName_Unlit, value = 0.0f });
             stateMachine.AddState(off, stateMachine.entryPosition + new Vector3(-20, 50));
             stateMachine.AddState(on, stateMachine.entryPosition + new Vector3(-20, 100));
 
-            fx.AddParameter(ParameterName_Reset, AnimatorControllerParameterType.Bool);
-            settings.gameObject.GetOrAddComponent<ModularAvatarParameters>().parameters.Add(new ParameterConfig() { nameOrPrefix = ParameterName_Reset, syncType = ParameterSyncType.Bool, localOnly = true, saved = false });
+            context.Controller.AddParameter(ParameterName_Reset, AnimatorControllerParameterType.Bool);
+            context.Object.GetOrAddComponent<ModularAvatarParameters>().parameters.Add(new ParameterConfig() { nameOrPrefix = ParameterName_Reset, syncType = ParameterSyncType.Bool, localOnly = true, saved = false });
 
-            fx.AddLayer(layer);
+            context.Controller.AddLayer(layer);
         }
 
         private static void AddLayer(AnimatorController fx, ControlAnimationContainer container, string parameterName)
@@ -388,12 +406,12 @@ namespace io.github.azukimochi
             return rootMenu;
         }
 
-        private static AnimatorController CreateTemporaryAsset()
+        private static AssetContainer CreateTemporaryAsset()
         {
-            var fx = new AnimatorController() { name = GUID.Generate().ToString() };
-            AssetDatabase.CreateAsset(fx, System.IO.Path.Combine(Utils.GetGeneratedAssetsFolder(), $"{fx.name}.controller"));
+            var container = ScriptableObject.CreateInstance<AssetContainer>(); 
+            AssetDatabase.CreateAsset(container, System.IO.Path.Combine(Utils.GetGeneratedAssetsFolder(), $"{GUID.Generate()}.asset"));
             AssetDatabase.SaveAssets();
-            return fx;
+            return container;
         }
 
         // Original: https://github.com/anatawa12/AvatarOptimizer/blob/f31d71e318a857b4f4d7db600f043c3ba5d26918/Editor/Processors/ApplyObjectMapping.cs#L136-L303

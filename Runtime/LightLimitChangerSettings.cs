@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityEngine;
+using UnityEngine.Serialization;
 using VRC.SDKBase;
 
 namespace io.github.azukimochi
@@ -8,15 +9,12 @@ namespace io.github.azukimochi
     [DefaultExecutionOrder(-100010)]
     public sealed class LightLimitChangerSettings : MonoBehaviour, IEditorOnly
     {
-        public RuntimeAnimatorController FX;
+        [FormerlySerializedAs("FX")]
+        public UnityEngine.Object AssetContainer;
+
         public LightLimitChangerParameters Parameters = LightLimitChangerParameters.Default;
 
         public static Action<LightLimitChangerSettings> OnAwake;
-
-        public bool IsValid()
-        {
-            return FX != null;
-        }
 
         private void Awake()
         {

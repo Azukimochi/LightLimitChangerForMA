@@ -101,7 +101,7 @@ namespace io.github.azukimochi
                 {
                     string buttonLabel;
                     {
-                        buttonLabel = TargetAvatar != null && TargetAvatar.TryGetComponentInChildren<LightLimitChangerSettings>(out var settings) && settings.IsValid()
+                        buttonLabel = TargetAvatar != null && TargetAvatar.TryGetComponentInChildren<LightLimitChangerSettings>(out var settings) && settings.AssetContainer != null
                         ? "info.re_generate"
                         : "info.generate";
                     }
@@ -137,21 +137,21 @@ namespace io.github.azukimochi
 
             var settings = avatar.GetComponentInChildren<LightLimitChangerSettings>(true);
 
-            if (settings == null || !settings.IsValid())
+            if (settings == null || settings.AssetContainer == null)
             {
-                var fileName = $"{TargetAvatar.name}_{DateTime.Now:yyyyMMddHHmmss}_{GUID.Generate()}.controller";
+                var fileName = $"{TargetAvatar.name}_{DateTime.Now:yyyyMMddHHmmss}_{GUID.Generate()}.asset";
                 var savePath = EditorUtility.SaveFilePanelInProject(Localization.S("info.save"), System.IO.Path.GetFileNameWithoutExtension(fileName), System.IO.Path.GetExtension(fileName).Trim('.'), Localization.S("info.save_location"));
                 if (string.IsNullOrEmpty(savePath))
                 {
                     throw new Exception(Localization.S("info.cancelled"));
                 }
 
-                var fx = new AnimatorController() { name = System.IO.Path.GetFileName(fileName) };
-                AssetDatabase.CreateAsset(fx, savePath);
+                var container = CreateInstance<AssetContainer>();
+                AssetDatabase.CreateAsset(container, savePath);
 
                 var obj = avatar.gameObject.GetOrAddChild(GenerateObjectName);
                 settings = obj.GetOrAddComponent<LightLimitChangerSettings>();
-                settings.FX = fx;
+                settings.AssetContainer = container;
             }
 
             settings.Parameters = Parameters;
