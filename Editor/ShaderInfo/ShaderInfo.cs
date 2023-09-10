@@ -72,7 +72,7 @@ namespace io.github.azukimochi
 
         public int ShaderType { get; private set; }
 
-        public abstract bool TryNormalizeMaterial(Material material, TextureBaker textureBaker);
+        public abstract bool TryNormalizeMaterial(Material material, UnityEngine.Object assetContainer);
 
         public abstract bool IsTargetShader(Shader shader);
 

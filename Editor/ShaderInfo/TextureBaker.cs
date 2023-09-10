@@ -1,15 +1,33 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using Unity.Collections.LowLevel.Unsafe;
+﻿using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
-using Object = UnityEngine.Object;
 
 namespace io.github.azukimochi
 {
-    public sealed class TextureBaker : IDisposable
+    public abstract class TextureBaker
+    {
+        public abstract Texture2D Bake();
+
+        public abstract void Reset();
+
+        protected static Dictionary<object, Texture2D> BakedTextureCache { get; } = new Dictionary<object, Texture2D>();
+
+        public static T GetInstance<T>(bool forceReset = true) where T : TextureBaker, new()
+        {
+            var instance = TextureBakerCache<T>.Default;
+            if (forceReset)
+                instance.Reset();
+            return instance;
+        }
+
+        private static class TextureBakerCache<T> where T : TextureBaker, new()
+        {
+            public static readonly T Default = new T();
+        }
+    }
+
+    public class DefaultTextureBaker : TextureBaker
     {
         private const string TextureBakerShaderName = "Hidden/LightLimitChanger/TextureBaker";
         private static Shader _shader = Shader.Find(TextureBakerShaderName);
@@ -20,47 +38,37 @@ namespace io.github.azukimochi
         private static readonly int _HSVGPropertyID = Shader.PropertyToID($"_{nameof(HSVG)}");
         private static readonly int _GradationStrengthPropertyID = Shader.PropertyToID($"_{nameof(GradationStrength)}");
 
-        private Dictionary<BakedTextureParameters, Texture2D> _cache = new Dictionary<BakedTextureParameters, Texture2D>();
-        private Material _material = new Material(_shader);
-        private Object _rootArtifact;
+        protected Material Material { get; } = new Material(_shader);
 
-        public TextureBaker(Object rootArtifact)
-        {
-            _rootArtifact = rootArtifact;
-        }
+        public Texture Texture { get => Material?.GetTexture(_TexturePropertyID); set => Material?.SetTexture(_TexturePropertyID, value); }
 
+        public Texture Mask { get => Material?.GetTexture(_MaskPropertyID); set => Material?.SetTexture(_MaskPropertyID, value); }
 
-        public Texture Texture { get => _material?.GetTexture(_TexturePropertyID); set => _material?.SetTexture(_TexturePropertyID, value); }
+        public Texture GradationMap { get => Material?.GetTexture(_GradationMapPropertyID); set => Material?.SetTexture(_GradationMapPropertyID, value); }
 
-        public Texture Mask { get => _material?.GetTexture(_MaskPropertyID); set => _material?.SetTexture(_MaskPropertyID, value); }
+        public Color Color { get => Material?.GetColor(_ColorPropertyID) ?? Color.black; set => Material?.SetColor(_ColorPropertyID, value); }
 
-        public Texture GradationMap { get => _material?.GetTexture(_GradationMapPropertyID); set => _material?.SetTexture(_GradationMapPropertyID, value); }
+        public Vector4 HSVG { get => Material?.GetVector(_HSVGPropertyID) ?? Vector4.zero; set => Material?.SetVector(_HSVGPropertyID, value); }
 
-        public Color Color { get => _material?.GetColor(_ColorPropertyID) ?? Color.black; set => _material?.SetColor(_ColorPropertyID, value); }
+        public float GradationStrength { get => Material?.GetFloat(_GradationStrengthPropertyID) ?? 0; set => Material?.SetFloat(_GradationStrengthPropertyID, Mathf.Clamp01(value)); }
 
-        public Vector4 HSVG { get => _material?.GetVector(_HSVGPropertyID) ?? Vector4.zero; set => _material?.SetVector(_HSVGPropertyID, value); }
-
-        public float GradationStrength { get => _material?.GetFloat(_GradationStrengthPropertyID) ?? 0; set => _material?.SetFloat(_GradationStrengthPropertyID, Mathf.Clamp01(value)); }
-
-        public bool IsPoiyomiMode { get => _material?.IsKeywordEnabled("_POIYOMI") ?? false; set => _material?.EnableKeyword("_POIYOMI"); }
-
-        public void ResetParamerter()
+        public override void Reset()
         {
             Texture = null;
             Mask = null;
             GradationMap = null;
             Color = Color.white;
             HSVG = new Vector4(0, 1, 1, 1);
-            GradationStrength = 0; 
+            GradationStrength = 0;
         }
 
-        public Texture2D Bake()
+        public override Texture2D Bake()
         {
-            if (_material == null)
+            if (Material == null)
                 return null;
 
             var key = new BakedTextureParameters(this);
-            if (_cache.TryGetValue(key, out var value) && value != null)
+            if (BakedTextureCache.TryGetValue(key, out var value) && value != null)
             {
                 return value;
             }
@@ -77,7 +85,7 @@ namespace io.github.azukimochi
             var temp = RenderTexture.active;
             try
             {
-                Graphics.Blit(source, rt, _material);
+                Graphics.Blit(source, rt, Material);
 
                 var request = AsyncGPUReadback.Request(rt);
                 request.WaitForCompletion();
@@ -88,8 +96,7 @@ namespace io.github.azukimochi
                 int quality = (AssetImporter.GetAtPath(AssetDatabase.GetAssetPath(source)) as TextureImporter)?.compressionQuality ?? 50;
                 EditorUtility.CompressTexture(dest, format, quality);
 
-                _cache.Add(key, dest);
-                dest.AddTo(_rootArtifact);
+                BakedTextureCache.Add(key, dest);
                 return dest;
             }
             finally
@@ -99,15 +106,9 @@ namespace io.github.azukimochi
             }
         }
 
-        public void Dispose()
+        private sealed class BakedTextureParameters
         {
-            Object.DestroyImmediate(_material);
-            _cache.Clear();
-        }
-
-        private readonly struct BakedTextureParameters : IEquatable<BakedTextureParameters>
-        {
-            public BakedTextureParameters(TextureBaker baker)
+            public BakedTextureParameters(DefaultTextureBaker baker)
             {
                 Texture = baker.Texture;
                 Mask = baker.Mask;
@@ -124,10 +125,9 @@ namespace io.github.azukimochi
             public readonly Vector4 HSVG;
             public readonly float GradationStrength;
 
-            public bool Equals(BakedTextureParameters other) => Equals(in other);
-            public override bool Equals(object obj) => obj is BakedTextureParameters other && Equals(in other);
+            public override bool Equals(object obj) => obj is BakedTextureParameters other && Equals(other);
 
-            public bool Equals(in BakedTextureParameters other)
+            public bool Equals(BakedTextureParameters other)
             {
                 return
                     this.Texture == other.Texture &&
@@ -138,23 +138,23 @@ namespace io.github.azukimochi
                     this.GradationStrength == other.GradationStrength;
             }
 
-            public override int GetHashCode()
-            {
-                const int Prime1 = 1117;
-                const int Prime2 = 1777;
+            public override int GetHashCode() => new HashCode()
+                .Append(Texture)
+                .Append(Mask)
+                .Append(GradationMap)
+                .Append(Color)
+                .Append(HSVG)
+                .Append(GradationStrength)
+                .GetHashCode();
+        }
+    }
 
-                int hash = Prime1;
-                unchecked
-                {
-                    hash = hash * Prime2 + Texture?.GetHashCode() ?? 0;
-                    hash = hash * Prime2 + Mask?.GetHashCode() ?? 0;
-                    hash = hash * Prime2 + GradationMap?.GetHashCode() ?? 0;
-                    hash = hash * Prime2 + Color.GetHashCode();
-                    hash = hash * Prime2 + HSVG.GetHashCode();
-                    hash = hash * Prime2 + GradationStrength.GetHashCode();
-                }
-                return hash;
-            }
+    internal sealed class PoiyomiTextureBaker : DefaultTextureBaker
+    {
+        public override Texture2D Bake()
+        {
+            Material?.EnableKeyword("_POIYOMI");
+            return base.Bake();
         }
     }
 }

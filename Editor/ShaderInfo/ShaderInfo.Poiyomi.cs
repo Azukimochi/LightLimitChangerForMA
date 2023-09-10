@@ -35,10 +35,11 @@ namespace io.github.azukimochi
             private const string Animated_Suffix = "Animated";
             private const string Flag_IsAnimated = "1";
 
-            public override bool TryNormalizeMaterial(Material material, TextureBaker textureBaker)
+            public override bool TryNormalizeMaterial(Material material, UnityEngine.Object assetContainer)
             {
                 bool bakeFlag = false;
-                textureBaker.IsPoiyomiMode = true;
+                var textureBaker = TextureBaker.GetInstance<PoiyomiTextureBaker>();
+
                 {
                     var tex = material.GetTexture(PropertyIDs.MainTex);
                     if (tex != null)
@@ -60,7 +61,7 @@ namespace io.github.azukimochi
 
                     if (bakeFlag)
                     {
-                        material.SetTexture(PropertyIDs.MainTex, textureBaker.Bake());
+                        material.SetTexture(PropertyIDs.MainTex, textureBaker.Bake().AddTo(assetContainer));
                     }
                 }
 

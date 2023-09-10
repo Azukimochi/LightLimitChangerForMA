@@ -79,62 +79,58 @@ namespace io.github.azukimochi
                 var objectMapper = new ObjectMapper(assetContainer);
                 var components = context.Avatar.GetComponentsInChildren<Component>().Where(x => !(x is Transform)).Select(x => new SerializedObject(x)).ToArray();
 
-                using (var baker = new TextureBaker(assetContainer))
+                objectMapper.MapObject(components, obj =>
                 {
-                    objectMapper.MapObject(components, obj =>
+                    if (obj is Material mat)
                     {
-                        if (obj is Material mat)
+                        return CloneAndNormalizeMaterial(mat);
+                    }
+                    else if (obj is RuntimeAnimatorController runtimeAnimatorController)
+                    {
+                        bool needAnimatorMapping = false;
+                        foreach (var material in runtimeAnimatorController.GetAnimatedMaterials())
                         {
-                            return CloneAndNormalizeMaterial(mat);
-                        }
-                        else if (obj is RuntimeAnimatorController runtimeAnimatorController)
-                        {
-                            bool needAnimatorMapping = false;
-                            foreach (var material in runtimeAnimatorController.GetAnimatedMaterials())
+                            if (!objectMapper.MappedObjects.ContainsKey(material))
                             {
-                                if (!objectMapper.MappedObjects.ContainsKey(material))
+                                var result = CloneAndNormalizeMaterial(material);
+                                if (result != null)
                                 {
-                                    var result = CloneAndNormalizeMaterial(material);
-                                    if (result != null)
-                                    {
-                                        objectMapper.MappedObjects.Add(material, result);
-                                        needAnimatorMapping = true;
-                                    }
-                                }
-                                else
-                                {
+                                    objectMapper.MappedObjects.Add(material, result);
                                     needAnimatorMapping = true;
                                 }
                             }
-
-                            if (needAnimatorMapping)
+                            else
                             {
-                                return objectMapper.MapController(runtimeAnimatorController);
+                                needAnimatorMapping = true;
                             }
                         }
 
-                        return null;
-                    });
-
-                    Material CloneAndNormalizeMaterial(Material material)
-                    {
-                        if (ShaderInfo.TryGetShaderInfo(material, out var info) && parameters.TargetShader.HasFlag(info.ShaderType))
+                        if (needAnimatorMapping)
                         {
-                            material = material.Clone().AddTo(assetContainer);
-                            if (parameters.AllowColorTempControl || parameters.AllowSaturationControl)
-                            {
-                                baker.ResetParamerter();
-                                info.TryNormalizeMaterial(material, baker);
-                            }
-
-                            info.AdditionalControl(material, parameters);
-
-                            return material;
+                            return objectMapper.MapController(runtimeAnimatorController);
                         }
-
-                        return null;
                     }
+
+                    return null;
+                });
+
+            Material CloneAndNormalizeMaterial(Material material)
+            {
+                if (ShaderInfo.TryGetShaderInfo(material, out var info) && parameters.TargetShader.HasFlag(info.ShaderType))
+                {
+                    material = material.Clone().AddTo(assetContainer);
+                    if (parameters.AllowColorTempControl || parameters.AllowSaturationControl)
+                    {
+                        info.TryNormalizeMaterial(material, assetContainer);
+                    }
+
+                    info.AdditionalControl(material, parameters);
+
+                    return material;
                 }
+
+                return null;
+            }
             }
 
             ReadOnlySpan<ControlAnimationContainer> animationContainers = new[]

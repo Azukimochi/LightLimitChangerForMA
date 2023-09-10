@@ -50,9 +50,10 @@ namespace io.github.azukimochi
                 public static readonly float MainGradationStrength = 0;
             }
 
-            public override bool TryNormalizeMaterial(Material material, TextureBaker textureBaker)
+            public override bool TryNormalizeMaterial(Material material, UnityEngine.Object assetContainer)
             {
                 bool result = false;
+                var textureBaker = TextureBaker.GetInstance<DefaultTextureBaker>();
 
                 // MainTexture
                 {
@@ -102,7 +103,7 @@ namespace io.github.azukimochi
                     // Run Bake
                     if (bakeFlag)
                     {
-                        material.SetTexture(PropertyIDs.MainTex, textureBaker.Bake());
+                        material.SetTexture(PropertyIDs.MainTex, textureBaker.Bake().AddTo(assetContainer));
                     }
 
                     result |= bakeFlag;
@@ -110,7 +111,7 @@ namespace io.github.azukimochi
 
                 // 2nd Texture
                 {
-                    textureBaker.ResetParamerter();
+                    textureBaker.Reset();
                     bool bakeFlag = false;
 
                     var tex = material.GetTexture(PropertyIDs.Main2ndTex);
@@ -126,7 +127,7 @@ namespace io.github.azukimochi
 
                     if (bakeFlag)
                     {
-                        material.SetTexture(PropertyIDs.Main2ndTex, textureBaker.Bake());
+                        material.SetTexture(PropertyIDs.Main2ndTex, textureBaker.Bake().AddTo(assetContainer));
                     }
 
                     result |= bakeFlag;
@@ -134,7 +135,7 @@ namespace io.github.azukimochi
 
                 // 3rd Texture
                 {
-                    textureBaker.ResetParamerter();
+                    textureBaker.Reset();
                     bool bakeFlag = false;
 
                     var tex = material.GetTexture(PropertyIDs.Main3rdTex);
@@ -150,7 +151,7 @@ namespace io.github.azukimochi
 
                     if (bakeFlag)
                     {
-                        material.SetTexture(PropertyIDs.Main3rdTex, textureBaker.Bake());
+                        material.SetTexture(PropertyIDs.Main3rdTex, textureBaker.Bake().AddTo(assetContainer));
                     }
                     result |= bakeFlag;
                 }

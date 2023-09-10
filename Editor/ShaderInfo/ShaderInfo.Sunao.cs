@@ -37,10 +37,11 @@ namespace io.github.azukimochi
                 public static readonly Color Color = Color.white;
             }
 
-            public override bool TryNormalizeMaterial(Material material, TextureBaker textureBaker)
+            public override bool TryNormalizeMaterial(Material material, UnityEngine.Object assetContainer)
             {
                 bool result = false;
                 bool bakeFlag = false;
+                var textureBaker = TextureBaker.GetInstance<DefaultTextureBaker>();
 
                 {
                     var tex = material.GetTexture(PropertyIDs.MainTex);
@@ -56,7 +57,7 @@ namespace io.github.azukimochi
 
                     if (bakeFlag)
                     {
-                        material.SetTexture(PropertyIDs.MainTex, textureBaker.Bake());
+                        material.SetTexture(PropertyIDs.MainTex, textureBaker.Bake().AddTo(assetContainer));
                     }
 
                     result |= bakeFlag;
