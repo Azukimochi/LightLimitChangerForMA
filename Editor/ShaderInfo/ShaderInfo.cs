@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -19,11 +20,26 @@ namespace io.github.azukimochi
             RegisterShaderInfo(Sunao.Instance);
             RegisterShaderInfo(Poiyomi.Instance);
 
-            // TODO: Register extended ShaderInfo from plugins
+            try
+            {
+                var self = Assembly.GetExecutingAssembly();
+                foreach (var type in AppDomain.CurrentDomain.GetAssemblies().Where(x => x != self).SelectMany(x => x.GetTypes()).Where(x => !x.IsAbstract && typeof(ShaderInfo).IsAssignableFrom(x)))
+                {
+                    var instance = Activator.CreateInstance(type) as ShaderInfo;
+                    RegisterShaderInfo(instance);
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError(ex);
+            }
         }
 
         private static void RegisterShaderInfo(ShaderInfo info)
         {
+            if (info is null)
+                return;
+
             var count = _ShaderInfoCount;
             if (count >= _RegisteredShaderInfos.Length)
                 return;
