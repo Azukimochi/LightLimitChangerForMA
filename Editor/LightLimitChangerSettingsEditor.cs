@@ -14,7 +14,7 @@ namespace io.github.azukimochi
     [CustomEditor(typeof(LightLimitChangerSettings))]
     internal sealed class LightLimitChangerSettingsEditor : Editor
     {
-        private SerializedProperty FX;
+        private SerializedProperty AssetContainer;
         private SerializedProperty IsDefaultUse;
         private SerializedProperty IsValueSave;
         private SerializedProperty OverwriteDefaultLightMinMax;
@@ -34,7 +34,7 @@ namespace io.github.azukimochi
 
         private void OnEnable()
         {
-            FX =                            serializedObject.FindProperty  (nameof(LightLimitChangerSettings.FX));
+            AssetContainer =                            serializedObject.FindProperty  (nameof(LightLimitChangerSettings.AssetContainer));
             var parameters =                serializedObject.FindProperty  (nameof(LightLimitChangerSettings.Parameters));
             IsDefaultUse =                  parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.IsDefaultUse));
             IsValueSave =                   parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.IsValueSave));
@@ -80,7 +80,7 @@ namespace io.github.azukimochi
             {
                 if (group.IsOpen)
                 {
-                    TargetShader.intValue = EditorGUILayout.MaskField(Localization.G("label.target_shader"), TargetShader.intValue, TargetShader.enumNames);
+                    TargetShader.intValue = EditorGUILayout.MaskField(Localization.G("label.target_shader"), TargetShader.intValue, ShaderInfo.RegisteredShaderInfoNames);
 
                     EditorGUILayout.PropertyField(ExcludeEditorOnly, Localization.G("label.allow_editor_only"));
                     EditorGUILayout.Separator();
@@ -88,7 +88,7 @@ namespace io.github.azukimochi
 
                     EditorGUILayout.Separator();
                     EditorGUI.BeginDisabledGroup(true);
-                    EditorGUILayout.PropertyField(FX);
+                    EditorGUILayout.PropertyField(AssetContainer);
                     EditorGUI.EndDisabledGroup();
                 }
             }

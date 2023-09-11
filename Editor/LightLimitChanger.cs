@@ -1,6 +1,4 @@
-﻿#if UNITY_EDITOR
-
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System;
 using UnityEngine;
 using UnityEditor;
@@ -21,8 +19,6 @@ namespace io.github.azukimochi
         private static bool _isOptionFoldoutOpen = false;
 
         private const string GenerateObjectName = "Light Limit Changer";
-
-        private static readonly string[] _targetShaderLabels = Enum.GetNames(typeof(Shaders));
 
         private string infoLabel = "";
 
@@ -87,7 +83,7 @@ namespace io.github.azukimochi
                         if (group.IsOpen)
                         {
                             EditorGUI.BeginChangeCheck();
-                            param.TargetShader = (Shaders)EditorGUILayout.MaskField(Localization.G("label.target_shader", "tip.target_shader"), (int)param.TargetShader, _targetShaderLabels);
+                            param.TargetShader = EditorGUILayout.MaskField(Localization.G("label.target_shader", "tip.target_shader"), param.TargetShader, ShaderInfo.RegisteredShaderInfoNames);
                             if (EditorGUI.EndChangeCheck())
                             {
                                 infoLabel = param.TargetShader == 0 ? Localization.S("info.shader_must_select") : string.Empty;
@@ -105,7 +101,7 @@ namespace io.github.azukimochi
                 {
                     string buttonLabel;
                     {
-                        buttonLabel = TargetAvatar != null && TargetAvatar.TryGetComponentInChildren<LightLimitChangerSettings>(out var settings) && settings.IsValid()
+                        buttonLabel = TargetAvatar != null && TargetAvatar.TryGetComponentInChildren<LightLimitChangerSettings>(out var settings) && settings.AssetContainer != null
                         ? "info.re_generate"
                         : "info.generate";
                     }
@@ -141,21 +137,21 @@ namespace io.github.azukimochi
 
             var settings = avatar.GetComponentInChildren<LightLimitChangerSettings>(true);
 
-            if (settings == null || !settings.IsValid())
+            if (settings == null || settings.AssetContainer == null)
             {
-                var fileName = $"{TargetAvatar.name}_{DateTime.Now:yyyyMMddHHmmss}_{GUID.Generate()}.controller";
+                var fileName = $"{TargetAvatar.name}_{DateTime.Now:yyyyMMddHHmmss}_{GUID.Generate()}.asset";
                 var savePath = EditorUtility.SaveFilePanelInProject(Localization.S("info.save"), System.IO.Path.GetFileNameWithoutExtension(fileName), System.IO.Path.GetExtension(fileName).Trim('.'), Localization.S("info.save_location"));
                 if (string.IsNullOrEmpty(savePath))
                 {
                     throw new Exception(Localization.S("info.cancelled"));
                 }
 
-                var fx = new AnimatorController() { name = System.IO.Path.GetFileName(fileName) };
-                AssetDatabase.CreateAsset(fx, savePath);
+                var container = CreateInstance<AssetContainer>();
+                AssetDatabase.CreateAsset(container, savePath);
 
                 var obj = avatar.gameObject.GetOrAddChild(GenerateObjectName);
                 settings = obj.GetOrAddComponent<LightLimitChangerSettings>();
-                settings.FX = fx;
+                settings.AssetContainer = container;
             }
 
             settings.Parameters = Parameters;
@@ -179,5 +175,3 @@ namespace io.github.azukimochi
         }
     }
 }
-
-#endif

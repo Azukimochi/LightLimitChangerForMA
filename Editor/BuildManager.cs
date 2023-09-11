@@ -1,6 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.IO;
-using nadena.dev.modular_avatar.core.editor;
 using UnityEditor;
 using UnityEngine;
 using VRC.SDK3.Avatars.Components;
@@ -13,13 +11,13 @@ namespace io.github.azukimochi
     {
         static BuildManager()
         {
-            // 多分これが一番早いと思います
             LightLimitChangerSettings.OnAwake = OnPlayModeEnter;
         }
 
-        public int callbackOrder => new AvatarProcessor().callbackOrder - 1;
+        public int callbackOrder => -100010;
 
         internal static bool IsRunning { get; private set; }
+        private static bool _isGenerated;
 
         internal static Dictionary<Material, Dictionary<string, string>> PoiyomiOriginalFlags;
 
@@ -27,10 +25,11 @@ namespace io.github.azukimochi
         {
             VRCAvatarDescriptor avatar;
             IsRunning = true;
-            if (settings.Parameters.GenerateAtBuild && (avatar = settings.gameObject.FindAvatarFromParent()) != null)
+            if (!_isGenerated && settings.Parameters.GenerateAtBuild && (avatar = settings.gameObject.FindAvatarFromParent()) != null)
             {
                 LightLimitGenerator.Generate(avatar, settings);
             }
+            _isGenerated = true;
             IsRunning = false;
         }
 
