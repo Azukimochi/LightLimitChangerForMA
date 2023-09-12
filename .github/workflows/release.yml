@@ -34,6 +34,7 @@ jobs:
         with:
           type: "zip"
           filename: "${{env.zipFile}}" # make the zip file two directories up, since we start two directories in above
+          exclusions: ".git*"
 
       - name: Make Release
         uses: softprops/action-gh-release@1e07f4398721186383de40550babbdf2b84acfc5
