@@ -13,7 +13,7 @@ namespace io.github.azukimochi
 {
     internal static class Utils
     {
-        public static bool HasFlag(this int x, int y) => (x & y) != y;
+        public static bool HasFlag(this int x, int y) => (x & y) == y;
 
         public static void ClearSubAssets(this Object obj)
         {
