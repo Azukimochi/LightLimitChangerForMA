@@ -101,7 +101,7 @@ namespace io.github.azukimochi
                 {
                     string buttonLabel;
                     {
-                        buttonLabel = TargetAvatar != null && TargetAvatar.TryGetComponentInChildren<LightLimitChangerSettings>(out var settings) && settings.AssetContainer != null
+                        buttonLabel = TargetAvatar != null && TargetAvatar.TryGetComponentInChildren<LightLimitChangerSettings>(out var settings)
                         ? "info.re_generate"
                         : "info.generate";
                     }
@@ -133,46 +133,7 @@ namespace io.github.azukimochi
 
         private void GenerateAssets()
         {
-            var avatar = TargetAvatar;
-
-            var settings = avatar.GetComponentInChildren<LightLimitChangerSettings>(true);
-
-            if (settings == null || settings.AssetContainer == null)
-            {
-                var fileName = $"{TargetAvatar.name}_{DateTime.Now:yyyyMMddHHmmss}_{GUID.Generate()}.asset";
-                var savePath = EditorUtility.SaveFilePanelInProject(Localization.S("info.save"), System.IO.Path.GetFileNameWithoutExtension(fileName), System.IO.Path.GetExtension(fileName).Trim('.'), Localization.S("info.save_location"));
-                if (string.IsNullOrEmpty(savePath))
-                {
-                    throw new Exception(Localization.S("info.cancelled"));
-                }
-
-                var container = CreateInstance<AssetContainer>();
-                AssetDatabase.CreateAsset(container, savePath);
-
-                var obj = avatar.gameObject.GetOrAddChild(GenerateObjectName);
-                settings = obj.GetOrAddComponent<LightLimitChangerSettings>();
-                settings.AssetContainer = container;
-            }
-
-            settings.Parameters = Parameters;
-            // 一旦消しておく
-            //LightLimitGenerator.Generate(avatar, settings);
-            
-            if (Parameters.AllowColorTempControl || Parameters.AllowSaturationControl)
-            {
-                string PreferenceKey = "io.github.azukimochi.light-limit-changer.lang";
-
-                if (EditorPrefs.GetInt(PreferenceKey, 1) == 1)
-                {
-                    EditorUtility.DisplayDialog(
-                        "上級者向け設定使用中",
-                        "焼き込みなどの前処理を行わないと不具合が起きる可能性があります。", "OK");
-                }
-                else 
-                    EditorUtility.DisplayDialog(
-                        "Now using Advanced setting",
-                        "If you do not perform preprocessing such as burning, problems may occur.", "OK");
-            }
+            // あとで書く
         }
     }
 }

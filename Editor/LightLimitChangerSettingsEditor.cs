@@ -14,7 +14,6 @@ namespace io.github.azukimochi
     [CustomEditor(typeof(LightLimitChangerSettings))]
     internal sealed class LightLimitChangerSettingsEditor : Editor
     {
-        private SerializedProperty AssetContainer;
         private SerializedProperty IsDefaultUse;
         private SerializedProperty IsValueSave;
         private SerializedProperty OverwriteDefaultLightMinMax;
@@ -34,7 +33,6 @@ namespace io.github.azukimochi
 
         private void OnEnable()
         {
-            AssetContainer =                            serializedObject.FindProperty  (nameof(LightLimitChangerSettings.AssetContainer));
             var parameters =                serializedObject.FindProperty  (nameof(LightLimitChangerSettings.Parameters));
             IsDefaultUse =                  parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.IsDefaultUse));
             IsValueSave =                   parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.IsValueSave));
@@ -85,11 +83,6 @@ namespace io.github.azukimochi
                     EditorGUILayout.PropertyField(ExcludeEditorOnly, Localization.G("label.allow_editor_only"));
                     EditorGUILayout.Separator();
                     EditorGUILayout.PropertyField(GenerateAtBuild, Localization.G("label.allow_gen_playmode"));
-
-                    EditorGUILayout.Separator();
-                    EditorGUI.BeginDisabledGroup(true);
-                    EditorGUILayout.PropertyField(AssetContainer);
-                    EditorGUI.EndDisabledGroup();
                 }
             }
 
