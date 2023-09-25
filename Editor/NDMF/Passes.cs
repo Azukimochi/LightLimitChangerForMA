@@ -42,29 +42,37 @@ namespace io.github.azukimochi
 
         private static bool _isStateInitialized = false;
 
-        private static Session GetSession(BuildContext context)
+        private static Session GetSession(this BuildContext context)
         {
             var session = context.GetState<Session>();
             if (!_isStateInitialized)
             {
                 session.Settings = context.AvatarRootObject.GetComponentInChildren<LightLimitChangerSettings>();
                 session.Parameters = session.Settings?.Parameters ?? LightLimitChangerParameters.Default;
-                session.Controller = new AnimatorController() { name = "Light Limit Controller" }.AddTo(context.AssetContainer);
+                session.Controller = new AnimatorController() { name = "Light Limit Controller" }.AddTo(context.GetObjectCache());
 
                 _isStateInitialized = true;
             }
             return session;
         }
 
+        private static LightLimitChangerObjectCache GetObjectCache(this BuildContext context)
+        {
+            var cache = context.GetState<LightLimitChangerObjectCache>();
+            if (cache.Context != context)
+                cache.Context = context;
+            return cache;
+        }
+
         internal sealed class CloningMaterialsPass : Pass<CloningMaterialsPass>
         {
             protected override void Execute(BuildContext context)
             {
-                var session = GetSession(context);
+                var session = context.GetSession();
                 if (!session.IsValid())
                     return;
                 var components = context.AvatarRootObject.GetComponentsInChildren<Component>(true);
-                var mapper = new AnimatorControllerMapper(session.ObjectMapping, context.AssetContainer);
+                var mapper = new AnimatorControllerMapper(context.GetObjectCache());
 
                 foreach (var component in components)
                 {
@@ -78,7 +86,7 @@ namespace io.github.azukimochi
                             var obj = p.objectReferenceValue;
                             if (obj != null)
                             {
-                                if (session.ObjectMapping.TryGetValue(obj, out var mapped))
+                                if (context.GetObjectCache().TryGetValue(obj, out var mapped))
                                 {
                                     p.objectReferenceValue = mapped;
                                 }
@@ -109,12 +117,13 @@ namespace io.github.azukimochi
 
                             bool TryClone(Material material, out Material clonedMaterial)
                             {
-                                if (!session.ObjectMapping.TryGetValue(material, out var mapped))
+                                var cache = context.GetObjectCache();
+                                if (!cache.TryGetValue(material, out var mapped))
                                 {
                                     if (ShaderInfo.TryGetShaderInfo(material, out var info) && session.Parameters.TargetShader.HasFlag(info.ShaderType))
                                     {
-                                        clonedMaterial = material.Clone().AddTo(context.AssetContainer);
-                                        session.ObjectMapping.Add(material, clonedMaterial);
+                                        clonedMaterial = material.Clone().AddTo(cache);
+                                        cache.Register(material, clonedMaterial);
                                         return true;
                                     }
                                     clonedMaterial = null;
@@ -122,7 +131,7 @@ namespace io.github.azukimochi
                                 }
                                 else
                                 {
-                                    clonedMaterial = mapped as Material;
+                                    clonedMaterial = mapped;
                                     return true;
                                 }
                             }
@@ -170,15 +179,17 @@ namespace io.github.azukimochi
         {
             protected override void Execute(BuildContext context)
             {
-                var session = GetSession(context);
+                var session = context.GetSession();
                 if (!session.IsValid() || (!session.Parameters.AllowColorTempControl && !session.Parameters.AllowSaturationControl))
                     return;
 
-                foreach (var material in session.ObjectMapping.Values.Select(x => x as Material).Where(x => x != null))
+                var cache = context.GetObjectCache();
+
+                foreach (var material in cache.MappedObjects.Select(x => x as Material).Where(x => x != null).ToArray())
                 {
                     if (ShaderInfo.TryGetShaderInfo(material, out var shaderInfo))
                     {
-                        shaderInfo.TryNormalizeMaterial(material, context.AssetContainer);
+                        shaderInfo.TryNormalizeMaterial(material, cache);
                     }
                 }
             }
@@ -188,7 +199,7 @@ namespace io.github.azukimochi
         {
             protected override void Execute(BuildContext context)
             {
-                var session = GetSession(context);
+                var session = context.GetSession();
                 if (!session.IsValid())
                     return;
 
@@ -261,8 +272,8 @@ namespace io.github.azukimochi
                         if (parameterName is null)
                             continue;
 
-                        container.AddTo(context.AssetContainer);
-                        AddLayer(controller, container, parameterName);
+                        container.AddTo(context.GetObjectCache());
+                        AddLayer(context, container, parameterName);
 
                         controller.AddParameter(new AnimatorControllerParameter() { name = parameterName, defaultFloat = defaultValue, type = AnimatorControllerParameterType.Float });
                         param.parameters.Add(new ParameterConfig() { nameOrPrefix = parameterName, saved = parameters.IsValueSave, defaultValue = defaultValue, syncType = ParameterSyncType.Float });
@@ -276,12 +287,12 @@ namespace io.github.azukimochi
                 var layer = new AnimatorControllerLayer()
                 {
                     name = "Reset",
-                    stateMachine = stateMachine = new AnimatorStateMachine().HideInHierarchy().AddTo(context.AssetContainer),
+                    stateMachine = stateMachine = new AnimatorStateMachine().HideInHierarchy().AddTo(context.GetObjectCache()),
                     defaultWeight = 1,
                 };
-                var blank = new AnimationClip() { name = "Blank" }.HideInHierarchy().AddTo(context.AssetContainer);
-                var off = new AnimatorState() { name = "Off", writeDefaultValues = false, motion = blank }.HideInHierarchy().AddTo(context.AssetContainer);
-                var on = new AnimatorState() { name = "On", writeDefaultValues = false, motion = blank }.HideInHierarchy().AddTo(context.AssetContainer);
+                var blank = new AnimationClip() { name = "Blank" }.HideInHierarchy().AddTo(context.GetObjectCache());
+                var off = new AnimatorState() { name = "Off", writeDefaultValues = false, motion = blank }.HideInHierarchy().AddTo(context.GetObjectCache());
+                var on = new AnimatorState() { name = "On", writeDefaultValues = false, motion = blank }.HideInHierarchy().AddTo(context.GetObjectCache());
 
                 var cond = new AnimatorCondition[] { new AnimatorCondition() { mode = AnimatorConditionMode.If, parameter = ParameterName_Reset } };
 
@@ -291,7 +302,7 @@ namespace io.github.azukimochi
                     duration = 0,
                     hasExitTime = false,
                     conditions = cond
-                }.HideInHierarchy().AddTo(context.AssetContainer);
+                }.HideInHierarchy().AddTo(context.GetObjectCache());
 
                 off.AddTransition(t);
 
@@ -302,7 +313,7 @@ namespace io.github.azukimochi
                     duration = 0,
                     hasExitTime = false,
                     conditions = cond
-                }.HideInHierarchy().AddTo(context.AssetContainer);
+                }.HideInHierarchy().AddTo(context.GetObjectCache());
 
                 on.AddTransition(t);
 
@@ -322,12 +333,12 @@ namespace io.github.azukimochi
                 session.Controller.AddLayer(layer);
             }
 
-            private static void AddLayer(AnimatorController fx, ControlAnimationContainer container, string parameterName)
+            private static void AddLayer(BuildContext context, ControlAnimationContainer container, string parameterName)
             {
-                var layer = new AnimatorControllerLayer() { name = container.Name, defaultWeight = 1, stateMachine = new AnimatorStateMachine().HideInHierarchy().AddTo(fx) };
+                var layer = new AnimatorControllerLayer() { name = container.Name, defaultWeight = 1, stateMachine = new AnimatorStateMachine().HideInHierarchy().AddTo(context.GetObjectCache()) };
                 var stateMachine = layer.stateMachine;
-                var defaultState = new AnimatorState() { name = "Default", writeDefaultValues = false, motion = container.Default }.HideInHierarchy().AddTo(fx);
-                var state = new AnimatorState() { name = "Control", writeDefaultValues = false, motion = container.Control, timeParameterActive = true, timeParameter = parameterName }.HideInHierarchy().AddTo(fx);
+                var defaultState = new AnimatorState() { name = "Default", writeDefaultValues = false, motion = container.Default }.HideInHierarchy().AddTo(context.GetObjectCache());
+                var state = new AnimatorState() { name = "Control", writeDefaultValues = false, motion = container.Control, timeParameterActive = true, timeParameter = parameterName }.HideInHierarchy().AddTo(context.GetObjectCache());
 
                 var condition = new AnimatorCondition[] { new AnimatorCondition() { parameter = ParameterName_Toggle, mode = AnimatorConditionMode.If, threshold = 0 } };
 
@@ -337,7 +348,7 @@ namespace io.github.azukimochi
                     duration = 0,
                     hasExitTime = false,
                     conditions = condition,
-                }.HideInHierarchy().AddTo(fx);
+                }.HideInHierarchy().AddTo(context.GetObjectCache());
 
                 defaultState.AddTransition(tr);
 
@@ -348,14 +359,14 @@ namespace io.github.azukimochi
                     duration = 0,
                     hasExitTime = false,
                     conditions = condition,
-                }.HideInHierarchy().AddTo(fx);
+                }.HideInHierarchy().AddTo(context.GetObjectCache());
 
                 state.AddTransition(tr);
 
                 stateMachine.AddState(defaultState, stateMachine.entryPosition + new Vector3(-20, 50));
                 stateMachine.AddState(state, stateMachine.entryPosition + new Vector3(-20, 100));
 
-                fx.AddLayer(layer);
+                context.GetSession().Controller.AddLayer(layer);
             }
         }
 
@@ -363,7 +374,7 @@ namespace io.github.azukimochi
         {
             protected override void Execute(BuildContext context)
             {
-                var session = GetSession(context);
+                var session = context.GetSession();
                 if (!session.IsValid())
                     return;
 
@@ -393,8 +404,8 @@ namespace io.github.azukimochi
 
             private static VRCExpressionsMenu CreateMenu(BuildContext context)
             {
-                var session = GetSession(context);
-                var mainMenu = ScriptableObject.CreateInstance<VRCExpressionsMenu>().AddTo(context.AssetContainer);
+                var session = context.GetSession();
+                var mainMenu = ScriptableObject.CreateInstance<VRCExpressionsMenu>().AddTo(context.GetObjectCache());
                 mainMenu.name = "Main Menu";
                 mainMenu.controls = new List<VRCExpressionsMenu.Control>
                 {
@@ -479,7 +490,7 @@ namespace io.github.azukimochi
                     });
                 }
 
-                var rootMenu = ScriptableObject.CreateInstance<VRCExpressionsMenu>().AddTo(context.AssetContainer);
+                var rootMenu = ScriptableObject.CreateInstance<VRCExpressionsMenu>().AddTo(context.GetObjectCache());
                 {
                     rootMenu.name = "Root Menu";
                     rootMenu.controls = new List<VRCExpressionsMenu.Control>
@@ -501,12 +512,9 @@ namespace io.github.azukimochi
         {
             public LightLimitChangerSettings Settings;
             public LightLimitChangerParameters Parameters;
-            public Dictionary<Object, Object> ObjectMapping = new Dictionary<Object, Object>();
             public AnimatorController Controller;
 
             public bool IsValid() => Settings != null;
         }
-
     }
-
 }

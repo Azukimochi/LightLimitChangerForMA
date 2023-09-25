@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace io.github.azukimochi
 {
@@ -50,7 +51,7 @@ namespace io.github.azukimochi
                 public static readonly float MainGradationStrength = 0;
             }
 
-            public override bool TryNormalizeMaterial(Material material, UnityEngine.Object assetContainer)
+            public override bool TryNormalizeMaterial(Material material, LightLimitChangerObjectCache cache)
             {
                 bool result = false;
                 var textureBaker = TextureBaker.GetInstance<DefaultTextureBaker>();
@@ -103,7 +104,7 @@ namespace io.github.azukimochi
                     // Run Bake
                     if (bakeFlag)
                     {
-                        material.SetTexture(PropertyIDs.MainTex, textureBaker.Bake().AddTo(assetContainer));
+                        material.SetTexture(PropertyIDs.MainTex, cache.Register(textureBaker.Bake()));
                     }
 
                     result |= bakeFlag;
@@ -127,7 +128,7 @@ namespace io.github.azukimochi
 
                     if (bakeFlag)
                     {
-                        material.SetTexture(PropertyIDs.Main2ndTex, textureBaker.Bake().AddTo(assetContainer));
+                        material.SetTexture(PropertyIDs.Main2ndTex, cache.Register(textureBaker.Bake()));
                     }
 
                     result |= bakeFlag;
@@ -151,7 +152,7 @@ namespace io.github.azukimochi
 
                     if (bakeFlag)
                     {
-                        material.SetTexture(PropertyIDs.Main3rdTex, textureBaker.Bake().AddTo(assetContainer));
+                        material.SetTexture(PropertyIDs.Main3rdTex, cache.Register(textureBaker.Bake()));
                     }
                     result |= bakeFlag;
                 }

@@ -13,14 +13,12 @@ namespace io.github.azukimochi
     // Copyright (c) 2022 anatawa12
     internal sealed class AnimatorControllerMapper
     {
-        private readonly Dictionary<Object, Object> _cache;
-        private readonly Object _rootArtifact;
+        private readonly LightLimitChangerObjectCache _cache;
         private bool _mapped = false;
 
-        public AnimatorControllerMapper(Dictionary<Object, Object> cahce, Object rootArtifact)
+        public AnimatorControllerMapper(LightLimitChangerObjectCache cache)
         {
-            _cache = cahce;
-            _rootArtifact = rootArtifact;
+            _cache = cache;
         }
 
         public RuntimeAnimatorController MapController(RuntimeAnimatorController controller)
@@ -39,7 +37,7 @@ namespace io.github.azukimochi
 
         public AnimatorController MapAnimatorController(AnimatorController controller)
         {
-            if (_cache.TryGetValue(controller, out var cached)) return (AnimatorController)cached;
+            if (_cache.TryGetValue(controller, out AnimatorController cached)) return cached;
             _mapped = false;
             var newController = new AnimatorController
             {
@@ -47,13 +45,13 @@ namespace io.github.azukimochi
                 layers = controller.layers.Select(MapAnimatorControllerLayer).ToArray()
             };
             if (!_mapped) newController = null;
-            _cache[controller] = newController;
-            return newController?.AddTo(_rootArtifact);
+
+            return _cache.Register(controller, newController);
         }
 
         public AnimatorOverrideController MapAnimatorOverrideController(AnimatorOverrideController controller)
         {
-            if (_cache.TryGetValue(controller, out var cached)) return (AnimatorOverrideController)cached;
+            if (_cache.TryGetValue(controller, out var cached)) return cached;
             _mapped = false;
 
             controller = controller.Clone();
@@ -99,7 +97,7 @@ namespace io.github.azukimochi
                     newClip.localBounds = clip.localBounds;
                     AnimationUtility.SetAnimationClipSettings(newClip, AnimationUtility.GetAnimationClipSettings(clip));
 
-                    list[i] = new KeyValuePair<AnimationClip, AnimationClip>(x.Key, newClip.AddTo(_rootArtifact));
+                    list[i] = new KeyValuePair<AnimationClip, AnimationClip>(x.Key, _cache.Register(newClip));
                 }
             }
 
@@ -111,8 +109,8 @@ namespace io.github.azukimochi
             {
                 controller.ApplyOverrides(list);
             }
-            _cache[controller] = controller;
-            return controller?.AddTo(_rootArtifact);
+
+            return _cache.Register(controller);
         }
 
         private AnimatorControllerLayer MapAnimatorControllerLayer(AnimatorControllerLayer layer) =>
@@ -164,7 +162,7 @@ namespace io.github.azukimochi
                 if (!changed)
                     return null;
 
-                newClip.AddTo(_rootArtifact);
+                _cache.Register(newClip);
 
                 foreach (var binding in AnimationUtility.GetCurveBindings(clip))
                 {
@@ -225,14 +223,13 @@ namespace io.github.azukimochi
                 default:
                     throw new Exception($"Unknown type referenced from animator: {original.GetType()}");
             }
-            if (_cache.TryGetValue(original, out var cached)) return (T)cached;
+            if (_cache.TryGetValue(original, out var cached)) return cached;
 
 
-            var obj = visitor(original);
+            var obj = visitor(original) as T;
             if (obj != null)
             {
-                _cache[original] = obj;
-                return (T)obj;
+                return _cache.Register(original, obj);
             }
 
 
@@ -247,9 +244,7 @@ namespace io.github.azukimochi
                 EditorUtility.CopySerialized(original, obj);
             }
 
-
-            _cache[original] = obj.HideInHierarchy().AddTo(_rootArtifact);
-
+            _cache.Register(original, obj.HideInHierarchy());
 
             SerializedObject so = new SerializedObject(obj);
             SerializedProperty prop = so.GetIterator();

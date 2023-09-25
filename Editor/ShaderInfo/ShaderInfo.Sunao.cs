@@ -37,7 +37,7 @@ namespace io.github.azukimochi
                 public static readonly Color Color = Color.white;
             }
 
-            public override bool TryNormalizeMaterial(Material material, UnityEngine.Object assetContainer)
+            public override bool TryNormalizeMaterial(Material material, LightLimitChangerObjectCache cache)
             {
                 bool result = false;
                 bool bakeFlag = false;
@@ -57,7 +57,7 @@ namespace io.github.azukimochi
 
                     if (bakeFlag)
                     {
-                        material.SetTexture(PropertyIDs.MainTex, textureBaker.Bake().AddTo(assetContainer));
+                        material.SetTexture(PropertyIDs.MainTex, cache.Register(textureBaker.Bake()));
                     }
 
                     result |= bakeFlag;

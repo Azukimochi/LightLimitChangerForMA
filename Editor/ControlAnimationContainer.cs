@@ -22,10 +22,10 @@ namespace io.github.azukimochi
         public static ControlAnimationContainer Create(LightLimitControlType controlType, string animationName)
             => new ControlAnimationContainer(controlType, animationName, new AnimationClip() { name = $"{animationName} Default" }, new AnimationClip() { name = $"{animationName} Control"});
 
-        public void AddTo(Object asset)
+        public void AddTo(LightLimitChangerObjectCache cache)
         {
-            Default.AddTo(asset);
-            Control.AddTo(asset);
+            cache.Register(Default);
+            cache.Register(Control);
         }
     }
 }
