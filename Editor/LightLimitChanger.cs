@@ -155,7 +155,8 @@ namespace io.github.azukimochi
             }
 
             settings.Parameters = Parameters;
-            LightLimitGenerator.Generate(avatar, settings);
+            // 一旦消しておく
+            //LightLimitGenerator.Generate(avatar, settings);
             
             if (Parameters.AllowColorTempControl || Parameters.AllowSaturationControl)
             {
