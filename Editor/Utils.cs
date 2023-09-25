@@ -15,6 +15,11 @@ namespace io.github.azukimochi
     {
         public static bool HasFlag(this int x, int y) => (x & y) == y;
 
+        public static void Destroy(this Object obj)
+        {
+            Object.DestroyImmediate(obj);
+        }
+
         public static void ClearSubAssets(this Object obj)
         {
             var path = AssetDatabase.GetAssetPath(obj);

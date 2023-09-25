@@ -31,6 +31,8 @@ namespace io.github.azukimochi
 
         private static bool _isOptionFoldoutOpen = true;
 
+        internal bool IsWindowMode = false;
+
         private void OnEnable()
         {
             var parameters =                serializedObject.FindProperty  (nameof(LightLimitChangerSettings.Parameters));
@@ -53,9 +55,11 @@ namespace io.github.azukimochi
 
         public override void OnInspectorGUI()
         {
-            Utils.ShowVersionInfo();
-
-            EditorGUILayout.Separator();
+            if (!IsWindowMode)
+            {
+                Utils.ShowVersionInfo();
+                EditorGUILayout.Separator();
+            }
 
             serializedObject.Update();
             EditorGUI.BeginChangeCheck();
@@ -91,10 +95,11 @@ namespace io.github.azukimochi
                 serializedObject.ApplyModifiedProperties();
             }
 
-            EditorGUILayout.Separator();
-
-
-            Localization.ShowLocalizationUI();
+            if (!IsWindowMode)
+            {
+                EditorGUILayout.Separator();
+                Localization.ShowLocalizationUI();
+            }
         }
     }
 }

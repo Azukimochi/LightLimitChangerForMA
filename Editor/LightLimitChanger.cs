@@ -7,133 +7,147 @@ using VRC.SDK3.Avatars.Components;
 using VRC.SDK3.Avatars.ScriptableObjects;
 using VRC.Core;
 using nadena.dev.modular_avatar.core;
+using UnityEngine.SceneManagement;
+using System.Linq;
 
 namespace io.github.azukimochi
 {
     public sealed class LightLimitChanger : EditorWindow
     {
         public const string Title = "Light Limit Changer For MA";
-        public LightLimitChangerParameters Parameters = LightLimitChangerParameters.Default;
+
         public VRCAvatarDescriptor TargetAvatar;
-        private Vector2 _scrollPosition;
-        private static bool _isOptionFoldoutOpen = false;
-
-        private const string GenerateObjectName = "Light Limit Changer";
-
-        private string infoLabel = "";
+        private VRCAvatarDescriptor _prevTargetAvatar;
+        private GameObject _temp;
+        private LightLimitChangerSettingsEditor _editor;
 
         [MenuItem("Tools/Modular Avatar/LightLimitChanger")]
         public static void CreateWindow()
         {
             var window = GetWindow<LightLimitChanger>(Title);
-            var pos = window.position;
-            pos.size = new Vector2(380, 530);
-            window.position = pos;
-            //window.maxSize = new Vector2(1000, 450);
+        }
+
+        private void OnEnable()
+        {
+            _temp = new GameObject()
+            {
+                hideFlags = HideFlags.HideInHierarchy | HideFlags.DontSave
+            };
+        }
+
+        private void OnDestroy()
+        {
+            if (_temp != null )
+            {
+                DestroyImmediate(_temp);
+            }
+            if (_editor != null )
+            {
+                DestroyImmediate(_editor);
+            }
         }
 
         private void OnGUI()
         {
-            EditorGUILayout.Space();
-            Utils.ShowVersionInfo();
+            EditorGUIUtility.labelWidth = 280;
+            Utils.ShowVersionInfo(); 
             EditorGUILayout.Separator();
-            ShowGeneratorMenu();
-            ShowSettingsMenu();
-        }
 
-        private void ShowGeneratorMenu()
-        {
-            _scrollPosition = GUILayout.BeginScrollView(_scrollPosition);
-            using (new Utils.DisabledScope(EditorApplication.isPlaying))
+            var style = new GUIStyle(EditorStyles.helpBox);
+            style.richText = true;
+            EditorGUILayout.LabelField($"<size=12>{Localization.S("window.info.deprecated")}\nhttps://azukimochi.github.io/LLC-Docs/docs/プレハブ置くときのやり方.htm</size>", style);
+            EditorGUILayout.Space(8);
+
+            TargetAvatar = EditorGUILayout.ObjectField(Localization.G("label.avatar"), TargetAvatar, typeof(VRCAvatarDescriptor), true) as VRCAvatarDescriptor;
+            EditorGUILayout.Separator();
+
+            UpdateInnerEditor();
+
+            if (_editor != null)
             {
-                using (new Utils.GroupScope(Localization.S("category.select_avatar"), 180))
+                try
                 {
-                    EditorGUI.BeginChangeCheck();
-                    TargetAvatar = EditorGUILayout.ObjectField(Localization.G("label.avatar", "tip.select_avatar"), TargetAvatar, typeof(VRCAvatarDescriptor), true) as VRCAvatarDescriptor;
-                    if (EditorGUI.EndChangeCheck())
+                    // InspectorのGUI処理を使いまわす
+                    _editor.IsWindowMode = true;
+                    _editor.OnInspectorGUI();
+                    EditorGUILayout.Separator();
+
+                    // 操作対象が一時オブジェクトなら生成ボタンを表示する
+                    if ((_editor.target as Component).gameObject.hideFlags.HasFlag(HideFlags.HideInHierarchy))
                     {
-                        Parameters = TargetAvatar != null && TargetAvatar.TryGetComponentInChildren<LightLimitChangerSettings>(out var settings)
-                            ? settings.Parameters
-                            : LightLimitChangerParameters.Default;
-                    }
-                }
-
-                var param = Parameters;
-
-                using (new Utils.GroupScope(Localization.S("category.select_parameter"), 250))
-                {
-                    param.IsDefaultUse = EditorGUILayout.Toggle(Localization.G("label.use_default", "tip.use_default"), param.IsDefaultUse);
-                    param.IsValueSave = EditorGUILayout.Toggle(Localization.G("label.save_value", "tip.save_value"), param.IsValueSave);
-                    param.OverwriteDefaultLightMinMax = EditorGUILayout.Toggle(Localization.G("label.override_min_max", "tip.override_min_max"), param.OverwriteDefaultLightMinMax);
-                    param.MaxLightValue = EditorGUILayout.FloatField(Localization.G("label.light_max", "tip.light_max"), param.MaxLightValue);
-                    param.MinLightValue = EditorGUILayout.FloatField(Localization.G("label.light_min", "tip.light_min"), param.MinLightValue);
-                    param.DefaultLightValue = EditorGUILayout.FloatField(Localization.G("label.light_default", "tip.light_default"), param.DefaultLightValue);
-
-                }
-                using (new Utils.GroupScope(Localization.S("category.select_option"), 250))
-                {
-                    param.AllowColorTempControl = EditorGUILayout.Toggle(Localization.G("label.allow_color_tmp", "tip.allow_color_tmp"), param.AllowColorTempControl);
-                    param.AllowSaturationControl = EditorGUILayout.Toggle(Localization.G("label.allow_saturation", "tip.allow_saturation"), param.AllowSaturationControl);
-                    param.AllowUnlitControl = EditorGUILayout.Toggle(Localization.G("label.allow_unlit", "tip.allow_unlit"), param.AllowUnlitControl);
-                    param.AddResetButton = EditorGUILayout.Toggle(Localization.G("label.allow_reset", "tip.allow_reset"), param.AddResetButton);
-                    
-
-                    using (var group = new Utils.FoldoutHeaderGroupScope(ref _isOptionFoldoutOpen, Localization.G("category.select_advanced")))
-                    {
-                        if (group.IsOpen)
-                        {
-                            EditorGUI.BeginChangeCheck();
-                            param.TargetShader = EditorGUILayout.MaskField(Localization.G("label.target_shader", "tip.target_shader"), param.TargetShader, ShaderInfo.RegisteredShaderInfoNames);
-                            if (EditorGUI.EndChangeCheck())
-                            {
-                                infoLabel = param.TargetShader == 0 ? Localization.S("info.shader_must_select") : string.Empty;
-                            }
-                            param.ExcludeEditorOnly = EditorGUILayout.Toggle(Localization.G("label.allow_editor_only", "tip.allow_editor_only"), param.ExcludeEditorOnly);
-                            param.GenerateAtBuild = EditorGUILayout.Toggle(Localization.G("label.allow_gen_playmode", "tip.allow_gen_playmode"), param.GenerateAtBuild);
-                            param.AllowOverridePoiyomiAnimTag = EditorGUILayout.Toggle(
-                                Localization.G("label.allow_override_poiyomi", "tip.allow_override_poiyomi"), param.AllowOverridePoiyomiAnimTag);
-                        }
-                    }
-                }
-                Parameters = param;
-
-                using (new Utils.DisabledScope(TargetAvatar == null || Parameters.TargetShader == 0))
-                {
-                    string buttonLabel;
-                    {
-                        buttonLabel = TargetAvatar != null && TargetAvatar.TryGetComponentInChildren<LightLimitChangerSettings>(out var settings)
-                        ? "info.re_generate"
-                        : "info.generate";
-                    }
-
-                    if (GUILayout.Button(Localization.S(buttonLabel)))
-                    {
-                        infoLabel = Localization.S( "info.process");
-                        try
+                        if (GUILayout.Button(Localization.G("info.generate")))
                         {
                             GenerateAssets();
-                            infoLabel = Localization.S("info.complete");
-                        }
-                        catch (Exception e)
-                        {
-                            infoLabel = $"{Localization.S("info.error")}: {e.Message}";
                         }
                     }
                 }
-
+                catch { }
             }
-            GUILayout.EndScrollView();
-            GUILayout.Label(Utils.Label(infoLabel));
+
+            EditorGUILayout.Separator();
+            Localization.ShowLocalizationUI();
         }
 
-        private void ShowSettingsMenu()
+        private void UpdateInnerEditor()
         {
-            Localization.ShowLocalizationUI();
+            if (_editor == null)
+            {
+                if (TargetAvatar != null)
+                {
+                    var settings = TargetAvatar.GetComponentInChildren<LightLimitChangerSettings>();
+                    if (settings != null)
+                    {
+                        _editor = Editor.CreateEditor(settings, typeof(LightLimitChangerSettingsEditor)) as LightLimitChangerSettingsEditor;
+                    }
+                    else
+                    {
+                        _temp.GetComponent<LightLimitChangerSettings>()?.Destroy();
+                        _editor = Editor.CreateEditor(_temp.AddComponent<LightLimitChangerSettings>(), typeof(LightLimitChangerSettingsEditor)) as LightLimitChangerSettingsEditor;
+                    }
+                }
+                else
+                {
+                    // nanimo sinai...
+                }
+            }
+            else
+            {
+                if (TargetAvatar != _prevTargetAvatar)
+                {
+                    _editor.Destroy();
+                    _editor = null;
+                }
+                else if (TargetAvatar != null)
+                {
+                    if (_editor.target == null)
+                    {
+                        _editor.Destroy();
+                        _editor = null;
+                        _temp.GetComponent<LightLimitChangerSettings>()?.Destroy();
+                        _editor = Editor.CreateEditor(_temp.AddComponent<LightLimitChangerSettings>(), typeof(LightLimitChangerSettingsEditor)) as LightLimitChangerSettingsEditor;
+                    }
+                    else
+                    {
+
+                        var settings = TargetAvatar.GetComponentInChildren<LightLimitChangerSettings>();
+                        if (settings != null && (_editor.target as Component).gameObject.hideFlags.HasFlag(HideFlags.HideInHierarchy))
+                        {
+                            _editor.Destroy();
+                            _editor = null;
+                            _editor = Editor.CreateEditor(settings, typeof(LightLimitChangerSettingsEditor)) as LightLimitChangerSettingsEditor;
+                        }
+                    }
+                }
+            }
+            _prevTargetAvatar = TargetAvatar;
         }
 
         private void GenerateAssets()
         {
-            // あとで書く
+            const string PrefabGUID = "b3d7759e248364e4dadf8e4fbc37fde1";
+
+            var prefab = PrefabUtility.InstantiatePrefab(AssetDatabase.LoadAssetAtPath<GameObject>(AssetDatabase.GUIDToAssetPath(PrefabGUID)), TargetAvatar.transform);
+            EditorUtility.CopySerialized(_editor.target, (prefab as GameObject).GetComponent<LightLimitChangerSettings>());
         }
     }
 }

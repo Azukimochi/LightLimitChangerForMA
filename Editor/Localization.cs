@@ -79,6 +79,7 @@ namespace io.github.azukimochi
                 }
             },
             { "tip.allow_gen_playmode", new[] { "Automatically generate animations at build/play mode", "ビルド・実行時にアニメーションを自動生成します" } },
+            { "window.info.deprecated", new[] { "The settings window has been deprecated. See below for new ways of doing things.", "設定ウィンドウは非推奨になりました。新しいやり方については以下をご覧ください。" } },
         };
 
         public static string S(string text)
