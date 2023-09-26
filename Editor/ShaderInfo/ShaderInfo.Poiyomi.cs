@@ -18,6 +18,7 @@ namespace io.github.azukimochi
 
             public const string _EnableDissolve = "_EnableDissolve";
             public const string _DissolveTextureColor = "_DissolveTextureColor";
+            public const string _DissolveToTexture = "_DissolveToTexture";
 
             private static class PropertyIDs
             {
@@ -27,6 +28,9 @@ namespace io.github.azukimochi
                 public static readonly int Saturation = Shader.PropertyToID(_Saturation);
                 public static readonly int Color = Shader.PropertyToID(_Color);
                 public static readonly int MainTex = Shader.PropertyToID(_MainTex);
+                public static readonly int EnableDissolve = Shader.PropertyToID(_EnableDissolve);
+                public static readonly int DissolveTextureColor = Shader.PropertyToID(_DissolveTextureColor);
+                public static readonly int DissolveToTexture = Shader.PropertyToID(_DissolveToTexture);
             }
 
             private static class DefaultParameters
@@ -40,10 +44,11 @@ namespace io.github.azukimochi
 
             public override bool TryNormalizeMaterial(Material material, LightLimitChangerObjectCache cache)
             {
-                bool bakeFlag = false;
                 var textureBaker = TextureBaker.GetInstance<PoiyomiTextureBaker>();
+                bool result = false;
 
                 {
+                    bool bakeFlag = false;
                     var tex = material.GetTexture(PropertyIDs.MainTex);
                     if (tex != null)
                         textureBaker.Texture = tex;
@@ -66,11 +71,36 @@ namespace io.github.azukimochi
                     {
                         material.SetTexture(PropertyIDs.MainTex, cache.Register(textureBaker.Bake()));
                     }
+
+                    result |= bakeFlag;
+                }
+
+                if (material.GetFloat(PropertyIDs.EnableDissolve) != 0)
+                {
+                    textureBaker.Reset();
+
+                    bool bakeFlag = false;
+                    var tex = material.GetTexture(PropertyIDs.DissolveToTexture);
+                    if (tex != null)
+                        textureBaker.Texture = tex;
+
+                    if (material.GetColor(PropertyIDs.DissolveTextureColor) != DefaultParameters.Color)
+                    {
+                        textureBaker.Color = material.GetColor(PropertyIDs.DissolveTextureColor);
+                        material.SetColor(PropertyIDs.DissolveTextureColor, DefaultParameters.Color);
+                        bakeFlag = true;
+                    }
+
+                    if (bakeFlag)
+                    {
+                        material.SetTexture(PropertyIDs.DissolveToTexture, cache.Register(textureBaker.Bake()));
+                    }
+
+                    result |= bakeFlag;
                 }
 
 
-
-                return bakeFlag;
+                return result;
             }
 
             public override bool IsTargetShader(Shader shader)
@@ -105,6 +135,9 @@ namespace io.github.azukimochi
                         container.Default.SetParameterAnimation(parameters, _Color, DefaultParameters.Color);
                         container.Control.SetColorTempertureAnimation(parameters, _Color, DefaultParameters.Color);
 
+                        container.Default.SetParameterAnimation(parameters, _DissolveTextureColor, DefaultParameters.Color);
+                        container.Control.SetColorTempertureAnimation(parameters, _DissolveTextureColor, DefaultParameters.Color);
+
                         break;
                 }
             }
@@ -123,6 +156,9 @@ namespace io.github.azukimochi
                     if (parameters.AllowColorTempControl)
                     {
                         material.SetOverrideTag($"{_Color}{Animated_Suffix}", Flag_IsAnimated);
+
+                        if (material.GetFloat(PropertyIDs.EnableDissolve) != 0)
+                            material.SetOverrideTag($"{_DissolveTextureColor}{Animated_Suffix}", Flag_IsAnimated);
                     }
                     if (parameters.AllowSaturationControl)
                     {
