@@ -24,7 +24,6 @@ namespace io.github.azukimochi
         private SerializedProperty AllowColorTempControl;
         private SerializedProperty AllowSaturationControl;
         private SerializedProperty AllowUnlitControl;
-        private SerializedProperty AllowOverridePoiyomiAnimTag;
         private SerializedProperty AddResetButton;
         private SerializedProperty GenerateAtBuild;
         private SerializedProperty ExcludeEditorOnly;
@@ -46,11 +45,7 @@ namespace io.github.azukimochi
             AllowColorTempControl =        parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.AllowColorTempControl));
             AllowSaturationControl =        parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.AllowSaturationControl));
             AllowUnlitControl =             parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.AllowUnlitControl));
-            AllowOverridePoiyomiAnimTag =
-                parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.AllowOverridePoiyomiAnimTag));
             AddResetButton =                parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.AddResetButton));
-            GenerateAtBuild =               parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.GenerateAtBuild));
-            ExcludeEditorOnly =             parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.ExcludeEditorOnly));
         }
 
         public override void OnInspectorGUI()
@@ -75,8 +70,6 @@ namespace io.github.azukimochi
             EditorGUILayout.PropertyField(AllowSaturationControl, Localization.G("label.allow_saturation"));
             EditorGUILayout.PropertyField(AllowUnlitControl, Localization.G("label.allow_unlit"));
             EditorGUILayout.PropertyField(AddResetButton, Localization.G("label.allow_reset"));
-            EditorGUILayout.PropertyField(AllowOverridePoiyomiAnimTag,
-                Localization.G("label.allow_override_poiyomi"));
 
             using (var group = new Utils.FoldoutHeaderGroupScope(ref _isOptionFoldoutOpen, Localization.G("category.select_option")))
             {

@@ -22,10 +22,7 @@ namespace io.github.azukimochi
         public bool AllowColorTempControl;
         public bool AllowSaturationControl;
         public bool AllowUnlitControl;
-        public bool AllowOverridePoiyomiAnimTag;
         public bool AddResetButton;
-        public bool GenerateAtBuild;
-        public bool ExcludeEditorOnly;
 
         public static LightLimitChangerParameters Default => new LightLimitChangerParameters()
         {
@@ -39,10 +36,7 @@ namespace io.github.azukimochi
             AllowColorTempControl = false,
             AllowSaturationControl = false,
             AllowUnlitControl = false,
-            AllowOverridePoiyomiAnimTag = true,
             AddResetButton = false,
-            GenerateAtBuild = true,
-            ExcludeEditorOnly = true
         };
     }
 }

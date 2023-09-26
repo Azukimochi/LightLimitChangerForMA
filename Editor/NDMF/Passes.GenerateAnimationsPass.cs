@@ -44,7 +44,7 @@ namespace io.github.azukimochi
 
                 foreach (var renderer in context.AvatarRootObject.GetComponentsInChildren<Renderer>(true))
                 {
-                    if (!(renderer is MeshRenderer || renderer is SkinnedMeshRenderer) || (parameters.ExcludeEditorOnly && renderer.CompareTag("EditorOnly")))
+                    if (!(renderer is MeshRenderer || renderer is SkinnedMeshRenderer))
                     {
                         continue;
                     }
