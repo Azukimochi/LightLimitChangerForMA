@@ -10,9 +10,6 @@ namespace io.github.azukimochi
         {
             protected override void Execute(BuildContext context, Session session, LightLimitChangerObjectCache cache)
             {
-                if (!session.Parameters.AllowColorTempControl && !session.Parameters.AllowSaturationControl)
-                    return;
-
                 var components = context.AvatarRootObject.GetComponentsInChildren<Component>(true);
                 var mapper = new AnimatorControllerMapper(cache);
 
