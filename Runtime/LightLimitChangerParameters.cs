@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 using UnityEngine.Serialization;
 
 namespace io.github.azukimochi
@@ -13,8 +14,14 @@ namespace io.github.azukimochi
         public bool IsDefaultUse;
         public bool IsValueSave;
         public bool OverwriteDefaultLightMinMax;
+
+        [Range(0, 1)]
         public float DefaultLightValue;
+
+        [Range(0, 10)]
         public float MaxLightValue;
+
+        [Range(0, 10)]
         public float MinLightValue;
 
         public int TargetShader;
