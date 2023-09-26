@@ -9,12 +9,12 @@ namespace io.github.azukimochi
         {
             public static Poiyomi Instance { get; } = new Poiyomi();
 
-            public const string _LightingMinLightBrightness = nameof(_LightingMinLightBrightness);
-            public const string _LightingCap = nameof(_LightingCap);
-            public const string _MainColorAdjustToggle = nameof(_MainColorAdjustToggle);
-            public const string _Saturation = nameof(_Saturation);
-            public const string _Color = nameof(_Color);
-            public const string _MainTex = nameof(_MainTex);
+            public const string _LightingMinLightBrightness = "_LightingMinLightBrightness";
+            public const string _LightingCap = "_LightingCap";
+            public const string _MainColorAdjustToggle = "_MainColorAdjustToggle";
+            public const string _Saturation = "_Saturation";
+            public const string _Color = "_Color";
+            public const string _MainTex = "_MainTex";
 
             private static class PropertyIDs
             {

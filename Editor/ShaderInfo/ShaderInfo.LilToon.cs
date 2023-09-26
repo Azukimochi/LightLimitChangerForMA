@@ -11,19 +11,19 @@ namespace io.github.azukimochi
         {
             public static LilToon Instance { get; } = new LilToon();
 
-            public const string _LightMinLimit = nameof(_LightMinLimit);
-            public const string _LightMaxLimit = nameof(_LightMaxLimit);
-            public const string _AsUnlit = nameof(_AsUnlit);
-            public const string _MainTexHSVG = nameof(_MainTexHSVG);
-            public const string _Color = nameof(_Color);
-            public const string _Color2nd = nameof(_Color2nd);
-            public const string _Color3rd = nameof(_Color3rd);
-            public const string _MainTex = nameof(_MainTex);
-            public const string _Main2ndTex = nameof(_Main2ndTex);
-            public const string _Main3rdTex = nameof(_Main3rdTex);
-            public const string _MainGradationTex = nameof(_MainGradationTex);
-            public const string _MainGradationStrength = nameof(_MainGradationStrength);
-            public const string _MainColorAdjustMask = nameof(_MainColorAdjustMask);
+            public const string _LightMinLimit = "_LightMinLimit";
+            public const string _LightMaxLimit = "_LightMaxLimit";
+            public const string _AsUnlit = "_AsUnlit";
+            public const string _MainTexHSVG = "_MainTexHSVG";
+            public const string _Color = "_Color";
+            public const string _Color2nd = "_Color2nd";
+            public const string _Color3rd = "_Color3rd";
+            public const string _MainTex = "_MainTex";
+            public const string _Main2ndTex = "_Main2ndTex";
+            public const string _Main3rdTex = "_Main3rdTex";
+            public const string _MainGradationTex = "_MainGradationTex";
+            public const string _MainGradationStrength = "_MainGradationStrength";
+            public const string _MainColorAdjustMask = "_MainColorAdjustMask";
 
             private static class PropertyIDs
             {
