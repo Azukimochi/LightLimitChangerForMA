@@ -25,8 +25,6 @@ namespace io.github.azukimochi
         private SerializedProperty AllowSaturationControl;
         private SerializedProperty AllowUnlitControl;
         private SerializedProperty AddResetButton;
-        private SerializedProperty GenerateAtBuild;
-        private SerializedProperty ExcludeEditorOnly;
 
         private static bool _isOptionFoldoutOpen = true;
 
@@ -42,7 +40,7 @@ namespace io.github.azukimochi
             MaxLightValue =                 parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.MaxLightValue));
             MinLightValue =                 parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.MinLightValue));
             TargetShader =                  parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.TargetShader));
-            AllowColorTempControl =        parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.AllowColorTempControl));
+            AllowColorTempControl =         parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.AllowColorTempControl));
             AllowSaturationControl =        parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.AllowSaturationControl));
             AllowUnlitControl =             parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.AllowUnlitControl));
             AddResetButton =                parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.AddResetButton));
@@ -76,10 +74,6 @@ namespace io.github.azukimochi
                 if (group.IsOpen)
                 {
                     TargetShader.intValue = EditorGUILayout.MaskField(Localization.G("label.target_shader"), TargetShader.intValue, ShaderInfo.RegisteredShaderInfoNames);
-
-                    EditorGUILayout.PropertyField(ExcludeEditorOnly, Localization.G("label.allow_editor_only"));
-                    EditorGUILayout.Separator();
-                    EditorGUILayout.PropertyField(GenerateAtBuild, Localization.G("label.allow_gen_playmode"));
                 }
             }
 
