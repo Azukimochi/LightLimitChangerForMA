@@ -9,12 +9,16 @@ namespace io.github.azukimochi
         {
             public static Poiyomi Instance { get; } = new Poiyomi();
 
-            public const string _LightingMinLightBrightness = nameof(_LightingMinLightBrightness);
-            public const string _LightingCap = nameof(_LightingCap);
-            public const string _MainColorAdjustToggle = nameof(_MainColorAdjustToggle);
-            public const string _Saturation = nameof(_Saturation);
-            public const string _Color = nameof(_Color);
-            public const string _MainTex = nameof(_MainTex);
+            public const string _LightingMinLightBrightness = "_LightingMinLightBrightness";
+            public const string _LightingCap = "_LightingCap";
+            public const string _MainColorAdjustToggle = "_MainColorAdjustToggle";
+            public const string _Saturation = "_Saturation";
+            public const string _Color = "_Color";
+            public const string _MainTex = "_MainTex";
+
+            public const string _EnableDissolve = "_EnableDissolve";
+            public const string _DissolveTextureColor = "_DissolveTextureColor";
+            public const string _DissolveToTexture = "_DissolveToTexture";
 
             private static class PropertyIDs
             {
@@ -24,6 +28,9 @@ namespace io.github.azukimochi
                 public static readonly int Saturation = Shader.PropertyToID(_Saturation);
                 public static readonly int Color = Shader.PropertyToID(_Color);
                 public static readonly int MainTex = Shader.PropertyToID(_MainTex);
+                public static readonly int EnableDissolve = Shader.PropertyToID(_EnableDissolve);
+                public static readonly int DissolveTextureColor = Shader.PropertyToID(_DissolveTextureColor);
+                public static readonly int DissolveToTexture = Shader.PropertyToID(_DissolveToTexture);
             }
 
             private static class DefaultParameters
@@ -35,12 +42,13 @@ namespace io.github.azukimochi
             private const string Animated_Suffix = "Animated";
             private const string Flag_IsAnimated = "1";
 
-            public override bool TryNormalizeMaterial(Material material, UnityEngine.Object assetContainer)
+            public override bool TryNormalizeMaterial(Material material, LightLimitChangerObjectCache cache)
             {
-                bool bakeFlag = false;
                 var textureBaker = TextureBaker.GetInstance<PoiyomiTextureBaker>();
+                bool result = false;
 
                 {
+                    bool bakeFlag = false;
                     var tex = material.GetTexture(PropertyIDs.MainTex);
                     if (tex != null)
                         textureBaker.Texture = tex;
@@ -61,16 +69,44 @@ namespace io.github.azukimochi
 
                     if (bakeFlag)
                     {
-                        material.SetTexture(PropertyIDs.MainTex, textureBaker.Bake().AddTo(assetContainer));
+                        material.SetTexture(PropertyIDs.MainTex, cache.Register(textureBaker.Bake()));
                     }
+
+                    result |= bakeFlag;
                 }
 
-                return bakeFlag;
+                if (material.GetFloat(PropertyIDs.EnableDissolve) != 0)
+                {
+                    textureBaker.Reset();
+
+                    bool bakeFlag = false;
+                    var tex = material.GetTexture(PropertyIDs.DissolveToTexture);
+                    if (tex != null)
+                        textureBaker.Texture = tex;
+
+                    if (material.GetColor(PropertyIDs.DissolveTextureColor) != DefaultParameters.Color)
+                    {
+                        textureBaker.Color = material.GetColor(PropertyIDs.DissolveTextureColor);
+                        material.SetColor(PropertyIDs.DissolveTextureColor, DefaultParameters.Color);
+                        bakeFlag = true;
+                    }
+
+                    if (bakeFlag)
+                    {
+                        material.SetTexture(PropertyIDs.DissolveToTexture, cache.Register(textureBaker.Bake()));
+                    }
+
+                    result |= bakeFlag;
+                }
+
+
+                return result;
             }
 
             public override bool IsTargetShader(Shader shader)
             {
-                return shader.name.Contains("poiyomi", StringComparison.OrdinalIgnoreCase);
+                //return shader.name.Contains("poiyomi", StringComparison.OrdinalIgnoreCase);
+                return shader.name.Contains("Poiyomi 8", StringComparison.OrdinalIgnoreCase);
             }
 
             public override void SetControlAnimation(in ControlAnimationContainer container, in ControlAnimationParameters parameters)
@@ -99,6 +135,9 @@ namespace io.github.azukimochi
                         container.Default.SetParameterAnimation(parameters, _Color, DefaultParameters.Color);
                         container.Control.SetColorTempertureAnimation(parameters, _Color, DefaultParameters.Color);
 
+                        container.Default.SetParameterAnimation(parameters, _DissolveTextureColor, DefaultParameters.Color);
+                        container.Control.SetColorTempertureAnimation(parameters, _DissolveTextureColor, DefaultParameters.Color);
+
                         break;
                 }
             }
@@ -117,6 +156,9 @@ namespace io.github.azukimochi
                     if (parameters.AllowColorTempControl)
                     {
                         material.SetOverrideTag($"{_Color}{Animated_Suffix}", Flag_IsAnimated);
+
+                        if (material.GetFloat(PropertyIDs.EnableDissolve) != 0)
+                            material.SetOverrideTag($"{_DissolveTextureColor}{Animated_Suffix}", Flag_IsAnimated);
                     }
                     if (parameters.AllowSaturationControl)
                     {

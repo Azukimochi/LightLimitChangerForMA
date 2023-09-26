@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace io.github.azukimochi
 {
@@ -10,19 +11,19 @@ namespace io.github.azukimochi
         {
             public static LilToon Instance { get; } = new LilToon();
 
-            public const string _LightMinLimit = nameof(_LightMinLimit);
-            public const string _LightMaxLimit = nameof(_LightMaxLimit);
-            public const string _AsUnlit = nameof(_AsUnlit);
-            public const string _MainTexHSVG = nameof(_MainTexHSVG);
-            public const string _Color = nameof(_Color);
-            public const string _Color2nd = nameof(_Color2nd);
-            public const string _Color3rd = nameof(_Color3rd);
-            public const string _MainTex = nameof(_MainTex);
-            public const string _Main2ndTex = nameof(_Main2ndTex);
-            public const string _Main3rdTex = nameof(_Main3rdTex);
-            public const string _MainGradationTex = nameof(_MainGradationTex);
-            public const string _MainGradationStrength = nameof(_MainGradationStrength);
-            public const string _MainColorAdjustMask = nameof(_MainColorAdjustMask);
+            public const string _LightMinLimit = "_LightMinLimit";
+            public const string _LightMaxLimit = "_LightMaxLimit";
+            public const string _AsUnlit = "_AsUnlit";
+            public const string _MainTexHSVG = "_MainTexHSVG";
+            public const string _Color = "_Color";
+            public const string _Color2nd = "_Color2nd";
+            public const string _Color3rd = "_Color3rd";
+            public const string _MainTex = "_MainTex";
+            public const string _Main2ndTex = "_Main2ndTex";
+            public const string _Main3rdTex = "_Main3rdTex";
+            public const string _MainGradationTex = "_MainGradationTex";
+            public const string _MainGradationStrength = "_MainGradationStrength";
+            public const string _MainColorAdjustMask = "_MainColorAdjustMask";
 
             private static class PropertyIDs
             {
@@ -50,7 +51,7 @@ namespace io.github.azukimochi
                 public static readonly float MainGradationStrength = 0;
             }
 
-            public override bool TryNormalizeMaterial(Material material, UnityEngine.Object assetContainer)
+            public override bool TryNormalizeMaterial(Material material, LightLimitChangerObjectCache cache)
             {
                 bool result = false;
                 var textureBaker = TextureBaker.GetInstance<DefaultTextureBaker>();
@@ -103,7 +104,7 @@ namespace io.github.azukimochi
                     // Run Bake
                     if (bakeFlag)
                     {
-                        material.SetTexture(PropertyIDs.MainTex, textureBaker.Bake().AddTo(assetContainer));
+                        material.SetTexture(PropertyIDs.MainTex, cache.Register(textureBaker.Bake()));
                     }
 
                     result |= bakeFlag;
@@ -127,7 +128,7 @@ namespace io.github.azukimochi
 
                     if (bakeFlag)
                     {
-                        material.SetTexture(PropertyIDs.Main2ndTex, textureBaker.Bake().AddTo(assetContainer));
+                        material.SetTexture(PropertyIDs.Main2ndTex, cache.Register(textureBaker.Bake()));
                     }
 
                     result |= bakeFlag;
@@ -151,7 +152,7 @@ namespace io.github.azukimochi
 
                     if (bakeFlag)
                     {
-                        material.SetTexture(PropertyIDs.Main3rdTex, textureBaker.Bake().AddTo(assetContainer));
+                        material.SetTexture(PropertyIDs.Main3rdTex, cache.Register(textureBaker.Bake()));
                     }
                     result |= bakeFlag;
                 }

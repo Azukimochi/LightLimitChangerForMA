@@ -6,6 +6,7 @@ using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
+using Object = UnityEngine.Object;
 
 namespace io.github.azukimochi
 {
@@ -88,7 +89,7 @@ namespace io.github.azukimochi
 
         public int ShaderType { get; private set; }
 
-        public abstract bool TryNormalizeMaterial(Material material, UnityEngine.Object assetContainer);
+        public abstract bool TryNormalizeMaterial(Material material, LightLimitChangerObjectCache cache);
 
         public abstract bool IsTargetShader(Shader shader);
 

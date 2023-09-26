@@ -9,15 +9,15 @@ namespace io.github.azukimochi
         {
             public static Sunao Instance { get; } = new Sunao();
 
-            public const string _MinimumLight = nameof(_MinimumLight);
-            public const string _DirectionalLight = nameof(_DirectionalLight);
-            public const string _PointLight = nameof(_PointLight);
-            public const string _Unlit = nameof(_Unlit);
-            public const string _SHLight = nameof(_SHLight);
-            public const string _Color = nameof(_Color);
-            public const string _MainTex = nameof(_MainTex);
-            public const string _SubTex = nameof(_SubTex);
-            public const string _SubColor = nameof(_SubColor);
+            public const string _MinimumLight = "_MinimumLight";
+            public const string _DirectionalLight = "_DirectionalLight";
+            public const string _PointLight = "_PointLight";
+            public const string _Unlit = "_Unlit";
+            public const string _SHLight = "_SHLight";
+            public const string _Color = "_Color";
+            public const string _MainTex = "_MainTex";
+            public const string _SubTex = "_SubTex";
+            public const string _SubColor = "_SubColor";
 
             private static class PropertyIDs
             {
@@ -37,7 +37,7 @@ namespace io.github.azukimochi
                 public static readonly Color Color = Color.white;
             }
 
-            public override bool TryNormalizeMaterial(Material material, UnityEngine.Object assetContainer)
+            public override bool TryNormalizeMaterial(Material material, LightLimitChangerObjectCache cache)
             {
                 bool result = false;
                 bool bakeFlag = false;
@@ -57,7 +57,7 @@ namespace io.github.azukimochi
 
                     if (bakeFlag)
                     {
-                        material.SetTexture(PropertyIDs.MainTex, textureBaker.Bake().AddTo(assetContainer));
+                        material.SetTexture(PropertyIDs.MainTex, cache.Register(textureBaker.Bake()));
                     }
 
                     result |= bakeFlag;

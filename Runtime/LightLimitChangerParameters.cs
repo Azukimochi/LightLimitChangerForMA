@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 using UnityEngine.Serialization;
 
 namespace io.github.azukimochi
@@ -13,8 +14,14 @@ namespace io.github.azukimochi
         public bool IsDefaultUse;
         public bool IsValueSave;
         public bool OverwriteDefaultLightMinMax;
+
+        [Range(0, 1)]
         public float DefaultLightValue;
+
+        [Range(0, 10)]
         public float MaxLightValue;
+
+        [Range(0, 10)]
         public float MinLightValue;
 
         public int TargetShader;
@@ -22,10 +29,7 @@ namespace io.github.azukimochi
         public bool AllowColorTempControl;
         public bool AllowSaturationControl;
         public bool AllowUnlitControl;
-        public bool AllowOverridePoiyomiAnimTag;
         public bool AddResetButton;
-        public bool GenerateAtBuild;
-        public bool ExcludeEditorOnly;
 
         public static LightLimitChangerParameters Default => new LightLimitChangerParameters()
         {
@@ -39,10 +43,7 @@ namespace io.github.azukimochi
             AllowColorTempControl = false,
             AllowSaturationControl = false,
             AllowUnlitControl = false,
-            AllowOverridePoiyomiAnimTag = true,
             AddResetButton = false,
-            GenerateAtBuild = true,
-            ExcludeEditorOnly = true
         };
     }
 }

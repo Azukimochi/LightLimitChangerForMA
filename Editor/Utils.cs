@@ -15,6 +15,11 @@ namespace io.github.azukimochi
     {
         public static bool HasFlag(this int x, int y) => (x & y) == y;
 
+        public static void Destroy(this Object obj)
+        {
+            Object.DestroyImmediate(obj);
+        }
+
         public static void ClearSubAssets(this Object obj)
         {
             var path = AssetDatabase.GetAssetPath(obj);
@@ -72,10 +77,9 @@ namespace io.github.azukimochi
             }
         }
 
-        public static T AddTo<T>(this T obj, Object asset) where T : Object
+        public static T AddTo<T>(this T obj, LightLimitChangerObjectCache cache) where T : Object
         {
-            AssetDatabase.AddObjectToAsset(obj, asset);
-            return obj;
+            return cache.Register(obj);
         }
 
         public static T HideInHierarchy<T>(this T obj) where T : Object
