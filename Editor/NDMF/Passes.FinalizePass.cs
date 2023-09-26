@@ -36,6 +36,11 @@ namespace io.github.azukimochi
                 }));
 
                 menuInstaller.menuToAppend = CreateMenu(session, cache);
+
+                foreach(var component in context.AvatarRootObject.GetComponentsInChildren<LightLimitChangerSettings>(true))
+                {
+                    component.Destroy();
+                }
             }
 
 
