@@ -60,7 +60,7 @@ namespace io.github.azukimochi
                                 {
                                     if (ShaderInfo.TryGetShaderInfo(material, out var info) && session.Parameters.TargetShader.HasFlag(info.ShaderType))
                                     {
-                                        clonedMaterial = material.Clone().AddTo(cache);
+                                        clonedMaterial = material.Clone();
                                         cache.Register(material, clonedMaterial);
                                         return true;
                                     }
