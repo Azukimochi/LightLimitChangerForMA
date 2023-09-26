@@ -11,6 +11,7 @@ using VRC.SDK3.Avatars.Components;
 
 namespace io.github.azukimochi
 {
+    [CanEditMultipleObjects]
     [CustomEditor(typeof(LightLimitChangerSettings))]
     internal sealed class LightLimitChangerSettingsEditor : Editor
     {
