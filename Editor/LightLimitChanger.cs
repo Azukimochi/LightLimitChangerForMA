@@ -38,7 +38,7 @@ namespace io.github.azukimochi
                 if (!ValidateCore(x))
                     continue;
 
-                var prefab = GeneratePrefab(x.GetComponent<VRCAvatarDescriptor>());
+                var prefab = GeneratePrefab(x.transform);
 
                 objectToCreated.Add(prefab);
             }
@@ -51,15 +51,6 @@ namespace io.github.azukimochi
 
         // 選択されているものがアバター本体かつ、LLCが含まれていないときに実行可能
         private static bool ValidateCore(GameObject obj) => obj != null && obj.GetComponent<VRCAvatarDescriptor>() != null && obj.GetComponentInChildren<LightLimitChangerSettings>() == null;
-
-
-        private void OnEnable()
-        {
-            _temp = new GameObject()
-            {
-                hideFlags = HideFlags.HideInHierarchy | HideFlags.DontSave
-            };
-        }
 
         private void OnDestroy()
         {
@@ -103,7 +94,7 @@ namespace io.github.azukimochi
                     {
                         if (GUILayout.Button(Localization.G("info.generate")))
                         {
-                            var prefab = GeneratePrefab(TargetAvatar);
+                            var prefab = GeneratePrefab(TargetAvatar.transform);
                             EditorUtility.CopySerialized(_editor.target, prefab.GetComponent<LightLimitChangerSettings>());
                         }
                     }
@@ -128,8 +119,7 @@ namespace io.github.azukimochi
                     }
                     else
                     {
-                        _temp.GetComponent<LightLimitChangerSettings>()?.Destroy();
-                        _editor = Editor.CreateEditor(_temp.AddComponent<LightLimitChangerSettings>(), typeof(LightLimitChangerSettingsEditor)) as LightLimitChangerSettingsEditor;
+                        _editor = Editor.CreateEditor(GetTempSettings(), typeof(LightLimitChangerSettingsEditor)) as LightLimitChangerSettingsEditor;
                     }
                 }
                 else
@@ -150,31 +140,58 @@ namespace io.github.azukimochi
                     {
                         _editor.Destroy();
                         _editor = null;
-                        _temp.GetComponent<LightLimitChangerSettings>()?.Destroy();
-                        _editor = Editor.CreateEditor(_temp.AddComponent<LightLimitChangerSettings>(), typeof(LightLimitChangerSettingsEditor)) as LightLimitChangerSettingsEditor;
+                        _editor = Editor.CreateEditor(GetTempSettings(), typeof(LightLimitChangerSettingsEditor)) as LightLimitChangerSettingsEditor;
                     }
                     else
                     {
-
                         var settings = TargetAvatar.GetComponentInChildren<LightLimitChangerSettings>();
                         if (settings != null && (_editor.target as Component).gameObject.hideFlags.HasFlag(HideFlags.HideInHierarchy))
                         {
                             _editor.Destroy();
                             _editor = null;
                             _editor = Editor.CreateEditor(settings, typeof(LightLimitChangerSettingsEditor)) as LightLimitChangerSettingsEditor;
+                            _temp?.Destroy();
+                            _temp = null;
                         }
                     }
                 }
             }
             _prevTargetAvatar = TargetAvatar;
+            if (_temp != null)
+            {
+                // ApplyとかRevertすると何故かHideFlagsが剥がれるので
+                _temp.hideFlags = HideFlags.HideAndDontSave & ~HideFlags.NotEditable;
+            }
+
+            LightLimitChangerSettings GetTempSettings()
+            {
+                _temp?.Destroy();
+                _temp = GeneratePrefab();
+                _temp.name = "_INTERNAL_LLC_PREFAB_";
+
+                return _temp.GetComponent<LightLimitChangerSettings>();
+            }
         }
 
-        private static GameObject GeneratePrefab(VRCAvatarDescriptor avatar)
+        private static GameObject GeneratePrefab(Transform parent = null)
         {
             const string PrefabGUID = "b3d7759e248364e4dadf8e4fbc37fde1";
-            var prefab = PrefabUtility.InstantiatePrefab(AssetDatabase.LoadAssetAtPath<GameObject>(AssetDatabase.GUIDToAssetPath(PrefabGUID)), avatar.transform);
+            var prefabObj = AssetDatabase.LoadAssetAtPath<GameObject>(AssetDatabase.GUIDToAssetPath(PrefabGUID));
+            var prefab = prefabObj != null ? PrefabUtility.InstantiatePrefab(prefabObj, parent) as GameObject : CreateNonPrefabLLC();
             Undo.RegisterCreatedObjectUndo(prefab, "Apply LightLimitChanger");
-            return prefab as GameObject;
+
+            // おおもとのプレハブからLLCを消す不届き者がいるかもしれない、、、
+            if (prefab.GetComponent<LightLimitChangerSettings>() == null)
+                prefab.AddComponent<LightLimitChangerSettings>();
+            
+            return prefab;
+
+            GameObject CreateNonPrefabLLC()
+            {
+                var obj = new GameObject("Light Limit Changer", typeof(LightLimitChangerSettings));
+                obj.transform.parent = parent;
+                return obj;
+            }
         }
     }
 }

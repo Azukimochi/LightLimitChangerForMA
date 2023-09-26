@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 8442159124839926025}
   - component: {fileID: 5369528776110213476}
   m_Layer: 0
-  m_Name: GameObject
+  m_Name: Light Limit Changer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -54,7 +54,4 @@ MonoBehaviour:
     AllowColorTempControl: 0
     AllowSaturationControl: 0
     AllowUnlitControl: 0
-    AllowOverridePoiyomiAnimTag: 1
     AddResetButton: 0
-    GenerateAtBuild: 1
-    ExcludeEditorOnly: 1
