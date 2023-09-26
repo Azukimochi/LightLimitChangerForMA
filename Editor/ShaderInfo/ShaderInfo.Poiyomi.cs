@@ -16,6 +16,9 @@ namespace io.github.azukimochi
             public const string _Color = "_Color";
             public const string _MainTex = "_MainTex";
 
+            public const string _EnableDissolve = "_EnableDissolve";
+            public const string _DissolveTextureColor = "_DissolveTextureColor";
+
             private static class PropertyIDs
             {
                 public static readonly int LightingMinLightBrightness = Shader.PropertyToID(_LightingMinLightBrightness);
@@ -65,12 +68,15 @@ namespace io.github.azukimochi
                     }
                 }
 
+
+
                 return bakeFlag;
             }
 
             public override bool IsTargetShader(Shader shader)
             {
-                return shader.name.Contains("poiyomi", StringComparison.OrdinalIgnoreCase);
+                //return shader.name.Contains("poiyomi", StringComparison.OrdinalIgnoreCase);
+                return shader.name.Contains("Poiyomi 8", StringComparison.OrdinalIgnoreCase);
             }
 
             public override void SetControlAnimation(in ControlAnimationContainer container, in ControlAnimationParameters parameters)
