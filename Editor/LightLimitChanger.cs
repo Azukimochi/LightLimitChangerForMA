@@ -72,7 +72,7 @@ namespace io.github.azukimochi
 
             var style = new GUIStyle(EditorStyles.helpBox);
             style.richText = true;
-            EditorGUILayout.LabelField($"<size=12>{Localization.S("window.info.deprecated")}\nhttps://azukimochi.github.io/LLC-Docs/docs/プレハブ置くときのやり方.htm</size>", style);
+            EditorGUILayout.LabelField($"<size=12>{Localization.S("window.info.deprecated")}\n<a href=\"https://azukimochi.github.io/LLC-Docs/docs/howtouse/howtouse-basic/\">https://azukimochi.github.io/LLC-Docs/docs/howtouse/howtouse-basic</a></size>", style);
             EditorGUILayout.Space(8);
 
             TargetAvatar = EditorGUILayout.ObjectField(Localization.G("label.avatar"), TargetAvatar, typeof(VRCAvatarDescriptor), true) as VRCAvatarDescriptor;
