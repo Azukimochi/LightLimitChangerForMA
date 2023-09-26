@@ -15,6 +15,8 @@ namespace io.github.azukimochi
     public sealed class LightLimitChanger : EditorWindow
     {
         public const string Title = "Light Limit Changer For MA";
+        private const string ContextMenuPath = "GameObject/ModularAvatar/Light Limit Changer";
+        private const int ContextMenuPriority = 130;
 
         public VRCAvatarDescriptor TargetAvatar;
         private VRCAvatarDescriptor _prevTargetAvatar;
@@ -22,10 +24,34 @@ namespace io.github.azukimochi
         private LightLimitChangerSettingsEditor _editor;
 
         [MenuItem("Tools/Modular Avatar/LightLimitChanger")]
-        public static void CreateWindow()
+        public static void CreateWindow() => GetWindow<LightLimitChanger>(Title);
+
+        [MenuItem(ContextMenuPath, true, ContextMenuPriority)]
+        public static bool ValidateApplytoAvatar() => Selection.gameObjects.Any(ValidateCore);
+
+        [MenuItem(ContextMenuPath, false, ContextMenuPriority)]
+        public static void ApplytoAvatar()
         {
-            var window = GetWindow<LightLimitChanger>(Title);
+            List<GameObject> objectToCreated = new List<GameObject>();
+            foreach (var x in Selection.gameObjects)
+            {
+                if (!ValidateCore(x))
+                    continue;
+
+                var prefab = GeneratePrefab(x.GetComponent<VRCAvatarDescriptor>());
+
+                objectToCreated.Add(prefab);
+            }
+            if (objectToCreated.Count == 0)
+                return;
+
+            EditorGUIUtility.PingObject(objectToCreated[0]);
+            Selection.objects = objectToCreated.ToArray();
         }
+
+        // 選択されているものがアバター本体かつ、LLCが含まれていないときに実行可能
+        private static bool ValidateCore(GameObject obj) => obj != null && obj.GetComponent<VRCAvatarDescriptor>() != null && obj.GetComponentInChildren<LightLimitChangerSettings>() == null;
+
 
         private void OnEnable()
         {
@@ -77,7 +103,8 @@ namespace io.github.azukimochi
                     {
                         if (GUILayout.Button(Localization.G("info.generate")))
                         {
-                            GenerateAssets();
+                            var prefab = GeneratePrefab(TargetAvatar);
+                            EditorUtility.CopySerialized(_editor.target, prefab.GetComponent<LightLimitChangerSettings>());
                         }
                     }
                 }
@@ -142,12 +169,12 @@ namespace io.github.azukimochi
             _prevTargetAvatar = TargetAvatar;
         }
 
-        private void GenerateAssets()
+        private static GameObject GeneratePrefab(VRCAvatarDescriptor avatar)
         {
             const string PrefabGUID = "b3d7759e248364e4dadf8e4fbc37fde1";
-
-            var prefab = PrefabUtility.InstantiatePrefab(AssetDatabase.LoadAssetAtPath<GameObject>(AssetDatabase.GUIDToAssetPath(PrefabGUID)), TargetAvatar.transform);
-            EditorUtility.CopySerialized(_editor.target, (prefab as GameObject).GetComponent<LightLimitChangerSettings>());
+            var prefab = PrefabUtility.InstantiatePrefab(AssetDatabase.LoadAssetAtPath<GameObject>(AssetDatabase.GUIDToAssetPath(PrefabGUID)), avatar.transform);
+            Undo.RegisterCreatedObjectUndo(prefab, "Apply LightLimitChanger");
+            return prefab as GameObject;
         }
     }
 }
