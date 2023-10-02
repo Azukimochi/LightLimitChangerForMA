@@ -77,7 +77,7 @@ namespace io.github.azukimochi
             var source = Texture;
             if (source != null)
             {
-                (width, height) = (source.width, source.height);
+                (width, height) = (Mathf.Max(32, source.width), Mathf.Max(32, source.height));
             }
 
             var dest = new Texture2D(width, height, TextureFormat.RGBA32, false);
