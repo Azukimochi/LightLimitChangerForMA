@@ -49,51 +49,54 @@ namespace io.github.azukimochi
 
                 {
                     bool bakeFlag = false;
-                    var tex = material.GetTexture(PropertyIDs.MainTex);
+                    var tex = material.GetOrDefault<Texture>(PropertyIDs.MainTex);
                     if (tex != null)
                         textureBaker.Texture = tex;
 
-                    if (material.GetColor(PropertyIDs.Color) != DefaultParameters.Color)
+                    var color = material.GetOrDefault(PropertyIDs.Color, DefaultParameters.Color);
+                    if (color != DefaultParameters.Color)
                     {
-                        textureBaker.Color = material.GetColor(PropertyIDs.Color);
-                        material.SetColor(PropertyIDs.Color, DefaultParameters.Color);
+                        textureBaker.Color = color;
+                        material.TrySet(PropertyIDs.Color, DefaultParameters.Color);
                         bakeFlag = true;
                     }
 
-                    if (material.GetFloat(PropertyIDs.Saturation) != DefaultParameters.Saturation)
+                    var saturation = material.GetOrDefault(PropertyIDs.Saturation, DefaultParameters.Saturation);
+                    if (saturation != DefaultParameters.Saturation)
                     {
-                        textureBaker.HSVG = new Vector4(0, material.GetFloat(PropertyIDs.Saturation), 1, 1);
-                        material.SetFloat(PropertyIDs.Saturation, DefaultParameters.Saturation);
+                        textureBaker.HSVG = new Vector4(0, saturation, 1, 1);
+                        material.TrySet(PropertyIDs.Saturation, DefaultParameters.Saturation);
                         bakeFlag = true;
                     }
 
                     if (bakeFlag)
                     {
-                        material.SetTexture(PropertyIDs.MainTex, cache.Register(textureBaker.Bake()));
+                        material.TrySet(PropertyIDs.MainTex, cache.Register(textureBaker.Bake()));
                     }
 
                     result |= bakeFlag;
                 }
 
-                if (material.GetFloat(PropertyIDs.EnableDissolve) != 0)
+                if (material.GetOrDefault(PropertyIDs.EnableDissolve, 0f) != 0)
                 {
                     textureBaker.Reset();
 
                     bool bakeFlag = false;
-                    var tex = material.GetTexture(PropertyIDs.DissolveToTexture);
+                    var tex = material.GetOrDefault<Texture>(PropertyIDs.DissolveToTexture);
                     if (tex != null)
                         textureBaker.Texture = tex;
 
-                    if (material.GetColor(PropertyIDs.DissolveTextureColor) != DefaultParameters.Color)
+                    var color = material.GetOrDefault(PropertyIDs.DissolveTextureColor, DefaultParameters.Color);
+                    if (color != DefaultParameters.Color)
                     {
-                        textureBaker.Color = material.GetColor(PropertyIDs.DissolveTextureColor);
-                        material.SetColor(PropertyIDs.DissolveTextureColor, DefaultParameters.Color);
+                        textureBaker.Color = color;
+                        material.TrySet(PropertyIDs.DissolveTextureColor, DefaultParameters.Color);
                         bakeFlag = true;
                     }
 
                     if (bakeFlag)
                     {
-                        material.SetTexture(PropertyIDs.DissolveToTexture, cache.Register(textureBaker.Bake()));
+                        material.TrySet(PropertyIDs.DissolveToTexture, cache.Register(textureBaker.Bake()));
                     }
 
                     result |= bakeFlag;
@@ -146,7 +149,7 @@ namespace io.github.azukimochi
             {
                 if (parameters.AllowSaturationControl || parameters.AllowColorTempControl)
                 {
-                    material.SetFloat(_MainColorAdjustToggle, 1);
+                    material.TrySet(PropertyIDs.MainColorAdjustToggle, 1f);
                     material.EnableKeyword($"{_MainColorAdjustToggle.ToUpperInvariant()}_ON");
                     material.EnableKeyword("COLOR_GRADING_HDR");
 
@@ -157,35 +160,13 @@ namespace io.github.azukimochi
                     {
                         material.SetOverrideTag($"{_Color}{Animated_Suffix}", Flag_IsAnimated);
 
-                        if (material.GetFloat(PropertyIDs.EnableDissolve) != 0)
+                        if (material.GetOrDefault(PropertyIDs.EnableDissolve, 0f) != 0)
                             material.SetOverrideTag($"{_DissolveTextureColor}{Animated_Suffix}", Flag_IsAnimated);
                     }
                     if (parameters.AllowSaturationControl)
                     {
                         material.SetOverrideTag($"{_Saturation}{Animated_Suffix}", Flag_IsAnimated);
                     }
-                }
-            }
-
-            public static void EnableColorAdjust(Material material)
-            {
-                material.SetFloat(_MainColorAdjustToggle, 1);
-                material.EnableKeyword($"{_MainColorAdjustToggle.ToUpperInvariant()}_ON");
-                material.EnableKeyword("COLOR_GRADING_HDR");
-            }
-
-            public static void SetAnimatedFlags(Material material, bool allowColorTempControl, bool allowSaturationControl)
-            {
-                material.SetOverrideTag($"{_LightingCap}{Animated_Suffix}", Flag_IsAnimated);
-                material.SetOverrideTag($"{_LightingMinLightBrightness}{Animated_Suffix}", Flag_IsAnimated);
-
-                if (allowColorTempControl )
-                {
-                    material.SetOverrideTag($"{_Color}{Animated_Suffix}", Flag_IsAnimated);
-                }
-                if (allowSaturationControl)
-                {
-                    material.SetOverrideTag($"{_Saturation}{Animated_Suffix}", Flag_IsAnimated);
                 }
             }
         }
