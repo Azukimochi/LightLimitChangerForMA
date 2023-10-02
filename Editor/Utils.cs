@@ -148,6 +148,50 @@ namespace io.github.azukimochi
             }
         }
 
+        public static T GetOrDefault<T>(this Material material, int nameID, T defaultValue = default)
+        {
+            if (material.HasProperty(nameID))
+            {
+                // 単純な型引数と型の比較は実行時に消去される
+
+                //if (typeof(Texture).IsAssignableFrom(typeof(T)))
+                if (typeof(T) == typeof(Texture) || typeof(T) == typeof(Texture2D) || typeof(T) == typeof(RenderTexture))
+                    return (T)(object)material.GetTexture(nameID);
+                if (typeof(T) == typeof(Color))
+                    return (T)(object)material.GetColor(nameID);
+                if (typeof(T) == typeof(Vector4))
+                    return (T)(object)material.GetVector(nameID);
+                if (typeof(T) == typeof(int))
+                    return (T)(object)material.GetInt(nameID);
+                if (typeof(T) == typeof(float))
+                    return (T)(object)material.GetFloat(nameID);
+            }
+
+            return defaultValue;
+        }
+
+        public static bool TrySet<T>(this Material material, int nameID, T value)
+        {
+            if (!material.HasProperty(nameID))
+                return false;
+
+            //if (typeof(Texture).IsAssignableFrom(typeof(T)))
+            if (typeof(T) == typeof(Texture) || typeof(T) == typeof(Texture2D) || typeof(T) == typeof(RenderTexture))
+                material.SetTexture(nameID, (Texture)(object)value);
+            else if (typeof(T) == typeof(Color))
+                material.SetColor(nameID, (Color)(object)value);
+            else if (typeof(T) == typeof(Vector4))
+                material.SetVector(nameID, (Vector4)(object)value);
+            else if (typeof(T) == typeof(int))
+                material.SetInt(nameID, (int)(object)value);
+            else if (typeof(T) == typeof(float))
+                material.SetFloat(nameID, (float)(object)value);
+            else 
+                return false;
+
+            return true;
+        }
+
         // https://github.com/bdunderscore/modular-avatar/blob/b15520271455350cf728bc1b95b874dc30682eb2/Packages/nadena.dev.modular-avatar/Editor/Util.cs#L162C9-L178C10
         // Originally under MIT License
         // Copyright (c) 2022 bd_
