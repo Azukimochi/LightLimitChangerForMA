@@ -34,6 +34,8 @@ namespace io.github.azukimochi
             {
                 Debug.LogError(ex);
             }
+
+            InitializeRuntimeMethods();
         }
 
         private static void RegisterShaderInfo(ShaderInfo info)
@@ -48,6 +50,11 @@ namespace io.github.azukimochi
             _RegisteredShaderInfos[count] = info;
             info.ShaderType = 1 << _ShaderInfoCount;
             _ShaderInfoCount = count + 1;
+        }
+
+        private static void InitializeRuntimeMethods()
+        {
+            RuntimeShaderInfo.FromBitMask = ShaderInfoUtility.FromBitMask;
         }
 
         public static ReadOnlySpan<ShaderInfo> RegisteredShaderInfos => _RegisteredShaderInfos.AsSpan(0, _ShaderInfoCount);
