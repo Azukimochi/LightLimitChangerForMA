@@ -83,10 +83,10 @@ namespace io.github.azukimochi
 
         public static int ToBitMask(in this TargetShaders targetShaders)
         {
-            if (targetShaders.IncludeEverything)
+            if (targetShaders.IsEverything)
                 return -1;
 
-            if (targetShaders.Targets?.Length == 0)
+            if (targetShaders.Targets == null || targetShaders.Targets.Length == 0)
                 return 0;
 
             int result = 0;
@@ -95,7 +95,7 @@ namespace io.github.azukimochi
             {
                 if (targetShaders.Targets.Contains(infos[i]))
                 {
-                    result |= 1 << (i + 1);
+                    result |= 1 << i;
                 }
             }
             return result;
@@ -116,9 +116,8 @@ namespace io.github.azukimochi
                 if (bitMask.IsPop(i))
                     list.Add(infos[i]);
             }
-            targetShaders.IncludeEverything = false;
+            targetShaders.IsEverything = false;
             targetShaders.Targets = list.ToArray();
-
         }
 
         private static bool IsPop(this int value, int index)
