@@ -58,7 +58,7 @@ namespace io.github.azukimochi
                             {
                                 if (!cache.TryGetValue(material, out var mapped))
                                 {
-                                    if (ShaderInfo.TryGetShaderInfo(material, out var info) && session.Parameters.TargetShader.HasFlag(info.ShaderType))
+                                    if (ShaderInfo.TryGetShaderInfo(material, out var info) && session.Parameters.TargetShaders.Contains(info.Name))
                                     {
                                         clonedMaterial = material.Clone();
                                         cache.Register(material, clonedMaterial);
