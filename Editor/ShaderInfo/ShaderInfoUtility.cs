@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Linq;
+using Boo.Lang;
 using NUnit.Framework.Internal;
 using UnityEngine;
 
@@ -77,6 +79,51 @@ namespace io.github.azukimochi
             animationClip.SetCurve(parameters.TargetPath, parameters.TargetType, $"{MaterialAnimationKeyPrefix}{propertyName}.a", Utils.Animation.Constant(color.a));
 
             return animationClip;
+        }
+
+        public static int ToBitMask(in this TargetShaders targetShaders)
+        {
+            if (targetShaders.IncludeEverything)
+                return -1;
+
+            if (targetShaders.Targets?.Length == 0)
+                return 0;
+
+            int result = 0;
+            var infos = ShaderInfo.RegisteredShaderInfoNames;
+            for(int i = 0; i < infos.Length; i++)
+            {
+                if (targetShaders.Targets.Contains(infos[i]))
+                {
+                    result |= 1 << (i + 1);
+                }
+            }
+            return result;
+        }
+
+        public static void FromBitMask(ref this TargetShaders targetShaders, int bitMask)
+        {
+            if (bitMask <= 0)
+            {
+                targetShaders = bitMask == 0 ? TargetShaders.None : TargetShaders.Everything;
+                return;
+            }
+
+            List<string> list = new List<string>();
+            var infos = ShaderInfo.RegisteredShaderInfoNames;
+            for (int i = 0; i < infos.Length; i++)
+            {
+                if (bitMask.IsPop(i))
+                    list.Add(infos[i]);
+            }
+            targetShaders.IncludeEverything = false;
+            targetShaders.Targets = list.ToArray();
+
+        }
+
+        private static bool IsPop(this int value, int index)
+        {
+            return (value & (1 << index)) != 0;
         }
 
         [Flags]
