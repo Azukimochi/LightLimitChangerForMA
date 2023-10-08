@@ -24,7 +24,10 @@ namespace io.github.azukimochi
         [Range(0, 10)]
         public float MinLightValue;
 
+        [Obsolete]
         public int TargetShader;
+
+        public TargetShaders TargetShaders;
 
         public bool AllowColorTempControl;
         public bool AllowSaturationControl;
@@ -39,7 +42,8 @@ namespace io.github.azukimochi
             DefaultLightValue = 0.5f,
             MaxLightValue = 1.0f,
             MinLightValue = 0.0f,
-            TargetShader = -1, // Everything
+            //TargetShader = -1, // Everything
+            TargetShaders = TargetShaders.Everything,
             AllowColorTempControl = false,
             AllowSaturationControl = false,
             AllowUnlitControl = false,

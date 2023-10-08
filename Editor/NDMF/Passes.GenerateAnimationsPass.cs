@@ -56,7 +56,7 @@ namespace io.github.azukimochi
 
                     foreach (var x in ShaderInfo.RegisteredShaderInfos)
                     {
-                        if (!parameters.TargetShader.HasFlag(x.ShaderType))
+                        if (!parameters.TargetShaders.Contains(x.Name))
                             continue;
 
                         foreach (ref readonly var container in animationContainers)

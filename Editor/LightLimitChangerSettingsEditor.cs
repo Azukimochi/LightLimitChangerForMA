@@ -21,7 +21,7 @@ namespace io.github.azukimochi
         private SerializedProperty DefaultLightValue;
         private SerializedProperty MaxLightValue;
         private SerializedProperty MinLightValue;
-        private SerializedProperty TargetShader;
+        private SerializedProperty TargetShaders;
         private SerializedProperty AllowColorTempControl;
         private SerializedProperty AllowSaturationControl;
         private SerializedProperty AllowUnlitControl;
@@ -40,7 +40,7 @@ namespace io.github.azukimochi
             DefaultLightValue =             parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.DefaultLightValue));
             MaxLightValue =                 parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.MaxLightValue));
             MinLightValue =                 parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.MinLightValue));
-            TargetShader =                  parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.TargetShader));
+            TargetShaders =                 parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.TargetShaders));
             AllowColorTempControl =         parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.AllowColorTempControl));
             AllowSaturationControl =        parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.AllowSaturationControl));
             AllowUnlitControl =             parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.AllowUnlitControl));
@@ -74,7 +74,7 @@ namespace io.github.azukimochi
             {
                 if (group.IsOpen)
                 {
-                    TargetShader.intValue = EditorGUILayout.MaskField(Localization.G("label.target_shader"), TargetShader.intValue, ShaderInfo.RegisteredShaderInfoNames);
+                    EditorGUILayout.PropertyField(TargetShaders, Localization.G("label.target_shader"));
                 }
             }
 
