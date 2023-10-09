@@ -66,10 +66,8 @@ namespace io.github.azukimochi
                     }
                 }
 
-                var param = session.Settings.gameObject.GetOrAddComponent<ModularAvatarParameters>();
                 controller.AddParameter(new AnimatorControllerParameter() { name = ParameterName_Toggle, defaultBool = parameters.IsDefaultUse, type = AnimatorControllerParameterType.Bool });
-                param.parameters.Add(new ParameterConfig() { nameOrPrefix = ParameterName_Toggle, saved = parameters.IsValueSave, defaultValue = parameters.IsDefaultUse ? 1 : 0, syncType = ParameterSyncType.Bool });
-
+                
                 foreach (ref readonly var container in animationContainers)
                 {
                     if (targetControl.HasFlag(container.ControlType))
@@ -88,7 +86,6 @@ namespace io.github.azukimochi
                         AddLayer(session, cache, container, parameterName);
 
                         controller.AddParameter(new AnimatorControllerParameter() { name = parameterName, defaultFloat = defaultValue, type = AnimatorControllerParameterType.Float });
-                        param.parameters.Add(new ParameterConfig() { nameOrPrefix = parameterName, saved = parameters.IsValueSave, defaultValue = defaultValue, syncType = ParameterSyncType.Float });
                     }
                 }
 
