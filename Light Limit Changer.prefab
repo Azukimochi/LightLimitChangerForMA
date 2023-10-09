@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8442159124839926025}
   - component: {fileID: 5369528776110213476}
+  - component: {fileID: 2992164003499654213}
   m_Layer: 0
   m_Name: Light Limit Changer
   m_TagString: Untagged
@@ -50,8 +51,25 @@ MonoBehaviour:
     DefaultLightValue: 0.5
     MaxLightValue: 1
     MinLightValue: 0
-    TargetShader: -1
+    TargetShader: 0
+    TargetShaders:
+      IsEverything: 1
+      Targets: []
     AllowColorTempControl: 0
     AllowSaturationControl: 0
     AllowUnlitControl: 0
     AddResetButton: 0
+--- !u!114 &2992164003499654213
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9213525711835462960}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7ef83cb0c23d4d7c9d41021e544a1978, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  menuToAppend: {fileID: 0}
+  installTargetMenu: {fileID: 0}
