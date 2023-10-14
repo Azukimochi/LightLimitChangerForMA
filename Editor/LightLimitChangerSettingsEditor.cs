@@ -58,23 +58,23 @@ namespace io.github.azukimochi
             serializedObject.Update();
             EditorGUI.BeginChangeCheck();
 
-            EditorGUILayout.PropertyField(IsDefaultUse, Localization.G("label.use_default"));
-            EditorGUILayout.PropertyField(IsValueSave, Localization.G("label.save_value"));
-            EditorGUILayout.PropertyField(OverwriteDefaultLightMinMax, Localization.G("label.override_min_max"));
-            EditorGUILayout.PropertyField(MaxLightValue, Localization.G("label.light_max"));
-            EditorGUILayout.PropertyField(MinLightValue, Localization.G("label.light_min"));
-            EditorGUILayout.PropertyField(DefaultLightValue, Localization.G("label.light_default"));
+            EditorGUILayout.PropertyField(IsDefaultUse, Localization.G("label.use_default", "tip.use_default"));
+            EditorGUILayout.PropertyField(IsValueSave, Localization.G("label.save_value", "tip.save_value"));
+            EditorGUILayout.PropertyField(OverwriteDefaultLightMinMax, Localization.G("label.override_min_max", "tip.override_min_max"));
+            EditorGUILayout.PropertyField(MaxLightValue, Localization.G("label.light_max", "tip.light_max"));
+            EditorGUILayout.PropertyField(MinLightValue, Localization.G("label.light_min", "tip.light_min"));
+            EditorGUILayout.PropertyField(DefaultLightValue, Localization.G("label.light_default", "tip.light_default"));
 
-            EditorGUILayout.PropertyField(AllowColorTempControl, Localization.G("label.allow_color_tmp"));
-            EditorGUILayout.PropertyField(AllowSaturationControl, Localization.G("label.allow_saturation"));
-            EditorGUILayout.PropertyField(AllowUnlitControl, Localization.G("label.allow_unlit"));
-            EditorGUILayout.PropertyField(AddResetButton, Localization.G("label.allow_reset"));
+            EditorGUILayout.PropertyField(AllowColorTempControl, Localization.G("label.allow_color_tmp", "tip.allow_color_tmp"));
+            EditorGUILayout.PropertyField(AllowSaturationControl, Localization.G("label.allow_saturation", "tip.allow_saturation"));
+            EditorGUILayout.PropertyField(AllowUnlitControl, Localization.G("label.allow_unlit", "tip.allow_unlit"));
+            EditorGUILayout.PropertyField(AddResetButton, Localization.G("label.allow_reset", "tip.allow_reset"));
 
             using (var group = new Utils.FoldoutHeaderGroupScope(ref _isOptionFoldoutOpen, Localization.G("category.select_option")))
             {
                 if (group.IsOpen)
                 {
-                    EditorGUILayout.PropertyField(TargetShaders, Localization.G("label.target_shader"));
+                    EditorGUILayout.PropertyField(TargetShaders, Localization.G("label.target_shader", "tip.target_shader"));
                 }
             }
 
