@@ -89,6 +89,7 @@ namespace io.github.azukimochi
                         {
                             name = "Controls",
                             type = VRCExpressionsMenu.Control.ControlType.SubMenu,
+                            icon = AssetDatabase.LoadAssetAtPath<Texture2D>(AssetDatabase.GUIDToAssetPath("75cdf4ab5baf72a4f8b6463d3720bd35")),
                             subMenu = menu,
                         });
 
