@@ -23,7 +23,7 @@ namespace io.github.azukimochi
                         if (p.propertyType == SerializedPropertyType.ObjectReference)
                         {
                             var obj = p.objectReferenceValue;
-                            if (obj != null)
+                            if (obj != null && !session.Excludes.Contains(obj))
                             {
                                 if (cache.TryGetValue(obj, out var mapped))
                                 {
