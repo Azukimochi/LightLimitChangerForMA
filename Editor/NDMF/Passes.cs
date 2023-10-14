@@ -1,4 +1,5 @@
-﻿using nadena.dev.ndmf;
+﻿using System.Collections.Generic;
+using nadena.dev.ndmf;
 using nadena.dev.ndmf.fluent;
 using UnityEditor.Animations;
 using Object = UnityEngine.Object;
@@ -51,6 +52,7 @@ namespace io.github.azukimochi
                     session.Controller = new AnimatorController() { name = "Light Limit Controller" }.AddTo(GetObjectCache(context));
                     session.Settings = context.AvatarRootObject.GetComponentInChildren<LightLimitChangerSettings>();
                     session.Parameters = session.Settings?.Parameters ?? LightLimitChangerParameters.Default;
+                    session.Excludes = new HashSet<Object>(session.Settings?.Excludes);
                 }
                 return session;
             }
@@ -71,6 +73,8 @@ namespace io.github.azukimochi
             public LightLimitChangerSettings Settings;
             public LightLimitChangerParameters Parameters;
             public AnimatorController Controller;
+
+            public HashSet<Object> Excludes;
 
             public bool IsValid() => Settings != null;
         }

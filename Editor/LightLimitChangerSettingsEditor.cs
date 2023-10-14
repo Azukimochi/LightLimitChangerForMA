@@ -26,6 +26,7 @@ namespace io.github.azukimochi
         private SerializedProperty AllowSaturationControl;
         private SerializedProperty AllowUnlitControl;
         private SerializedProperty AddResetButton;
+        private SerializedProperty Excludes;
 
         private static bool _isOptionFoldoutOpen = true;
 
@@ -45,6 +46,7 @@ namespace io.github.azukimochi
             AllowSaturationControl =        parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.AllowSaturationControl));
             AllowUnlitControl =             parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.AllowUnlitControl));
             AddResetButton =                parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.AddResetButton));
+            Excludes =                      serializedObject.FindProperty  (nameof(LightLimitChangerSettings.Excludes));
         }
 
         public override void OnInspectorGUI()
@@ -74,7 +76,9 @@ namespace io.github.azukimochi
             {
                 if (group.IsOpen)
                 {
+
                     EditorGUILayout.PropertyField(TargetShaders, Localization.G("label.target_shader", "tip.target_shader"));
+                    EditorGUILayout.PropertyField(Excludes, Localization.G("label.excludes"));
                 }
             }
 
