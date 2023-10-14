@@ -1,6 +1,6 @@
 {
   "name": "io.github.azukimochi.light-limit-changer",
-  "version": "1.7.1",
+  "version": "1.7.2",
   "displayName": "LightLimitChanger",
   "description": "Light limit change animation generate tool for VRChat avaters",
   "author": {
@@ -13,7 +13,7 @@
   },
   "vpmDependencies" : {
     "com.vrchat.avatars" : ">=3.2.0",
-    "nadena.dev.modular-avatar" : "^1.8.0-beta.0",
+    "nadena.dev.modular-avatar" : "^1.8.0",
     "nadena.dev.ndmf" : "^1.0.1"
   }
 }
