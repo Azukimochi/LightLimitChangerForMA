@@ -34,6 +34,8 @@ namespace io.github.azukimochi
         public bool AllowUnlitControl;
         public bool AddResetButton;
 
+        public bool IsGroupingAdditionalControls;
+
         public static LightLimitChangerParameters Default => new LightLimitChangerParameters()
         {
             IsDefaultUse = false,
@@ -48,6 +50,7 @@ namespace io.github.azukimochi
             AllowSaturationControl = false,
             AllowUnlitControl = false,
             AddResetButton = false,
+            IsGroupingAdditionalControls = false,
         };
     }
 }
