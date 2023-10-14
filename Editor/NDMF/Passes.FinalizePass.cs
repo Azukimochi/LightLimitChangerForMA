@@ -76,55 +76,75 @@ namespace io.github.azukimochi
                     },
                 };
 
-                if (session.Parameters.AllowColorTempControl)
+                if (session.Parameters.AllowColorTempControl | 
+                    session.Parameters.AllowColorTempControl | 
+                    session.Parameters.AllowSaturationControl)
                 {
-                    mainMenu.controls.Add(new VRCExpressionsMenu.Control()
+                    var additionalControlMenuParent = mainMenu;
+                    if (session.Parameters.IsGroupingAdditionalControls)
                     {
-                        name = "ColorTemperature",
-                        type = VRCExpressionsMenu.Control.ControlType.RadialPuppet,
-                        icon = AssetDatabase.LoadAssetAtPath<Texture2D>(AssetDatabase.GUIDToAssetPath("94f3542912b540b47a37f7c914c92924")),
-                        subParameters = new VRCExpressionsMenu.Control.Parameter[]
+                        var menu = ScriptableObject.CreateInstance<VRCExpressionsMenu>().AddTo(cache);
+
+                        mainMenu.controls.Add(new VRCExpressionsMenu.Control
                         {
+                            name = "Controls",
+                            type = VRCExpressionsMenu.Control.ControlType.SubMenu,
+                            subMenu = menu,
+                        });
+
+                        additionalControlMenuParent = menu;
+                    }
+
+                    if (session.Parameters.AllowColorTempControl)
+                    {
+                        additionalControlMenuParent.controls.Add(new VRCExpressionsMenu.Control()
+                        {
+                            name = "ColorTemperature",
+                            type = VRCExpressionsMenu.Control.ControlType.RadialPuppet,
+                            icon = AssetDatabase.LoadAssetAtPath<Texture2D>(AssetDatabase.GUIDToAssetPath("94f3542912b540b47a37f7c914c92924")),
+                            subParameters = new VRCExpressionsMenu.Control.Parameter[]
+                            {
                         new VRCExpressionsMenu.Control.Parameter
                         {
                             name = ParameterName_ColorTemp
                         }
-                        },
-                    });
-                }
+                            },
+                        });
+                    }
 
-                if (session.Parameters.AllowSaturationControl)
-                {
-                    mainMenu.controls.Add(new VRCExpressionsMenu.Control()
+                    if (session.Parameters.AllowSaturationControl)
                     {
-                        name = "Saturation",
-                        type = VRCExpressionsMenu.Control.ControlType.RadialPuppet,
-                        icon = AssetDatabase.LoadAssetAtPath<Texture2D>(AssetDatabase.GUIDToAssetPath("e641931350faa6c4f82ba056f31a1ef6")),
-                        subParameters = new VRCExpressionsMenu.Control.Parameter[]
+                        additionalControlMenuParent.controls.Add(new VRCExpressionsMenu.Control()
                         {
+                            name = "Saturation",
+                            type = VRCExpressionsMenu.Control.ControlType.RadialPuppet,
+                            icon = AssetDatabase.LoadAssetAtPath<Texture2D>(AssetDatabase.GUIDToAssetPath("e641931350faa6c4f82ba056f31a1ef6")),
+                            subParameters = new VRCExpressionsMenu.Control.Parameter[]
+                            {
                         new VRCExpressionsMenu.Control.Parameter
                         {
                             name = ParameterName_Saturation
                         }
-                        },
-                    });
-                }
+                            },
+                        });
+                    }
 
-                if (session.Parameters.AllowUnlitControl)
-                {
-                    mainMenu.controls.Add(new VRCExpressionsMenu.Control()
+                    if (session.Parameters.AllowUnlitControl)
                     {
-                        name = "Unlit",
-                        type = VRCExpressionsMenu.Control.ControlType.RadialPuppet,
-                        icon = AssetDatabase.LoadAssetAtPath<Texture2D>(AssetDatabase.GUIDToAssetPath("b0b1a25395988c64f887088f1c6748cf")),
-                        subParameters = new VRCExpressionsMenu.Control.Parameter[]
+                        additionalControlMenuParent.controls.Add(new VRCExpressionsMenu.Control()
                         {
+                            name = "Unlit",
+                            type = VRCExpressionsMenu.Control.ControlType.RadialPuppet,
+                            icon = AssetDatabase.LoadAssetAtPath<Texture2D>(AssetDatabase.GUIDToAssetPath("b0b1a25395988c64f887088f1c6748cf")),
+                            subParameters = new VRCExpressionsMenu.Control.Parameter[]
+                            {
                         new VRCExpressionsMenu.Control.Parameter
                         {
                             name = ParameterName_Unlit
                         }
-                        },
-                    });
+                            },
+                        });
+                    }
                 }
 
                 if (session.Parameters.AddResetButton)
