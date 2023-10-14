@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
 using VRC.SDKBase;
@@ -10,6 +11,8 @@ namespace io.github.azukimochi
     public sealed class LightLimitChangerSettings : MonoBehaviour, IEditorOnly, ISerializationCallbackReceiver
     {
         public LightLimitChangerParameters Parameters = LightLimitChangerParameters.Default;
+
+        public List<UnityEngine.Object> Excludes = new List<UnityEngine.Object>();
 
 #pragma warning disable CS0612
         public void OnAfterDeserialize()
