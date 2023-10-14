@@ -2,6 +2,7 @@
 using System.Linq;
 using nadena.dev.modular_avatar.core;
 using nadena.dev.ndmf;
+using UnityEditor;
 using UnityEngine;
 using VRC.Core;
 using VRC.SDK3.Avatars.Components;
@@ -54,6 +55,7 @@ namespace io.github.azukimochi
                     {
                         name = "Enable",
                         type = VRCExpressionsMenu.Control.ControlType.Toggle,
+                        icon = AssetDatabase.LoadAssetAtPath<Texture2D>(AssetDatabase.GUIDToAssetPath("94e101a18f0647c448df7fc3193aa474")),
                         parameter = new VRCExpressionsMenu.Control.Parameter
                         {
                             name = ParameterName_Toggle,
@@ -63,6 +65,7 @@ namespace io.github.azukimochi
                     {
                         name = "Light",
                         type = VRCExpressionsMenu.Control.ControlType.RadialPuppet,
+                        icon = AssetDatabase.LoadAssetAtPath<Texture2D>(AssetDatabase.GUIDToAssetPath("68c823f3911f5eb4692149fa6c48fa78")),
                         subParameters = new VRCExpressionsMenu.Control.Parameter[]
                         {
                             new VRCExpressionsMenu.Control.Parameter
@@ -79,6 +82,7 @@ namespace io.github.azukimochi
                     {
                         name = "ColorTemperature",
                         type = VRCExpressionsMenu.Control.ControlType.RadialPuppet,
+                        icon = AssetDatabase.LoadAssetAtPath<Texture2D>(AssetDatabase.GUIDToAssetPath("94f3542912b540b47a37f7c914c92924")),
                         subParameters = new VRCExpressionsMenu.Control.Parameter[]
                         {
                         new VRCExpressionsMenu.Control.Parameter
@@ -95,6 +99,7 @@ namespace io.github.azukimochi
                     {
                         name = "Saturation",
                         type = VRCExpressionsMenu.Control.ControlType.RadialPuppet,
+                        icon = AssetDatabase.LoadAssetAtPath<Texture2D>(AssetDatabase.GUIDToAssetPath("e641931350faa6c4f82ba056f31a1ef6")),
                         subParameters = new VRCExpressionsMenu.Control.Parameter[]
                         {
                         new VRCExpressionsMenu.Control.Parameter
@@ -111,6 +116,7 @@ namespace io.github.azukimochi
                     {
                         name = "Unlit",
                         type = VRCExpressionsMenu.Control.ControlType.RadialPuppet,
+                        icon = AssetDatabase.LoadAssetAtPath<Texture2D>(AssetDatabase.GUIDToAssetPath("b0b1a25395988c64f887088f1c6748cf")),
                         subParameters = new VRCExpressionsMenu.Control.Parameter[]
                         {
                         new VRCExpressionsMenu.Control.Parameter
@@ -127,6 +133,7 @@ namespace io.github.azukimochi
                     {
                         name = "Reset",
                         type = VRCExpressionsMenu.Control.ControlType.Button,
+                        icon = AssetDatabase.LoadAssetAtPath<Texture2D>(AssetDatabase.GUIDToAssetPath("46b69c6755e703048845eef57e51a329")),
                         parameter = new VRCExpressionsMenu.Control.Parameter() { name = ParameterName_Reset }
                     });
                 }
@@ -139,6 +146,7 @@ namespace io.github.azukimochi
                         new VRCExpressionsMenu.Control
                         {
                             name = "Light Limit Changer",
+                            icon = AssetDatabase.LoadAssetAtPath<Texture2D>(AssetDatabase.GUIDToAssetPath("09c1f5650f9952f49a0fbb551e64dcad")),
                             type = VRCExpressionsMenu.Control.ControlType.SubMenu,
                             subMenu = mainMenu,
                         },
