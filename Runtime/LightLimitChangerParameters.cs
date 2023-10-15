@@ -34,6 +34,8 @@ namespace io.github.azukimochi
         public bool AllowUnlitControl;
         public bool AddResetButton;
 
+        public bool IsSeparateLightControl;
+
         public bool IsGroupingAdditionalControls;
 
         public static LightLimitChangerParameters Default => new LightLimitChangerParameters()

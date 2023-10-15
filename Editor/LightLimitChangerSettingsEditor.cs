@@ -27,6 +27,7 @@ namespace io.github.azukimochi
         private SerializedProperty AllowUnlitControl;
         private SerializedProperty AddResetButton;
         private SerializedProperty IsGroupingAdditionalControls;
+        private SerializedProperty IsSeparateLightControl;
         private SerializedProperty Excludes;
 
         private static bool _isOptionFoldoutOpen = true;
@@ -47,6 +48,7 @@ namespace io.github.azukimochi
             AllowSaturationControl =        parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.AllowSaturationControl));
             AllowUnlitControl =             parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.AllowUnlitControl));
             AddResetButton =                parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.AddResetButton));
+            IsSeparateLightControl =        parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.IsSeparateLightControl));
             IsGroupingAdditionalControls =  parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.IsGroupingAdditionalControls));
             Excludes =                      serializedObject.FindProperty  (nameof(LightLimitChangerSettings.Excludes));
         }
@@ -79,6 +81,7 @@ namespace io.github.azukimochi
                 if (group.IsOpen)
                 {
                     EditorGUILayout.PropertyField(TargetShaders, Localization.G("label.target_shader", "tip.target_shader"));
+                    EditorGUILayout.PropertyField(IsSeparateLightControl, Localization.G("label.separate_light_control"));
                     EditorGUILayout.PropertyField(IsGroupingAdditionalControls, Localization.G("label.grouping_additional_controls"));
                     EditorGUILayout.PropertyField(Excludes, Localization.G("label.excludes"));
                 }

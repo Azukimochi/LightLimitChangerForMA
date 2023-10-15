@@ -17,30 +17,9 @@ namespace io.github.azukimochi
             {
                 var controller = session.Controller;
 
-                ReadOnlySpan<ControlAnimationContainer> animationContainers = new[]
-                {
-                    ControlAnimationContainer.Create(LightLimitControlType.Light, "Light"),
-                    ControlAnimationContainer.Create(LightLimitControlType.Saturation, "Saturation"),
-                    ControlAnimationContainer.Create(LightLimitControlType.Unlit, "Unlit"),
-                    ControlAnimationContainer.Create(LightLimitControlType.ColorTemperature, "ColorTemp"),
-                };
+                ReadOnlySpan<ControlAnimationContainer> animationContainers = session.Controls;
 
                 var parameters = session.Parameters;
-                var targetControl = LightLimitControlType.Light;
-
-
-                if (parameters.AllowColorTempControl)
-                {
-                    targetControl |= LightLimitControlType.ColorTemperature;
-                }
-                if (parameters.AllowSaturationControl)
-                {
-                    targetControl |= LightLimitControlType.Saturation;
-                }
-                if (parameters.AllowUnlitControl)
-                {
-                    targetControl |= LightLimitControlType.Unlit;
-                }
 
                 foreach (var renderer in context.AvatarRootObject.GetComponentsInChildren<Renderer>(true))
                 {
@@ -70,22 +49,12 @@ namespace io.github.azukimochi
                 
                 foreach (ref readonly var container in animationContainers)
                 {
-                    if (targetControl.HasFlag(container.ControlType))
+                    if (session.TargetControl.HasFlag(container.ControlType))
                     {
-                        var (defaultValue, parameterName) =
-                            container.ControlType == LightLimitControlType.Light ? (parameters.DefaultLightValue, ParameterName_Value) :
-                            container.ControlType == LightLimitControlType.Saturation ? (0.5f, ParameterName_Saturation) :
-                            container.ControlType == LightLimitControlType.Unlit ? (0.0f, ParameterName_Unlit) :
-                            container.ControlType == LightLimitControlType.ColorTemperature ? (0.5f, ParameterName_ColorTemp) :
-                            (0f, null);
-
-                        if (parameterName is null)
-                            continue;
-
                         container.AddTo(cache);
-                        AddLayer(session, cache, container, parameterName);
+                        AddLayer(session, cache, container, container.ParameterName);
 
-                        controller.AddParameter(new AnimatorControllerParameter() { name = parameterName, defaultFloat = defaultValue, type = AnimatorControllerParameterType.Float });
+                        controller.AddParameter(new AnimatorControllerParameter() { name = container.ParameterName, defaultFloat = container.DefaultValue, type = AnimatorControllerParameterType.Float });
                     }
                 }
 
