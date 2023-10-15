@@ -17,30 +17,9 @@ namespace io.github.azukimochi
             {
                 var controller = session.Controller;
 
-                ReadOnlySpan<ControlAnimationContainer> animationContainers = new[]
-                {
-                    ControlAnimationContainer.Create(LightLimitControlType.Light, "Light"),
-                    ControlAnimationContainer.Create(LightLimitControlType.Saturation, "Saturation"),
-                    ControlAnimationContainer.Create(LightLimitControlType.Unlit, "Unlit"),
-                    ControlAnimationContainer.Create(LightLimitControlType.ColorTemperature, "ColorTemp"),
-                };
+                ReadOnlySpan<ControlAnimationContainer> animationContainers = session.Controls;
 
                 var parameters = session.Parameters;
-                var targetControl = LightLimitControlType.Light;
-
-
-                if (parameters.AllowColorTempControl)
-                {
-                    targetControl |= LightLimitControlType.ColorTemperature;
-                }
-                if (parameters.AllowSaturationControl)
-                {
-                    targetControl |= LightLimitControlType.Saturation;
-                }
-                if (parameters.AllowUnlitControl)
-                {
-                    targetControl |= LightLimitControlType.Unlit;
-                }
 
                 foreach (var renderer in context.AvatarRootObject.GetComponentsInChildren<Renderer>(true))
                 {
@@ -70,22 +49,12 @@ namespace io.github.azukimochi
                 
                 foreach (ref readonly var container in animationContainers)
                 {
-                    if (targetControl.HasFlag(container.ControlType))
+                    if (session.TargetControl.HasFlag(container.ControlType))
                     {
-                        var (defaultValue, parameterName) =
-                            container.ControlType == LightLimitControlType.Light ? (parameters.DefaultLightValue, ParameterName_Value) :
-                            container.ControlType == LightLimitControlType.Saturation ? (0.5f, ParameterName_Saturation) :
-                            container.ControlType == LightLimitControlType.Unlit ? (0.0f, ParameterName_Unlit) :
-                            container.ControlType == LightLimitControlType.ColorTemperature ? (0.5f, ParameterName_ColorTemp) :
-                            (0f, null);
-
-                        if (parameterName is null)
-                            continue;
-
                         container.AddTo(cache);
-                        AddLayer(session, cache, container, parameterName);
+                        AddLayer(session, cache, container, container.ParameterName);
 
-                        controller.AddParameter(new AnimatorControllerParameter() { name = parameterName, defaultFloat = defaultValue, type = AnimatorControllerParameterType.Float });
+                        controller.AddParameter(new AnimatorControllerParameter() { name = container.ParameterName, defaultFloat = container.DefaultValue, type = AnimatorControllerParameterType.Float });
                     }
                 }
 
@@ -127,13 +96,15 @@ namespace io.github.azukimochi
                 on.AddTransition(t);
 
                 var dr = on.AddStateMachineBehaviour<VRCAvatarParameterDriver>();
-                dr.parameters.Add(new VRC.SDKBase.VRC_AvatarParameterDriver.Parameter() { type = VRC.SDKBase.VRC_AvatarParameterDriver.ChangeType.Set, name = ParameterName_Value, value = session.Parameters.DefaultLightValue });
-                if (session.Parameters.AllowColorTempControl)
-                    dr.parameters.Add(new VRC.SDKBase.VRC_AvatarParameterDriver.Parameter() { type = VRC.SDKBase.VRC_AvatarParameterDriver.ChangeType.Set, name = ParameterName_ColorTemp, value = 0.5f });
-                if (session.Parameters.AllowSaturationControl)
-                    dr.parameters.Add(new VRC.SDKBase.VRC_AvatarParameterDriver.Parameter() { type = VRC.SDKBase.VRC_AvatarParameterDriver.ChangeType.Set, name = ParameterName_Saturation, value = 0.5f });
-                if (session.Parameters.AllowUnlitControl)
-                    dr.parameters.Add(new VRC.SDKBase.VRC_AvatarParameterDriver.Parameter() { type = VRC.SDKBase.VRC_AvatarParameterDriver.ChangeType.Set, name = ParameterName_Unlit, value = 0.0f });
+
+                foreach (ref readonly var container in animationContainers)
+                {
+                    if (session.TargetControl.HasFlag(container.ControlType))
+                    {
+                        dr.parameters.Add(new VRC.SDKBase.VRC_AvatarParameterDriver.Parameter() { type = VRC.SDKBase.VRC_AvatarParameterDriver.ChangeType.Set, name = container.ParameterName, value = container.DefaultValue });
+                    }
+                }
+
                 stateMachine.AddState(off, stateMachine.entryPosition + new Vector3(-20, 50));
                 stateMachine.AddState(on, stateMachine.entryPosition + new Vector3(-20, 100));
 

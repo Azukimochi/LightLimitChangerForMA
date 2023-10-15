@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using nadena.dev.modular_avatar.core;
 using nadena.dev.ndmf;
@@ -48,6 +49,7 @@ namespace io.github.azukimochi
             private static VRCExpressionsMenu CreateMenu(Session session, LightLimitChangerObjectCache cache)
             {
                 var mainMenu = ScriptableObject.CreateInstance<VRCExpressionsMenu>().AddTo(cache);
+                VRCExpressionsMenu additionalMenu = null;
                 mainMenu.name = "Main Menu";
                 mainMenu.controls = new List<VRCExpressionsMenu.Control>
                 {
@@ -55,97 +57,50 @@ namespace io.github.azukimochi
                     {
                         name = "Enable",
                         type = VRCExpressionsMenu.Control.ControlType.Toggle,
-                        icon = AssetDatabase.LoadAssetAtPath<Texture2D>(AssetDatabase.GUIDToAssetPath("94e101a18f0647c448df7fc3193aa474")),
+                        icon = Icons.Enable,
                         parameter = new VRCExpressionsMenu.Control.Parameter
                         {
                             name = ParameterName_Toggle,
                         },
                     },
-                    new VRCExpressionsMenu.Control
-                    {
-                        name = "Light",
-                        type = VRCExpressionsMenu.Control.ControlType.RadialPuppet,
-                        icon = AssetDatabase.LoadAssetAtPath<Texture2D>(AssetDatabase.GUIDToAssetPath("68c823f3911f5eb4692149fa6c48fa78")),
-                        subParameters = new VRCExpressionsMenu.Control.Parameter[]
-                        {
-                            new VRCExpressionsMenu.Control.Parameter
-                            {
-                                name = ParameterName_Value
-                            }
-                        },
-                    },
                 };
 
-                if (session.Parameters.AllowColorTempControl | 
-                    session.Parameters.AllowColorTempControl | 
-                    session.Parameters.AllowSaturationControl)
+                foreach (ref readonly var control in session.Controls.AsSpan())
                 {
-                    var additionalControlMenuParent = mainMenu;
-                    if (session.Parameters.IsGroupingAdditionalControls)
+                    if (!session.TargetControl.HasFlag(control.ControlType))
+                        continue;
+
+                    var menu = LightLimitControlType.AdditionalControls.HasFlag(control.ControlType) ? additionalMenu : mainMenu;
+
+
+                    if (menu == null && session.Parameters.IsGroupingAdditionalControls)
                     {
-                        var menu = ScriptableObject.CreateInstance<VRCExpressionsMenu>().AddTo(cache);
+                        menu = ScriptableObject.CreateInstance<VRCExpressionsMenu>().AddTo(cache);
 
                         mainMenu.controls.Add(new VRCExpressionsMenu.Control
                         {
                             name = "Controls",
                             type = VRCExpressionsMenu.Control.ControlType.SubMenu,
-                            icon = AssetDatabase.LoadAssetAtPath<Texture2D>(AssetDatabase.GUIDToAssetPath("75cdf4ab5baf72a4f8b6463d3720bd35")),
+                            icon = Icons.Settings,
                             subMenu = menu,
                         });
 
-                        additionalControlMenuParent = menu;
+                        additionalMenu = menu;
                     }
 
-                    if (session.Parameters.AllowColorTempControl)
+                    menu.controls.Add(new VRCExpressionsMenu.Control()
                     {
-                        additionalControlMenuParent.controls.Add(new VRCExpressionsMenu.Control()
+                        name = control.Name,
+                        type = VRCExpressionsMenu.Control.ControlType.RadialPuppet,
+                        icon = control.Icon,
+                        subParameters = new[]
                         {
-                            name = "ColorTemperature",
-                            type = VRCExpressionsMenu.Control.ControlType.RadialPuppet,
-                            icon = AssetDatabase.LoadAssetAtPath<Texture2D>(AssetDatabase.GUIDToAssetPath("94f3542912b540b47a37f7c914c92924")),
-                            subParameters = new VRCExpressionsMenu.Control.Parameter[]
+                            new VRCExpressionsMenu.Control.Parameter
                             {
-                        new VRCExpressionsMenu.Control.Parameter
-                        {
-                            name = ParameterName_ColorTemp
-                        }
-                            },
-                        });
-                    }
-
-                    if (session.Parameters.AllowSaturationControl)
-                    {
-                        additionalControlMenuParent.controls.Add(new VRCExpressionsMenu.Control()
-                        {
-                            name = "Saturation",
-                            type = VRCExpressionsMenu.Control.ControlType.RadialPuppet,
-                            icon = AssetDatabase.LoadAssetAtPath<Texture2D>(AssetDatabase.GUIDToAssetPath("e641931350faa6c4f82ba056f31a1ef6")),
-                            subParameters = new VRCExpressionsMenu.Control.Parameter[]
-                            {
-                        new VRCExpressionsMenu.Control.Parameter
-                        {
-                            name = ParameterName_Saturation
-                        }
-                            },
-                        });
-                    }
-
-                    if (session.Parameters.AllowUnlitControl)
-                    {
-                        additionalControlMenuParent.controls.Add(new VRCExpressionsMenu.Control()
-                        {
-                            name = "Unlit",
-                            type = VRCExpressionsMenu.Control.ControlType.RadialPuppet,
-                            icon = AssetDatabase.LoadAssetAtPath<Texture2D>(AssetDatabase.GUIDToAssetPath("b0b1a25395988c64f887088f1c6748cf")),
-                            subParameters = new VRCExpressionsMenu.Control.Parameter[]
-                            {
-                        new VRCExpressionsMenu.Control.Parameter
-                        {
-                            name = ParameterName_Unlit
-                        }
-                            },
-                        });
-                    }
+                                name = control.ParameterName
+                            }
+                        },
+                    });
                 }
 
                 if (session.Parameters.AddResetButton)
@@ -154,7 +109,7 @@ namespace io.github.azukimochi
                     {
                         name = "Reset",
                         type = VRCExpressionsMenu.Control.ControlType.Button,
-                        icon = AssetDatabase.LoadAssetAtPath<Texture2D>(AssetDatabase.GUIDToAssetPath("46b69c6755e703048845eef57e51a329")),
+                        icon = Icons.Reset,
                         parameter = new VRCExpressionsMenu.Control.Parameter() { name = ParameterName_Reset }
                     });
                 }
@@ -167,7 +122,7 @@ namespace io.github.azukimochi
                         new VRCExpressionsMenu.Control
                         {
                             name = "Light Limit Changer",
-                            icon = AssetDatabase.LoadAssetAtPath<Texture2D>(AssetDatabase.GUIDToAssetPath("09c1f5650f9952f49a0fbb551e64dcad")),
+                            icon = Icons.LLC,
                             type = VRCExpressionsMenu.Control.ControlType.SubMenu,
                             subMenu = mainMenu,
                         },
@@ -176,6 +131,7 @@ namespace io.github.azukimochi
 
                 return rootMenu;
             }
+
         }
     }
 }
