@@ -178,12 +178,15 @@ namespace io.github.azukimochi
 
             public override void SetControlAnimation(in ControlAnimationContainer container, in ControlAnimationParameters parameters)
             {
-                if (container.ControlType.HasFlag(LightLimitControlType.Light))
+                if (container.ControlType.HasFlag(LightLimitControlType.LightMin))
                 {
                     container.Default.SetParameterAnimation(parameters, _LightMinLimit, parameters.MinLightValue);
-                    container.Default.SetParameterAnimation(parameters, _LightMaxLimit, parameters.MaxLightValue);
-
                     container.Control.SetParameterAnimation(parameters, _LightMinLimit, parameters.MinLightValue, parameters.MaxLightValue);
+                }
+
+                if (container.ControlType.HasFlag(LightLimitControlType.LightMax))
+                {
+                    container.Default.SetParameterAnimation(parameters, _LightMaxLimit, parameters.MaxLightValue);
                     container.Control.SetParameterAnimation(parameters, _LightMaxLimit, parameters.MinLightValue, parameters.MaxLightValue);
                 }
 

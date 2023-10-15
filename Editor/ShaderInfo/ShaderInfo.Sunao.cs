@@ -73,15 +73,20 @@ namespace io.github.azukimochi
 
             public override void SetControlAnimation(in ControlAnimationContainer container, in ControlAnimationParameters parameters)
             {
-                if (container.ControlType.HasFlag(LightLimitControlType.Light))
+                if (container.ControlType.HasFlag(LightLimitControlType.LightMin))
                 {
                     container.Default.SetParameterAnimation(parameters, _MinimumLight, parameters.MinLightValue);
+
+                    container.Control.SetParameterAnimation(parameters, _MinimumLight, parameters.MinLightValue, parameters.MaxLightValue);
+                }
+
+                if (container.ControlType.HasFlag(LightLimitControlType.LightMax))
+                {
                     container.Default.SetParameterAnimation(parameters, _DirectionalLight, parameters.MaxLightValue);
                     container.Default.SetParameterAnimation(parameters, _PointLight, parameters.MaxLightValue);
                     container.Default.SetParameterAnimation(parameters, _SHLight, parameters.MaxLightValue);
 
                     var curve = Utils.Animation.Linear(parameters.MinLightValue, parameters.MaxLightValue);
-                    container.Control.SetParameterAnimation(parameters, _MinimumLight, curve);
                     container.Control.SetParameterAnimation(parameters, _DirectionalLight, curve);
                     container.Control.SetParameterAnimation(parameters, _PointLight, curve);
                     container.Control.SetParameterAnimation(parameters, _SHLight, curve);
