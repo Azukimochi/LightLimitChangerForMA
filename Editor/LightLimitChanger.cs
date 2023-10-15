@@ -175,8 +175,7 @@ namespace io.github.azukimochi
 
         private static GameObject GeneratePrefab(Transform parent = null)
         {
-            const string PrefabGUID = "b3d7759e248364e4dadf8e4fbc37fde1";
-            var prefabObj = AssetDatabase.LoadAssetAtPath<GameObject>(AssetDatabase.GUIDToAssetPath(PrefabGUID));
+            var prefabObj = LightLimitChangerPrefab.Object;
             var prefab = prefabObj != null ? PrefabUtility.InstantiatePrefab(prefabObj, parent) as GameObject : CreateNonPrefabLLC();
             Undo.RegisterCreatedObjectUndo(prefab, "Apply LightLimitChanger");
 
@@ -188,7 +187,7 @@ namespace io.github.azukimochi
 
             GameObject CreateNonPrefabLLC()
             {
-                var obj = new GameObject("Light Limit Changer", typeof(LightLimitChangerSettings));
+                var obj = new GameObject("Light Limit Changer", typeof(LightLimitChangerSettings), typeof(ModularAvatarMenuInstaller));
                 obj.transform.parent = parent;
                 return obj;
             }
