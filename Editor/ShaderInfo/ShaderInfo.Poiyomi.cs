@@ -114,34 +114,28 @@ namespace io.github.azukimochi
 
             public override void SetControlAnimation(in ControlAnimationContainer container, in ControlAnimationParameters parameters)
             {
-                switch (container.ControlType)
+                if (container.ControlType.HasFlag(LightLimitControlType.Light))
                 {
-                    case LightLimitControlType.Light:
+                    container.Default.SetParameterAnimation(parameters, _LightingMinLightBrightness, parameters.MinLightValue);
+                    container.Default.SetParameterAnimation(parameters, _LightingCap, parameters.MaxLightValue);
 
-                        container.Default.SetParameterAnimation(parameters, _LightingMinLightBrightness, parameters.MinLightValue);
-                        container.Default.SetParameterAnimation(parameters, _LightingCap, parameters.MaxLightValue);
+                    container.Control.SetParameterAnimation(parameters, _LightingMinLightBrightness, parameters.MinLightValue, parameters.MaxLightValue);
+                    container.Control.SetParameterAnimation(parameters, _LightingCap, parameters.MinLightValue, parameters.MaxLightValue);
+                }
 
-                        container.Control.SetParameterAnimation(parameters, _LightingMinLightBrightness, parameters.MinLightValue, parameters.MaxLightValue);
-                        container.Control.SetParameterAnimation(parameters, _LightingCap, parameters.MinLightValue, parameters.MaxLightValue);
+                if (container.ControlType.HasFlag(LightLimitControlType.Saturation))
+                {
+                    container.Default.SetParameterAnimation(parameters, _Saturation, DefaultParameters.Saturation);
+                    container.Control.SetParameterAnimation(parameters, _Saturation, -1, 1);
+                }
 
-                        break;
+                if (container.ControlType.HasFlag(LightLimitControlType.ColorTemperature))
+                {
+                    container.Default.SetParameterAnimation(parameters, _Color, DefaultParameters.Color);
+                    container.Control.SetColorTempertureAnimation(parameters, _Color, DefaultParameters.Color);
 
-                    case LightLimitControlType.Saturation:
-
-                        container.Default.SetParameterAnimation(parameters, _Saturation, DefaultParameters.Saturation);
-                        container.Control.SetParameterAnimation(parameters, _Saturation, -1, 1);
-
-                        break;
-
-                    case LightLimitControlType.ColorTemperature:
-
-                        container.Default.SetParameterAnimation(parameters, _Color, DefaultParameters.Color);
-                        container.Control.SetColorTempertureAnimation(parameters, _Color, DefaultParameters.Color);
-
-                        container.Default.SetParameterAnimation(parameters, _DissolveTextureColor, DefaultParameters.Color);
-                        container.Control.SetColorTempertureAnimation(parameters, _DissolveTextureColor, DefaultParameters.Color);
-
-                        break;
+                    container.Default.SetParameterAnimation(parameters, _DissolveTextureColor, DefaultParameters.Color);
+                    container.Control.SetColorTempertureAnimation(parameters, _DissolveTextureColor, DefaultParameters.Color);
                 }
             }
 

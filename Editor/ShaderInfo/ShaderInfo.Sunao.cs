@@ -73,36 +73,30 @@ namespace io.github.azukimochi
 
             public override void SetControlAnimation(in ControlAnimationContainer container, in ControlAnimationParameters parameters)
             {
-                switch (container.ControlType)
+                if (container.ControlType.HasFlag(LightLimitControlType.Light))
                 {
-                    case LightLimitControlType.Light:
+                    container.Default.SetParameterAnimation(parameters, _MinimumLight, parameters.MinLightValue);
+                    container.Default.SetParameterAnimation(parameters, _DirectionalLight, parameters.MaxLightValue);
+                    container.Default.SetParameterAnimation(parameters, _PointLight, parameters.MaxLightValue);
+                    container.Default.SetParameterAnimation(parameters, _SHLight, parameters.MaxLightValue);
 
-                        container.Default.SetParameterAnimation(parameters, _MinimumLight, parameters.MinLightValue);
-                        container.Default.SetParameterAnimation(parameters, _DirectionalLight, parameters.MaxLightValue);
-                        container.Default.SetParameterAnimation(parameters, _PointLight, parameters.MaxLightValue);
-                        container.Default.SetParameterAnimation(parameters, _SHLight, parameters.MaxLightValue);
+                    var curve = Utils.Animation.Linear(parameters.MinLightValue, parameters.MaxLightValue);
+                    container.Control.SetParameterAnimation(parameters, _MinimumLight, curve);
+                    container.Control.SetParameterAnimation(parameters, _DirectionalLight, curve);
+                    container.Control.SetParameterAnimation(parameters, _PointLight, curve);
+                    container.Control.SetParameterAnimation(parameters, _SHLight, curve);
+                }
 
-                        var curve = Utils.Animation.Linear(parameters.MinLightValue, parameters.MaxLightValue);
-                        container.Control.SetParameterAnimation(parameters, _MinimumLight, curve);
-                        container.Control.SetParameterAnimation(parameters, _DirectionalLight, curve);
-                        container.Control.SetParameterAnimation(parameters, _PointLight, curve);
-                        container.Control.SetParameterAnimation(parameters, _SHLight, curve);
+                if (container.ControlType.HasFlag(LightLimitControlType.Unlit))
+                {
+                    container.Default.SetParameterAnimation(parameters, _Unlit, 0);
+                    container.Control.SetParameterAnimation(parameters, _Unlit, 0, 1);
+                }
 
-                        break;
-
-                    case LightLimitControlType.Unlit:
-
-                        container.Default.SetParameterAnimation(parameters, _Unlit, 0);
-                        container.Control.SetParameterAnimation(parameters, _Unlit, 0, 1);
-
-                        break;
-
-                    case LightLimitControlType.ColorTemperature:
-
-                        container.Default.SetParameterAnimation(parameters, _Color, DefaultParameters.Color);
-                        container.Control.SetColorTempertureAnimation(parameters, _Color, DefaultParameters.Color);
-
-                        break;
+                if (container.ControlType.HasFlag(LightLimitControlType.ColorTemperature))
+                {
+                    container.Default.SetParameterAnimation(parameters, _Color, DefaultParameters.Color);
+                    container.Control.SetColorTempertureAnimation(parameters, _Color, DefaultParameters.Color);
                 }
             }
         }
