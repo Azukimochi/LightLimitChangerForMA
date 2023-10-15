@@ -96,13 +96,15 @@ namespace io.github.azukimochi
                 on.AddTransition(t);
 
                 var dr = on.AddStateMachineBehaviour<VRCAvatarParameterDriver>();
-                dr.parameters.Add(new VRC.SDKBase.VRC_AvatarParameterDriver.Parameter() { type = VRC.SDKBase.VRC_AvatarParameterDriver.ChangeType.Set, name = ParameterName_Value, value = session.Parameters.DefaultLightValue });
-                if (session.Parameters.AllowColorTempControl)
-                    dr.parameters.Add(new VRC.SDKBase.VRC_AvatarParameterDriver.Parameter() { type = VRC.SDKBase.VRC_AvatarParameterDriver.ChangeType.Set, name = ParameterName_ColorTemp, value = 0.5f });
-                if (session.Parameters.AllowSaturationControl)
-                    dr.parameters.Add(new VRC.SDKBase.VRC_AvatarParameterDriver.Parameter() { type = VRC.SDKBase.VRC_AvatarParameterDriver.ChangeType.Set, name = ParameterName_Saturation, value = 0.5f });
-                if (session.Parameters.AllowUnlitControl)
-                    dr.parameters.Add(new VRC.SDKBase.VRC_AvatarParameterDriver.Parameter() { type = VRC.SDKBase.VRC_AvatarParameterDriver.ChangeType.Set, name = ParameterName_Unlit, value = 0.0f });
+
+                foreach (ref readonly var container in animationContainers)
+                {
+                    if (session.TargetControl.HasFlag(container.ControlType))
+                    {
+                        dr.parameters.Add(new VRC.SDKBase.VRC_AvatarParameterDriver.Parameter() { type = VRC.SDKBase.VRC_AvatarParameterDriver.ChangeType.Set, name = container.ParameterName, value = container.DefaultValue });
+                    }
+                }
+
                 stateMachine.AddState(off, stateMachine.entryPosition + new Vector3(-20, 50));
                 stateMachine.AddState(on, stateMachine.entryPosition + new Vector3(-20, 100));
 
