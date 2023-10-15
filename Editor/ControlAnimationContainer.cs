@@ -14,7 +14,9 @@ namespace io.github.azukimochi
         public readonly AnimationClip Default;
         public readonly AnimationClip Control;
 
-        public ControlAnimationContainer(LightLimitControlType controlType, string name, string parameterName, float defaultValue, AnimationClip @default, AnimationClip control)
+        public readonly Texture2D Icon;
+
+        public ControlAnimationContainer(LightLimitControlType controlType, string name, string parameterName, float defaultValue, Texture2D icon, AnimationClip @default, AnimationClip control)
         {
             ControlType = controlType;
             Name = name;
@@ -22,10 +24,11 @@ namespace io.github.azukimochi
             DefaultValue = defaultValue;
             Default = @default;
             Control = control;
+            Icon = icon;
         }
 
-        public static ControlAnimationContainer Create(LightLimitControlType controlType, string animationName, string parameterName, float defaultValue)
-            => new ControlAnimationContainer(controlType, animationName, parameterName, defaultValue, new AnimationClip() { name = $"{animationName} Default" }, new AnimationClip() { name = $"{animationName} Control"});
+        public static ControlAnimationContainer Create(LightLimitControlType controlType, string animationName, string parameterName, float defaultValue, Texture2D icon = null)
+            => new ControlAnimationContainer(controlType, animationName, parameterName, defaultValue, icon, new AnimationClip() { name = $"{animationName} Default" }, new AnimationClip() { name = $"{animationName} Control"});
 
         public void AddTo(LightLimitChangerObjectCache cache)
         {

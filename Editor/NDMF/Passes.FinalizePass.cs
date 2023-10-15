@@ -57,7 +57,7 @@ namespace io.github.azukimochi
                     {
                         name = "Enable",
                         type = VRCExpressionsMenu.Control.ControlType.Toggle,
-                        icon = AssetDatabase.LoadAssetAtPath<Texture2D>(AssetDatabase.GUIDToAssetPath("94e101a18f0647c448df7fc3193aa474")),
+                        icon = Icons.Enable,
                         parameter = new VRCExpressionsMenu.Control.Parameter
                         {
                             name = ParameterName_Toggle,
@@ -81,7 +81,7 @@ namespace io.github.azukimochi
                         {
                             name = "Controls",
                             type = VRCExpressionsMenu.Control.ControlType.SubMenu,
-                            icon = AssetDatabase.LoadAssetAtPath<Texture2D>(AssetDatabase.GUIDToAssetPath("75cdf4ab5baf72a4f8b6463d3720bd35")),
+                            icon = Icons.Settings,
                             subMenu = menu,
                         });
 
@@ -92,6 +92,7 @@ namespace io.github.azukimochi
                     {
                         name = control.Name,
                         type = VRCExpressionsMenu.Control.ControlType.RadialPuppet,
+                        icon = control.Icon,
                         subParameters = new[]
                         {
                             new VRCExpressionsMenu.Control.Parameter
@@ -108,7 +109,7 @@ namespace io.github.azukimochi
                     {
                         name = "Reset",
                         type = VRCExpressionsMenu.Control.ControlType.Button,
-                        icon = AssetDatabase.LoadAssetAtPath<Texture2D>(AssetDatabase.GUIDToAssetPath("46b69c6755e703048845eef57e51a329")),
+                        icon = Icons.Reset,
                         parameter = new VRCExpressionsMenu.Control.Parameter() { name = ParameterName_Reset }
                     });
                 }
@@ -121,7 +122,7 @@ namespace io.github.azukimochi
                         new VRCExpressionsMenu.Control
                         {
                             name = "Light Limit Changer",
-                            icon = AssetDatabase.LoadAssetAtPath<Texture2D>(AssetDatabase.GUIDToAssetPath("09c1f5650f9952f49a0fbb551e64dcad")),
+                            icon = Icons.LLC,
                             type = VRCExpressionsMenu.Control.ControlType.SubMenu,
                             subMenu = mainMenu,
                         },

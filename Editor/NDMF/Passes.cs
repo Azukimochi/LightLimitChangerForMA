@@ -92,19 +92,19 @@ namespace io.github.azukimochi
                 List<ControlAnimationContainer> controls = new List<ControlAnimationContainer>();
                 if (!parameters.IsSeparateLightControl)
                 {
-                    controls.Add(ControlAnimationContainer.Create(LightLimitControlType.Light, "Light", ParameterName_Value, parameters.DefaultLightValue));
+                    controls.Add(ControlAnimationContainer.Create(LightLimitControlType.Light, "Light", ParameterName_Value, parameters.DefaultLightValue, Icons.Light));
                 }
                 else
                 {
-                    controls.Add(ControlAnimationContainer.Create(LightLimitControlType.LightMin, "Min Light", ParameterName_Min, parameters.DefaultLightValue));
-                    controls.Add(ControlAnimationContainer.Create(LightLimitControlType.LightMax, "Max Light", ParameterName_Max, parameters.DefaultLightValue));
+                    controls.Add(ControlAnimationContainer.Create(LightLimitControlType.LightMin, "Min Light", ParameterName_Min, parameters.DefaultLightValue, Icons.Light_Min));
+                    controls.Add(ControlAnimationContainer.Create(LightLimitControlType.LightMax, "Max Light", ParameterName_Max, parameters.DefaultLightValue, Icons.Light_Max));
                 }
 
                 controls.AddRange(new[]
                 {
-                    ControlAnimationContainer.Create(LightLimitControlType.Saturation, "Saturation", ParameterName_Saturation, 0.5f),
-                    ControlAnimationContainer.Create(LightLimitControlType.Unlit, "Unlit", ParameterName_Unlit, 0),
-                    ControlAnimationContainer.Create(LightLimitControlType.ColorTemperature, "ColorTemp", ParameterName_ColorTemp, 0.5f),
+                    ControlAnimationContainer.Create(LightLimitControlType.Saturation, "Saturation", ParameterName_Saturation, 0.5f, Icons.Color),
+                    ControlAnimationContainer.Create(LightLimitControlType.Unlit, "Unlit", ParameterName_Unlit, 0, Icons.Unlit),
+                    ControlAnimationContainer.Create(LightLimitControlType.ColorTemperature, "ColorTemp", ParameterName_ColorTemp, 0.5f, Icons.Temp),
                 });
 
                 Controls = controls.ToArray();
