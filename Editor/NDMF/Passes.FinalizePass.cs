@@ -49,7 +49,7 @@ namespace io.github.azukimochi
             private static VRCExpressionsMenu CreateMenu(Session session, LightLimitChangerObjectCache cache)
             {
                 var mainMenu = ScriptableObject.CreateInstance<VRCExpressionsMenu>().AddTo(cache);
-                VRCExpressionsMenu additionalMenu = null;
+                VRCExpressionsMenu additionalMenu = mainMenu;
                 mainMenu.name = "Main Menu";
                 mainMenu.controls = new List<VRCExpressionsMenu.Control>
                 {
@@ -73,7 +73,7 @@ namespace io.github.azukimochi
                     var menu = LightLimitControlType.AdditionalControls.HasFlag(control.ControlType) ? additionalMenu : mainMenu;
 
 
-                    if (menu == null && session.Parameters.IsGroupingAdditionalControls)
+                    if (menu == mainMenu && session.Parameters.IsGroupingAdditionalControls)
                     {
                         menu = ScriptableObject.CreateInstance<VRCExpressionsMenu>().AddTo(cache);
 
