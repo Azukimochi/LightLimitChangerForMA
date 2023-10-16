@@ -109,22 +109,7 @@ namespace io.github.azukimochi
 
                 Controls = controls.ToArray();
 
-                var targetControl = LightLimitControlType.Light;
-
-                if (parameters.AllowColorTempControl)
-                {
-                    targetControl |= LightLimitControlType.ColorTemperature;
-                }
-                if (parameters.AllowSaturationControl)
-                {
-                    targetControl |= LightLimitControlType.Saturation;
-                }
-                if (parameters.AllowUnlitControl)
-                {
-                    targetControl |= LightLimitControlType.Unlit;
-                }
-
-                TargetControl = targetControl;
+                TargetControl = parameters.GetControlTypeFlags();
 
                 _initialized = true;
             }

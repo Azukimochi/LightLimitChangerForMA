@@ -13,6 +13,26 @@ namespace io.github.azukimochi
 {
     internal static class Utils
     {
+        public static LightLimitControlType GetControlTypeFlags(in this LightLimitChangerParameters parameters)
+        {
+            var flags = LightLimitControlType.Light;
+
+            if (parameters.AllowColorTempControl)
+            {
+                flags |= LightLimitControlType.ColorTemperature;
+            }
+            if (parameters.AllowSaturationControl)
+            {
+                flags |= LightLimitControlType.Saturation;
+            }
+            if (parameters.AllowUnlitControl)
+            {
+                flags |= LightLimitControlType.Unlit;
+            }
+
+            return flags;
+        }
+
         public static bool HasFlag(this int x, int y) => (x & y) == y;
 
         public static void Destroy(this Object obj)
