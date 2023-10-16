@@ -20,5 +20,7 @@ namespace io.github.azukimochi
             public bool Enable;
             public float Value;
         }
+
+        public LightLimitChangerSettings GetParent() => GetComponentInParent<LightLimitChangerSettings>();
     }
 }
