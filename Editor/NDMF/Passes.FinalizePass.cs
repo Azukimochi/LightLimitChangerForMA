@@ -49,7 +49,7 @@ namespace io.github.azukimochi
             private static VRCExpressionsMenu CreateMenu(Session session, LightLimitChangerObjectCache cache)
             {
                 var mainMenu = ScriptableObject.CreateInstance<VRCExpressionsMenu>().AddTo(cache);
-                VRCExpressionsMenu additionalMenu = mainMenu;
+                VRCExpressionsMenu additionalMenu = null;
                 mainMenu.name = "Main Menu";
                 mainMenu.controls = new List<VRCExpressionsMenu.Control>
                 {
@@ -70,22 +70,27 @@ namespace io.github.azukimochi
                     if (!session.TargetControl.HasFlag(control.ControlType))
                         continue;
 
-                    var menu = LightLimitControlType.AdditionalControls.HasFlag(control.ControlType) ? additionalMenu : mainMenu;
-
-
-                    if (menu == mainMenu && session.Parameters.IsGroupingAdditionalControls)
+                    VRCExpressionsMenu menu;
+                    if (!session.Parameters.IsGroupingAdditionalControls || !LightLimitControlType.AdditionalControls.HasFlag(control.ControlType))
                     {
-                        menu = ScriptableObject.CreateInstance<VRCExpressionsMenu>().AddTo(cache);
-
-                        mainMenu.controls.Add(new VRCExpressionsMenu.Control
+                        menu = mainMenu;
+                    }
+                    else
+                    {
+                        if (additionalMenu == null)
                         {
-                            name = "Controls",
-                            type = VRCExpressionsMenu.Control.ControlType.SubMenu,
-                            icon = Icons.Settings,
-                            subMenu = menu,
-                        });
+                            additionalMenu = ScriptableObject.CreateInstance<VRCExpressionsMenu>().AddTo(cache);
 
-                        additionalMenu = menu;
+                            mainMenu.controls.Add(new VRCExpressionsMenu.Control
+                            {
+                                name = "Controls",
+                                type = VRCExpressionsMenu.Control.ControlType.SubMenu,
+                                icon = Icons.Settings,
+                                subMenu = additionalMenu,
+                            });
+
+                        }
+                        menu = additionalMenu;
                     }
 
                     menu.controls.Add(new VRCExpressionsMenu.Control()
