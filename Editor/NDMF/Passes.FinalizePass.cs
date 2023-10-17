@@ -71,7 +71,7 @@ namespace io.github.azukimochi
                         continue;
 
                     VRCExpressionsMenu menu;
-                    if (!LightLimitControlType.AdditionalControls.HasFlag(control.ControlType))
+                    if (!session.Parameters.IsGroupingAdditionalControls || !LightLimitControlType.AdditionalControls.HasFlag(control.ControlType))
                     {
                         menu = mainMenu;
                     }
