@@ -44,7 +44,7 @@ namespace io.github.azukimochi
 
             public override bool TryNormalizeMaterial(Material material, LightLimitChangerObjectCache cache)
             {
-                var textureBaker = TextureBaker.GetInstance<PoiyomiTextureBaker>();
+                var textureBaker = TextureBaker.GetInstance<PoiyomiTextureBaker>(cache);
                 bool result = false;
 
                 {

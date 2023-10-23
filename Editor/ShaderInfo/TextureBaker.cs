@@ -11,13 +11,14 @@ namespace io.github.azukimochi
 
         public abstract void Reset();
 
-        protected static Dictionary<object, Texture2D> BakedTextureCache { get; } = new Dictionary<object, Texture2D>();
+        protected LightLimitChangerObjectCache Cache;
 
-        public static T GetInstance<T>(bool forceReset = true) where T : TextureBaker, new()
+        public static T GetInstance<T>(LightLimitChangerObjectCache cache, bool forceReset = true) where T : TextureBaker, new()
         {
             var instance = TextureBakerCache<T>.Default;
             if (forceReset)
                 instance.Reset();
+            instance.Cache = cache;
             return instance;
         }
 
@@ -68,7 +69,7 @@ namespace io.github.azukimochi
                 return null;
 
             var key = new BakedTextureParameters(this);
-            if (BakedTextureCache.TryGetValue(key, out var value) && value != null)
+            if (Cache.TryGetBakedTexture(key, out var value) && value != null)
             {
                 return value;
             }
@@ -96,7 +97,7 @@ namespace io.github.azukimochi
                 int quality = (AssetImporter.GetAtPath(AssetDatabase.GetAssetPath(source)) as TextureImporter)?.compressionQuality ?? 50;
                 EditorUtility.CompressTexture(dest, format, quality);
 
-                BakedTextureCache.Add(key, dest);
+                Cache.RegisterBakedTexture(key, dest);
                 return dest;
             }
             finally
