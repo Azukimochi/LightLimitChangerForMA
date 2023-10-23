@@ -41,7 +41,7 @@ namespace io.github.azukimochi
             {
                 bool result = false;
                 bool bakeFlag = false;
-                var textureBaker = TextureBaker.GetInstance<DefaultTextureBaker>();
+                var textureBaker = TextureBaker.GetInstance<DefaultTextureBaker>(cache);
 
                 {
                     var tex = material.GetTexture(PropertyIDs.MainTex);

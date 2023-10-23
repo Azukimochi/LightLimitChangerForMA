@@ -35,7 +35,6 @@ namespace io.github.azukimochi
             if (!BakedTextureCache.ContainsKey(key))
             {
                 BakedTextureCache.Add(key, value);
-                AssetDatabase.AddObjectToAsset(value, Context.AssetContainer);
             }
             return value;
         }
@@ -46,6 +45,8 @@ namespace io.github.azukimochi
             value = temp as T;
             return result && temp is T;
         }
+
+        public bool TryGetBakedTexture(object key, out Texture2D value) => BakedTextureCache.TryGetValue(key, out value);
 
         public bool ContainsKey<T>(T key) where T : Object => Cache.ContainsKey(key);
 
