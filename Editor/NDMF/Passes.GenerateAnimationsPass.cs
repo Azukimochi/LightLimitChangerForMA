@@ -69,8 +69,8 @@ namespace io.github.azukimochi
                     defaultWeight = 1,
                 };
                 var blank = new AnimationClip() { name = "Blank" }.HideInHierarchy().AddTo(cache);
-                var off = new AnimatorState() { name = "Off", writeDefaultValues = false, motion = blank }.HideInHierarchy().AddTo(cache);
-                var on = new AnimatorState() { name = "On", writeDefaultValues = false, motion = blank }.HideInHierarchy().AddTo(cache);
+                var off = new AnimatorState() { name = "Off", writeDefaultValues = session.Settings.WriteDefaults == WriteDefaultsSetting.ON, motion = blank }.HideInHierarchy().AddTo(cache);
+                var on = new AnimatorState() { name = "On", writeDefaultValues = session.Settings.WriteDefaults == WriteDefaultsSetting.ON, motion = blank }.HideInHierarchy().AddTo(cache);
 
                 var cond = new AnimatorCondition[] { new AnimatorCondition() { mode = AnimatorConditionMode.If, parameter = ParameterName_Reset } };
 
@@ -117,8 +117,8 @@ namespace io.github.azukimochi
             {
                 var layer = new AnimatorControllerLayer() { name = container.Name, defaultWeight = 1, stateMachine = new AnimatorStateMachine().HideInHierarchy().AddTo(cache) };
                 var stateMachine = layer.stateMachine;
-                var defaultState = new AnimatorState() { name = "Default", writeDefaultValues = false, motion = container.Default }.HideInHierarchy().AddTo(cache);
-                var state = new AnimatorState() { name = "Control", writeDefaultValues = false, motion = container.Control, timeParameterActive = true, timeParameter = parameterName }.HideInHierarchy().AddTo(cache);
+                var defaultState = new AnimatorState() { name = "Default", writeDefaultValues = session.Settings.WriteDefaults == WriteDefaultsSetting.ON, motion = container.Default }.HideInHierarchy().AddTo(cache);
+                var state = new AnimatorState() { name = "Control", writeDefaultValues = session.Settings.WriteDefaults == WriteDefaultsSetting.ON, motion = container.Control, timeParameterActive = true, timeParameter = parameterName }.HideInHierarchy().AddTo(cache);
 
                 var condition = new AnimatorCondition[] { new AnimatorCondition() { parameter = ParameterName_Toggle, mode = AnimatorConditionMode.If, threshold = 0 } };
 

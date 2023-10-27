@@ -29,6 +29,7 @@ namespace io.github.azukimochi
         private SerializedProperty IsGroupingAdditionalControls;
         private SerializedProperty IsSeparateLightControl;
         private SerializedProperty Excludes;
+        private SerializedProperty WriteDefaults;
 
         private static bool _isOptionFoldoutOpen = true;
 
@@ -51,6 +52,7 @@ namespace io.github.azukimochi
             IsSeparateLightControl =        parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.IsSeparateLightControl));
             IsGroupingAdditionalControls =  parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.IsGroupingAdditionalControls));
             Excludes =                      serializedObject.FindProperty  (nameof(LightLimitChangerSettings.Excludes));
+            WriteDefaults =                 serializedObject.FindProperty  (nameof(LightLimitChangerSettings.WriteDefaults));
         }
 
         public override void OnInspectorGUI()
@@ -83,6 +85,7 @@ namespace io.github.azukimochi
                     EditorGUILayout.PropertyField(TargetShaders, Localization.G("label.target_shader", "tip.target_shader"));
                     EditorGUILayout.PropertyField(IsSeparateLightControl, Localization.G("label.separate_light_control"));
                     EditorGUILayout.PropertyField(IsGroupingAdditionalControls, Localization.G("label.grouping_additional_controls"));
+                    WriteDefaults.intValue = EditorGUILayout.Popup(Utils.Label("Write Defaults"), WriteDefaults.intValue, new[] { Localization.S("label.match_avatar"), "OFF", "ON" });
                     EditorGUILayout.PropertyField(Excludes, Localization.G("label.excludes"));
                 }
             }

@@ -25,7 +25,7 @@ namespace io.github.azukimochi
                 mergeAnimator.animator = session.Controller;
                 mergeAnimator.layerType = VRCAvatarDescriptor.AnimLayerType.FX;
                 mergeAnimator.pathMode = MergeAnimatorPathMode.Absolute;
-                mergeAnimator.matchAvatarWriteDefaults = true;
+                mergeAnimator.matchAvatarWriteDefaults = session.Settings.WriteDefaults == WriteDefaultsSetting.MatchAvatar;
 
                 maParameters.parameters.AddRange(session.Controller.parameters.Select(x => new ParameterConfig()
                 {
