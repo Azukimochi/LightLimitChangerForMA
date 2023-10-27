@@ -35,6 +35,45 @@ namespace io.github.azukimochi
             }
         }
 
+        public static void Deconstruct<TKey, TValue>(this KeyValuePair<TKey, TValue> kvp, out TKey key, out TValue value)
+        {
+            key = kvp.Key;
+            value = kvp.Value;
+        }
+
+        public static bool IsNeedToEnterChildren(this SerializedPropertyType type)
+        {
+            switch (type)
+            {
+                case SerializedPropertyType.String:
+                case SerializedPropertyType.Integer:
+                case SerializedPropertyType.Boolean:
+                case SerializedPropertyType.Float:
+                case SerializedPropertyType.Color:
+                case SerializedPropertyType.ObjectReference:
+                case SerializedPropertyType.LayerMask:
+                case SerializedPropertyType.Enum:
+                case SerializedPropertyType.Vector2:
+                case SerializedPropertyType.Vector3:
+                case SerializedPropertyType.Vector4:
+                case SerializedPropertyType.Rect:
+                case SerializedPropertyType.ArraySize:
+                case SerializedPropertyType.Character:
+                case SerializedPropertyType.AnimationCurve:
+                case SerializedPropertyType.Bounds:
+                case SerializedPropertyType.Gradient:
+                case SerializedPropertyType.Quaternion:
+                case SerializedPropertyType.FixedBufferSize:
+                case SerializedPropertyType.Vector2Int:
+                case SerializedPropertyType.Vector3Int:
+                case SerializedPropertyType.RectInt:
+                case SerializedPropertyType.BoundsInt:
+                    return false;
+                default:
+                    return true;
+            }
+        }
+
         public static void ClearLayers(this AnimatorController controller) => controller.layers = Array.Empty<AnimatorControllerLayer>();
 
         public static bool TryGetComponentInChildren<T>(this Component component, out T result) where T : Component => component.gameObject.TryGetComponentInChildren(out result);
