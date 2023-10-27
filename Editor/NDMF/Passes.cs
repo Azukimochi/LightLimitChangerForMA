@@ -2,7 +2,7 @@
 using nadena.dev.ndmf;
 using nadena.dev.ndmf.fluent;
 using UnityEditor.Animations;
-using static io.github.azukimochi.Passes;
+using UnityEngine;
 using Object = UnityEngine.Object;
 
 namespace io.github.azukimochi
@@ -12,13 +12,15 @@ namespace io.github.azukimochi
         public static void RunningPasses(Sequence sequence)
         {
             sequence
-            .Run(CloningMaterials).Then
-            .Run(NormalizeMaterials).Then
-            .Run(GenerateAdditionalControl).Then
-            .Run(GenerateAnimations).Then
-            .Run(Finalize);
+                .Run(CollectTargetRenderers).Then
+                .Run(CloningMaterials).Then
+                .Run(NormalizeMaterials).Then
+                .Run(GenerateAdditionalControl).Then
+                .Run(GenerateAnimations).Then
+                .Run(Finalize);
         }
 
+        public readonly static CollectTargetRenderersPass CollectTargetRenderers = new CollectTargetRenderersPass();
         public readonly static CloningMaterialsPass CloningMaterials = new CloningMaterialsPass();
         public readonly static NormalizeMaterialsPass NormalizeMaterials = new NormalizeMaterialsPass();
         public readonly static GenerateAdditionalControlPass GenerateAdditionalControl = new GenerateAdditionalControlPass();
@@ -72,6 +74,7 @@ namespace io.github.azukimochi
             public ControlAnimationContainer[] Controls;
             public AnimatorController Controller;
             public LightLimitControlType TargetControl;
+            public HashSet<Renderer> TargetRenderers;
 
             public HashSet<Object> Excludes;
 
@@ -125,6 +128,8 @@ namespace io.github.azukimochi
                 }
 
                 TargetControl = targetControl;
+
+                TargetRenderers = new HashSet<Renderer>();
 
                 _initialized = true;
             }

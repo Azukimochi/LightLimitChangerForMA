@@ -21,9 +21,9 @@ namespace io.github.azukimochi
 
                 var parameters = session.Parameters;
 
-                foreach (var renderer in context.AvatarRootObject.GetComponentsInChildren<Renderer>(true))
+                foreach (var renderer in session.TargetRenderers)
                 {
-                    if (!(renderer is MeshRenderer || renderer is SkinnedMeshRenderer) || session.Excludes.Contains(renderer.gameObject)) 
+                    if (session.Excludes.Contains(renderer.gameObject)) 
                     {
                         continue;
                     }
