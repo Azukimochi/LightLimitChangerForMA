@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using nadena.dev.modular_avatar.core;
+﻿using System.Collections.Generic;
 using nadena.dev.ndmf;
 using nadena.dev.ndmf.fluent;
-using UnityEditor;
 using UnityEditor.Animations;
 using UnityEngine;
-using static io.github.azukimochi.Passes;
 using Object = UnityEngine.Object;
 
 namespace io.github.azukimochi
@@ -137,115 +132,6 @@ namespace io.github.azukimochi
                 TargetRenderers = new HashSet<Renderer>();
 
                 _initialized = true;
-            }
-        }
-
-        internal sealed class CollectTargetRenderersPass : LightLimitChangerBasePass<CollectTargetRenderersPass>
-        {
-            protected override void Execute(BuildContext context, Session session, LightLimitChangerObjectCache cache)
-            {
-                var list = session.TargetRenderers;
-
-                var temp = new HashSet<Renderer>();
-                //CollectMeshRenderers(context.AvatarRootObject, session.Parameters.TargetShaders, temp);
-                CollectMeshRenderersInAnimation(context.AvatarRootObject, session.Parameters.TargetShaders, temp);
-
-                foreach(var x in temp)
-                {
-                    Debug.LogWarning(x);
-                }
-            }
-
-            private static void CollectMeshRenderers(GameObject avatarObject, in TargetShaders targetShaders, HashSet<Renderer> list)
-            {
-                foreach (var renderer in avatarObject.GetComponentsInChildren<Renderer>(true))
-                {
-                    if (renderer.CompareTag("EditorOnly") ||
-                        !(renderer is MeshRenderer || renderer is SkinnedMeshRenderer))
-                    {
-                        continue;
-                    }
-
-                    foreach(var material in renderer.sharedMaterials)
-                    {
-                        if (ShaderInfo.TryGetShaderInfo(material, out var shaderInfo) && targetShaders.Contains(shaderInfo.Name))
-                        {
-                            list.Add(renderer);
-                            break;
-                        }
-                    }
-                }
-            }
-
-            private static void CollectMeshRenderersInAnimation(GameObject avatarObject, in TargetShaders targetShaders, HashSet<Renderer> list)
-            {
-                var components = avatarObject.GetComponentsInChildren<Component>(true);
-                var clips = new Dictionary<AnimationClip, Component>();
-                foreach (var component in components)
-                {
-                    var so = new SerializedObject(component);
-                    bool enterChildren = true;
-                    var p = so.GetIterator();
-                    while (p.Next(enterChildren))
-                    {
-                        if (p.propertyType == SerializedPropertyType.ObjectReference)
-                        {
-                            if (p.objectReferenceValue is RuntimeAnimatorController controller)
-                            {
-                                foreach(var x in controller.animationClips)
-                                {
-                                    if (!clips.ContainsKey(x))
-                                        clips.Add(x, component);
-                                }
-                            }
-                        }
-
-                        enterChildren = p.propertyType.IsNeedToEnterChildren();
-                    }
-                }
-
-                foreach(var (clip, component) in clips)
-                {
-                    foreach(var bind in AnimationUtility.GetObjectReferenceCurveBindings(clip) ?? Array.Empty<EditorCurveBinding>())
-                    {
-                        var rootObj = component.gameObject;
-                        if (component is ModularAvatarMergeAnimator mamaaaa && mamaaaa.pathMode == MergeAnimatorPathMode.Absolute)
-                        {
-                            rootObj = avatarObject;
-                        }
-
-                        var obj = AnimationUtility.GetAnimatedObject(rootObj, bind);
-                        if (obj is MeshRenderer || obj is SkinnedMeshRenderer)
-                        {
-                            var renderer = obj as Renderer;
-                            if (AnimationUtility.GetObjectReferenceValue(rootObj, bind, out var maybeMaterial) && maybeMaterial is Material material)
-                            {
-                                Debug.LogError(material);
-                                if (ShaderInfo.TryGetShaderInfo(material, out var shaderInfo) && targetShaders.Contains(shaderInfo.Name))
-                                {
-                                    list.Add(renderer);
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            private sealed class GeneralEqualityComparer<T> : IEqualityComparer<T>
-            {
-                public Func<T, T, bool> _equals;
-                public Func<T, int> _getHashCode;
-
-                public GeneralEqualityComparer(Func<T, T, bool> equals, Func<T, int> getHashCode)
-                {
-                    _equals = equals;
-                    _getHashCode = getHashCode;
-                }
-
-                public bool Equals(T x, T y) => _equals(x, y);
-
-                public int GetHashCode(T obj) => _getHashCode(obj);
             }
         }
     }
