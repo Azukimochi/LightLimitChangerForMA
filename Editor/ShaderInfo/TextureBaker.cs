@@ -31,7 +31,6 @@ namespace io.github.azukimochi
     public class DefaultTextureBaker : TextureBaker
     {
         private const string TextureBakerShaderName = "Hidden/LightLimitChanger/TextureBaker";
-        private static Shader _shader = Shader.Find(TextureBakerShaderName);
         private static readonly int _TexturePropertyID = Shader.PropertyToID("_MainTex");
         private static readonly int _MaskPropertyID = Shader.PropertyToID($"_{nameof(Mask)}");
         private static readonly int _GradationMapPropertyID = Shader.PropertyToID($"_{nameof(GradationMap)}");
@@ -39,7 +38,16 @@ namespace io.github.azukimochi
         private static readonly int _HSVGPropertyID = Shader.PropertyToID($"_{nameof(HSVG)}");
         private static readonly int _GradationStrengthPropertyID = Shader.PropertyToID($"_{nameof(GradationStrength)}");
 
-        protected Material Material { get; } = new Material(_shader);
+        protected Material Material 
+        {
+            get
+            {
+                if (_material == null)
+                    _material = new Material(Shader.Find(TextureBakerShaderName));
+                return _material;
+            }
+        }
+        private Material _material;
 
         public Texture Texture { get => Material?.GetTexture(_TexturePropertyID); set => Material?.SetTexture(_TexturePropertyID, value); }
 
