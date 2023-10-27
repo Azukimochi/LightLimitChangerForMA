@@ -36,6 +36,7 @@ namespace io.github.azukimochi
             { "label.excludes", new[] { "Exclusion Settings", "除外設定" } },
             { "label.grouping_additional_controls", new[]{ "Grouping additional controls", "追加コントロールをグループ化する"} },
             { "label.separate_light_control", new[] { "Setting the upper and lower brightness limits separately", "明るさの上限と下限を別々に設定する" } },
+            { "label.match_avatar", new[]{ "Match Avatar", "アバターに合わせる" } },
             { "info.generate", new[] { "Generate", "生成" } },
             { "info.re_generate", new[] { "Regenerate", "再生成" } },
             { "info.process", new[] { "Processing", "生成中" } },

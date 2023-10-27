@@ -13,6 +13,7 @@ namespace io.github.azukimochi
         public LightLimitChangerParameters Parameters = LightLimitChangerParameters.Default;
 
         public List<UnityEngine.Object> Excludes = new List<UnityEngine.Object>();
+        public WriteDefaultsSetting WriteDefaults;
 
 #pragma warning disable CS0612
         public void OnAfterDeserialize()
