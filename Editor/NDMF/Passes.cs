@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using nadena.dev.ndmf;
 using nadena.dev.ndmf.fluent;
 using UnityEditor.Animations;
@@ -90,7 +92,7 @@ namespace io.github.azukimochi
                 Controller = new AnimatorController() { name = "Light Limit Controller" }.AddTo(GetObjectCache(context));
                 Settings = context.AvatarRootObject.GetComponentInChildren<LightLimitChangerSettings>();
                 var parameters = Parameters = Settings?.Parameters ?? LightLimitChangerParameters.Default;
-                Excludes = new HashSet<Object>(Settings?.Excludes);
+                Excludes = new HashSet<Object>(Settings?.Excludes ?? (IEnumerable<Object>)Array.Empty<Object>());
 
                 List<ControlAnimationContainer> controls = new List<ControlAnimationContainer>();
                 if (!parameters.IsSeparateLightControl)
