@@ -74,7 +74,7 @@ namespace io.github.azukimochi
                     }
 
                     // HSV / Gamma
-                    if (material.GetVector(PropertyIDs.MainTexHSVG) != DefaultParameters.MainTexHSVG)
+                    if (material.GetOrDefault(PropertyIDs.MainTexHSVG, DefaultParameters.MainTexHSVG) != DefaultParameters.MainTexHSVG)
                     {
                         textureBaker.HSVG = material.GetVector(PropertyIDs.MainTexHSVG);
                         material.SetVector(PropertyIDs.MainTexHSVG, DefaultParameters.MainTexHSVG);
@@ -83,7 +83,7 @@ namespace io.github.azukimochi
                     }
 
                     // Gradation
-                    if (material.GetTexture(PropertyIDs.MainGradationTex) != null && material.GetFloat(PropertyIDs.MainGradationStrength) != DefaultParameters.MainGradationStrength)
+                    if (material.GetOrDefault<Texture>(PropertyIDs.MainGradationTex) != null && material.GetFloat(PropertyIDs.MainGradationStrength) != DefaultParameters.MainGradationStrength)
                     {
                         textureBaker.GradationMap = material.GetTexture(PropertyIDs.MainGradationTex);
                         textureBaker.GradationStrength = material.GetFloat(PropertyIDs.MainGradationStrength);
@@ -94,7 +94,7 @@ namespace io.github.azukimochi
                     }
 
                     // Color Adujust Mask
-                    if (isColorAdjusted && material.GetTexture(PropertyIDs.MainColorAdjustMask) != null)
+                    if (isColorAdjusted && material.GetOrDefault<Texture>(PropertyIDs.MainColorAdjustMask) != null)
                     {
                         textureBaker.Mask = material.GetTexture(PropertyIDs.MainColorAdjustMask);
                         material.SetTexture(PropertyIDs.MainColorAdjustMask, null);
@@ -111,6 +111,7 @@ namespace io.github.azukimochi
                 }
 
                 // 2nd Texture
+                if (material.HasProperty(PropertyIDs.Main2ndTex))
                 {
                     textureBaker.Reset();
                     bool bakeFlag = false;
@@ -135,6 +136,7 @@ namespace io.github.azukimochi
                 }
 
                 // 3rd Texture
+                if (material.HasProperty(PropertyIDs.Main3rdTex))
                 {
                     textureBaker.Reset();
                     bool bakeFlag = false;
