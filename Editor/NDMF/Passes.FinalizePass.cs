@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Remoting.Contexts;
 using nadena.dev.modular_avatar.core;
 using nadena.dev.ndmf;
 using UnityEditor;
@@ -15,7 +16,16 @@ namespace io.github.azukimochi
     {
         internal sealed class FinalizePass : LightLimitChangerBasePass<FinalizePass>
         {
+            private GameObject _avatarObject;
+            private Session _session;
+            private LightLimitChangerObjectCache _cache;
+
             protected override void Execute(BuildContext context, Session session, LightLimitChangerObjectCache cache)
+            {
+                Run(context.AvatarRootObject, session, cache);
+            }
+
+            internal static void Run(GameObject avatarObject, Session session, LightLimitChangerObjectCache cache)
             {
                 var obj = session.Settings.gameObject;
                 var mergeAnimator = obj.GetOrAddComponent<ModularAvatarMergeAnimator>();
@@ -39,7 +49,7 @@ namespace io.github.azukimochi
 
                 menuInstaller.menuToAppend = CreateMenu(session, cache);
 
-                foreach(var component in context.AvatarRootObject.GetComponentsInChildren<LightLimitChangerSettings>(true))
+                foreach (var component in avatarObject.GetComponentsInChildren<LightLimitChangerSettings>(true))
                 {
                     component.Destroy();
                 }

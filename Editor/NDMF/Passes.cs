@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Remoting.Contexts;
 using nadena.dev.ndmf;
 using nadena.dev.ndmf.fluent;
 using UnityEditor.Animations;
@@ -48,8 +49,8 @@ namespace io.github.azukimochi
         private static LightLimitChangerObjectCache GetObjectCache(BuildContext context)
         {
             var cache = context.GetState<LightLimitChangerObjectCache>();
-            if (cache.Context != context)
-                cache.Context = context;
+            if (cache.Container != context.AssetContainer)
+                cache.Container = context.AssetContainer;
             return cache;
         }
 
@@ -86,11 +87,16 @@ namespace io.github.azukimochi
 
             public void InitializeSession(BuildContext context)
             {
+                InitializeSession(context.AvatarRootObject.GetComponentInChildren<LightLimitChangerSettings>(), GetObjectCache(context));
+            }
+
+            public void InitializeSession(LightLimitChangerSettings settings, LightLimitChangerObjectCache cache)
+            {
                 if (_initialized)
                     return;
 
-                Controller = new AnimatorController() { name = "Light Limit Controller" }.AddTo(GetObjectCache(context));
-                Settings = context.AvatarRootObject.GetComponentInChildren<LightLimitChangerSettings>();
+                Controller = new AnimatorController() { name = "Light Limit Controller" }.AddTo(cache);
+                Settings = settings;
                 var parameters = Parameters = Settings?.Parameters ?? LightLimitChangerParameters.Default;
                 Excludes = new HashSet<Object>(Settings?.Excludes ?? (IEnumerable<Object>)Array.Empty<Object>());
 
