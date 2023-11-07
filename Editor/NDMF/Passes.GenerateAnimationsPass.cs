@@ -47,8 +47,6 @@ namespace io.github.azukimochi
                                 min = parameters.MinLightValue;
                                 max = parameters.MaxLightValue;
                             }
-                            else
-                            Debug.Log($"{renderer.gameObject.name} Min:{min} Max:{max}");
 
                             x.SetControlAnimation(container, new ControlAnimationParameters(relativePath, type, min, max));
                         }
