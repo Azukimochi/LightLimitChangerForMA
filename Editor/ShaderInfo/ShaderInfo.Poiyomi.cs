@@ -35,6 +35,8 @@ namespace io.github.azukimochi
 
             private static class DefaultParameters
             {
+                public static readonly float LightingMinLightBrightness = 0;
+                public static readonly float LightingCap = 1;
                 public static readonly float Saturation = 0;
                 public static readonly Color Color = Color.white;
             }
@@ -165,6 +167,13 @@ namespace io.github.azukimochi
                         material.SetOverrideTag($"{_Saturation}{Animated_Suffix}", Flag_IsAnimated);
                     }
                 }
+            }
+
+            public override bool TryGetLightMinMaxValue(Material material, out float min, out float max)
+            {
+                min = material.GetOrDefault(PropertyIDs.LightingMinLightBrightness, DefaultParameters.LightingMinLightBrightness);
+                max = material.GetOrDefault(PropertyIDs.LightingCap, DefaultParameters.LightingCap);
+                return true;
             }
         }
     }

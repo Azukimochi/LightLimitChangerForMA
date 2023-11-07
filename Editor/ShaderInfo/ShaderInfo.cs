@@ -103,5 +103,12 @@ namespace io.github.azukimochi
         public abstract void SetControlAnimation(in ControlAnimationContainer container, in ControlAnimationParameters parameters);
 
         public virtual void AdditionalControl(Material material, in LightLimitChangerParameters parameters) { }
+
+        public virtual bool TryGetLightMinMaxValue(Material material, out float min, out float max)
+        {
+            min = 0;
+            max = 0;
+            return false;
+        }
     }
 }
