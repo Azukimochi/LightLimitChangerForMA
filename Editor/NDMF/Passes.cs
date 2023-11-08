@@ -56,13 +56,18 @@ namespace io.github.azukimochi
 
         internal abstract class LightLimitChangerBasePass<TPass> : Pass<TPass> where TPass : Pass<TPass>, new()
         {
+            protected LightLimitChangerObjectCache Cache => _cache;
+            protected Session Session => _session;
+            private LightLimitChangerObjectCache _cache;
+            private Session _session;
+
             protected override void Execute(BuildContext context)
             {
                 var session = GetSession(context);
                 if (!session.IsValid())
                     return;
-            
-                var cache = GetObjectCache(context);
+                _session = session;
+                var cache = _cache = GetObjectCache(context);
 
                 Execute(context, session, cache);
             }
