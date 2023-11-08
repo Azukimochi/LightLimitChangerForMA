@@ -1,11 +1,11 @@
 {
     "name": "io.github.azukimochi.light-limit-changer.editor",
     "references": [
-        "GUID:fc900867c0f47cd49b6e2ae4ef907300",
-        "GUID:3b561cce4d58e0e4f82089e8eb14b13b",
-        "GUID:5ce33783346c3124990afbe7b0390a06",
-        "GUID:62ced99b048af7f4d8dfe4bed8373d76",
-        "GUID:fe747755f7b44e048820525b07f9b956"
+        "nadena.dev.modular-avatar.core",
+        "io.github.azukimochi.light-limit-changer",
+        "nadena.dev.modular-avatar.core.editor",
+        "nadena.dev.ndmf",
+        "nadena.dev.ndmf.runtime"
     ],
     "includePlatforms": [
         "Editor"
