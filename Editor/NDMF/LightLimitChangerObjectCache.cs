@@ -14,6 +14,12 @@ namespace io.github.azukimochi
 
         internal BuildContext Context;
 
+        public Object this[Object key]
+        {
+            get => Cache[key];
+            set => Register(key, value);
+        }
+
         public T Register<T>(T key, T value) where T : Object
         {
             if (key == null || value == null)
@@ -21,7 +27,8 @@ namespace io.github.azukimochi
             if (!Cache.ContainsKey(key) && !Cache.ContainsKey(value))
             {
                 Cache.Add(key, value);
-                AssetDatabase.AddObjectToAsset(value, Context.AssetContainer);
+                if (string.IsNullOrEmpty(AssetDatabase.GetAssetPath(value)))
+                    AssetDatabase.AddObjectToAsset(value, Context.AssetContainer);
             }
             return value;
         }

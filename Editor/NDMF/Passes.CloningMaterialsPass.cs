@@ -1,6 +1,12 @@
-﻿using nadena.dev.ndmf;
+﻿using System;
+using System.Collections.Generic;
+using Anatawa12.AvatarOptimizer;
+using nadena.dev.ndmf;
 using UnityEditor;
+using UnityEditor.Animations;
 using UnityEngine;
+using static io.github.azukimochi.Passes;
+using Object = UnityEngine.Object;
 
 namespace io.github.azukimochi
 {
@@ -12,7 +18,6 @@ namespace io.github.azukimochi
             {
                 var components = context.AvatarRootObject.GetComponentsInChildren<Component>(true);
                 var mapper = new AnimatorControllerMapper(cache);
-
                 foreach (var component in components)
                 {
                     var so = new SerializedObject(component);
@@ -38,40 +43,24 @@ namespace io.github.azukimochi
                                 }
                                 else if (obj is RuntimeAnimatorController runtimeAnimatorController)
                                 {
-                                    bool needClone = false;
-                                    foreach (var material in runtimeAnimatorController.GetAnimatedMaterials())
+                                    if (cache.TryGetValue(runtimeAnimatorController, out var mappedController))
                                     {
-                                        if (TryClone(material, out var cloned))
+                                        p.objectReferenceValue = mappedController;
+                                    }
+                                    else
+                                    {
+                                        bool needClone = false;
+                                        foreach (var material in runtimeAnimatorController.GetAnimatedMaterials())
                                         {
-                                            needClone = true;
+                                            needClone |= TryClone(material, out _);
+                                        }
+                                        if (needClone)
+                                        {
+                                            p.objectReferenceValue = mapper.MapAnimatorController(runtimeAnimatorController);
                                         }
                                     }
-                                    if (needClone)
-                                    {
-                                        var c = mapper.MapController(runtimeAnimatorController);
-                                        p.objectReferenceValue = c;
-                                    }
                                 }
-                            }
 
-                            bool TryClone(Material material, out Material clonedMaterial)
-                            {
-                                if (!cache.TryGetValue(material, out var mapped))
-                                {
-                                    if (ShaderInfo.TryGetShaderInfo(material, out var info) && session.Parameters.TargetShaders.Contains(info.Name))
-                                    {
-                                        clonedMaterial = material.Clone();
-                                        cache.Register(material, clonedMaterial);
-                                        return true;
-                                    }
-                                    clonedMaterial = null;
-                                    return false;
-                                }
-                                else
-                                {
-                                    clonedMaterial = mapped;
-                                    return true;
-                                }
                             }
                         }
 
@@ -102,13 +91,35 @@ namespace io.github.azukimochi
                             case SerializedPropertyType.BoundsInt:
                                 enterChildren = false;
                                 break;
+                            case SerializedPropertyType.Generic:
+                            case SerializedPropertyType.ExposedReference:
+                            case SerializedPropertyType.ManagedReference:
                             default:
                                 enterChildren = true;
                                 break;
                         }
+                        so.ApplyModifiedProperties();
                     }
+                }
+            }
 
-                    so.ApplyModifiedProperties();
+            internal bool TryClone(Material material, out Material clonedMaterial)
+            {
+                if (!Cache.TryGetValue(material, out var mapped))
+                {
+                    if (ShaderInfo.TryGetShaderInfo(material, out var info) && Session.Parameters.TargetShaders.Contains(info.Name))
+                    {
+                        clonedMaterial = material.Clone();
+                        Cache.Register(material, clonedMaterial);
+                        return true;
+                    }
+                    clonedMaterial = null;
+                    return false;
+                }
+                else
+                {
+                    clonedMaterial = mapped;
+                    return true;
                 }
             }
         }
