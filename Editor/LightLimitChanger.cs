@@ -52,6 +52,24 @@ namespace io.github.azukimochi
         // 選択されているものがアバター本体かつ、LLCが含まれていないときに実行可能
         private static bool ValidateCore(GameObject obj) => obj != null && obj.GetComponent<VRCAvatarDescriptor>() != null && obj.GetComponentInChildren<LightLimitChangerSettings>() == null;
 
+        [MenuItem("CONTEXT/LightLimitChangerSettings/Manual Bake (For Advanced User)")]
+        public static void ManualBake(MenuCommand command)
+        {
+            if (!(EditorUtility.SaveFilePanelInProject("Save", $"LightLimitChanger_{GUID.Generate()}", "asset", "") is string path))
+                return;
+
+            var session = new Passes.Session();
+            var container = new nadena.dev.ndmf.runtime.GeneratedAssets();
+            AssetDatabase.CreateAsset(container, path);
+            
+            var cache = new LightLimitChangerObjectCache() { Container = container };
+            var settings = command.context as LightLimitChangerSettings;
+            session.InitializeSession(settings, cache);
+            Passes.GenerateAnimationsPass.Run(session, cache);
+            Passes.FinalizePass.Run(settings.GetComponentInParent<VRCAvatarDescriptor>().gameObject, session, cache);
+            AssetDatabase.SaveAssets();
+        }
+
         private void OnDestroy()
         {
             if (_temp != null )

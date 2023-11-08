@@ -6,6 +6,7 @@ using UnityEditor.Animations;
 using UnityEngine;
 using VRC.Core;
 using VRC.SDK3.Avatars.Components;
+using static io.github.azukimochi.Passes;
 
 namespace io.github.azukimochi
 {
@@ -13,17 +14,18 @@ namespace io.github.azukimochi
     {
         internal sealed class GenerateAnimationsPass : LightLimitChangerBasePass<GenerateAnimationsPass>
         {
-            protected override void Execute(BuildContext context, Session session, LightLimitChangerObjectCache cache)
+            protected override void Execute(BuildContext context, Session session, LightLimitChangerObjectCache cache) => Run(session, cache);
+
+            internal static void Run(Session session, LightLimitChangerObjectCache cache)
             {
                 var controller = session.Controller;
 
                 ReadOnlySpan<ControlAnimationContainer> animationContainers = session.Controls;
-
                 var parameters = session.Parameters;
 
                 foreach (var renderer in session.TargetRenderers)
                 {
-                    if (session.Excludes.Contains(renderer.gameObject)) 
+                    if (session.Excludes.Contains(renderer.gameObject))
                     {
                         continue;
                     }
@@ -54,7 +56,7 @@ namespace io.github.azukimochi
                 }
 
                 controller.AddParameter(new AnimatorControllerParameter() { name = ParameterName_Toggle, defaultBool = parameters.IsDefaultUse, type = AnimatorControllerParameterType.Bool });
-                
+
                 foreach (ref readonly var container in animationContainers)
                 {
                     if (session.TargetControl.HasFlag(container.ControlType))
