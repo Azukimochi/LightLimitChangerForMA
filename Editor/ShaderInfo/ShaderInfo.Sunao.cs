@@ -34,6 +34,8 @@ namespace io.github.azukimochi
 
             private static class DefaultParameters
             {
+                public static readonly float MinimumLight = 0;
+                public static readonly float DirectionalLight = 1;
                 public static readonly Color Color = Color.white;
             }
 
@@ -103,6 +105,13 @@ namespace io.github.azukimochi
                     container.Default.SetParameterAnimation(parameters, _Color, DefaultParameters.Color);
                     container.Control.SetColorTempertureAnimation(parameters, _Color, DefaultParameters.Color);
                 }
+            }
+
+            public override bool TryGetLightMinMaxValue(Material material, out float min, out float max)
+            {
+                min = material.GetOrDefault(PropertyIDs.MinimumLight, DefaultParameters.MinimumLight);
+                max = material.GetOrDefault(PropertyIDs.DirectionalLight, DefaultParameters.DirectionalLight);
+                return true;
             }
         }
     }

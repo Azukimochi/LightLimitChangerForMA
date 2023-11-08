@@ -33,8 +33,6 @@ namespace io.github.azukimochi
                     var relativePath = renderer.AvatarRootPath();
                     var type = renderer.GetType();
 
-                    var controlParameters = new ControlAnimationParameters(relativePath, type, parameters.MinLightValue, parameters.MaxLightValue);
-
                     foreach (var x in ShaderInfo.RegisteredShaderInfos)
                     {
                         if (!parameters.TargetShaders.Contains(x.Name))
@@ -42,7 +40,17 @@ namespace io.github.azukimochi
 
                         foreach (ref readonly var container in animationContainers)
                         {
-                            x.SetControlAnimation(container, controlParameters);
+                            if (!(!parameters.OverwriteDefaultLightMinMax &&
+                                  (renderer.sharedMaterials?.Length ?? 0) > 0 &&
+                                  renderer.sharedMaterials[0] is Material mat && 
+                                  x.IsTargetShader(mat?.shader) &&
+                                  x.TryGetLightMinMaxValue(mat, out var min, out var max)))
+                            {
+                                min = parameters.MinLightValue;
+                                max = parameters.MaxLightValue;
+                            }
+
+                            x.SetControlAnimation(container, new ControlAnimationParameters(relativePath, type, min, max));
                         }
                     }
                 }
