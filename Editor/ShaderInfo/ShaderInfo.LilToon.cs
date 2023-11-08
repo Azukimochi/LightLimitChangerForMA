@@ -44,6 +44,8 @@ namespace io.github.azukimochi
 
             private static class DefaultParameters
             {
+                public static readonly float LightMinLimit = 0.05f;
+                public static readonly float LightMaxLimit = 1f;
                 public static readonly Color Color = Color.white;
                 public static readonly Color Color2nd = Color.white;
                 public static readonly Color Color3rd = Color.white;
@@ -216,6 +218,13 @@ namespace io.github.azukimochi
                     container.Control.SetColorTempertureAnimation(parameters, _Color2nd);
                     container.Control.SetColorTempertureAnimation(parameters, _Color3rd);
                 }
+            }
+
+            public override bool TryGetLightMinMaxValue(Material material, out float min, out float max)
+            {
+                min = material.GetOrDefault(PropertyIDs.LightMinLimit, DefaultParameters.LightMinLimit);
+                max = material.GetOrDefault(PropertyIDs.LightMaxLimit, DefaultParameters.LightMaxLimit);
+                return true;
             }
         }
     }

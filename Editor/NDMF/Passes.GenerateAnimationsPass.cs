@@ -6,6 +6,7 @@ using UnityEditor.Animations;
 using UnityEngine;
 using VRC.Core;
 using VRC.SDK3.Avatars.Components;
+using static io.github.azukimochi.Passes;
 
 namespace io.github.azukimochi
 {
@@ -13,25 +14,24 @@ namespace io.github.azukimochi
     {
         internal sealed class GenerateAnimationsPass : LightLimitChangerBasePass<GenerateAnimationsPass>
         {
-            protected override void Execute(BuildContext context, Session session, LightLimitChangerObjectCache cache)
+            protected override void Execute(BuildContext context, Session session, LightLimitChangerObjectCache cache) => Run(session, cache);
+
+            internal static void Run(Session session, LightLimitChangerObjectCache cache)
             {
                 var controller = session.Controller;
 
                 ReadOnlySpan<ControlAnimationContainer> animationContainers = session.Controls;
-
                 var parameters = session.Parameters;
 
                 foreach (var renderer in session.TargetRenderers)
                 {
-                    if (session.Excludes.Contains(renderer.gameObject)) 
+                    if (session.Excludes.Contains(renderer.gameObject))
                     {
                         continue;
                     }
 
                     var relativePath = renderer.AvatarRootPath();
                     var type = renderer.GetType();
-
-                    var controlParameters = new ControlAnimationParameters(relativePath, type, parameters.MinLightValue, parameters.MaxLightValue);
 
                     foreach (var x in ShaderInfo.RegisteredShaderInfos)
                     {
@@ -40,13 +40,23 @@ namespace io.github.azukimochi
 
                         foreach (ref readonly var container in animationContainers)
                         {
-                            x.SetControlAnimation(container, controlParameters);
+                            if (!(!parameters.OverwriteDefaultLightMinMax &&
+                                  (renderer.sharedMaterials?.Length ?? 0) > 0 &&
+                                  renderer.sharedMaterials[0] is Material mat && 
+                                  x.IsTargetShader(mat?.shader) &&
+                                  x.TryGetLightMinMaxValue(mat, out var min, out var max)))
+                            {
+                                min = parameters.MinLightValue;
+                                max = parameters.MaxLightValue;
+                            }
+
+                            x.SetControlAnimation(container, new ControlAnimationParameters(relativePath, type, min, max));
                         }
                     }
                 }
 
                 controller.AddParameter(new AnimatorControllerParameter() { name = ParameterName_Toggle, defaultBool = parameters.IsDefaultUse, type = AnimatorControllerParameterType.Bool });
-                
+
                 foreach (ref readonly var container in animationContainers)
                 {
                     if (session.TargetControl.HasFlag(container.ControlType))
