@@ -12,7 +12,7 @@ namespace io.github.azukimochi
         internal readonly Dictionary<Object, Object> Cache = new Dictionary<Object, Object>();
         internal readonly Dictionary<object, Texture2D> BakedTextureCache = new Dictionary<object, Texture2D>();
 
-        internal BuildContext Context;
+        internal Object Container;
 
         public T Register<T>(T key, T value) where T : Object
         {
@@ -21,7 +21,7 @@ namespace io.github.azukimochi
             if (!Cache.ContainsKey(key) && !Cache.ContainsKey(value))
             {
                 Cache.Add(key, value);
-                AssetDatabase.AddObjectToAsset(value, Context.AssetContainer);
+                AssetDatabase.AddObjectToAsset(value, Container);
             }
             return value;
         }
