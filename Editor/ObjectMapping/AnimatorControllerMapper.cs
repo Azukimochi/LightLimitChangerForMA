@@ -50,18 +50,16 @@ namespace Anatawa12.AvatarOptimizer
                 foreach (var binding in AnimationUtility.GetObjectReferenceCurveBindings(clip))
                 {
                     var curves = AnimationUtility.GetObjectReferenceCurve(clip, binding);
-                    for (int i = 0; i < curves.Length; i++)
+                    foreach (ref var curve in curves.AsSpan())
                     {
-                        var x = curves[i];
-                        if (x.value is Material material)
+                        if (curve.value is Material material)
                         {
                             if (Passes.CloningMaterials.TryClone(material, out var cloned))
                             {
-                                x.value = cloned;
+                                curve.value = cloned;
                                 _mapped = true;
                             }
                         }
-                        curves[i] = x;
                     }
                     AnimationUtility.SetObjectReferenceCurve(newClip, binding, curves);
                 }
