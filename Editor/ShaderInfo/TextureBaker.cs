@@ -89,7 +89,7 @@ namespace io.github.azukimochi
                 (width, height) = (Mathf.Max(32, source.width), Mathf.Max(32, source.height));
             }
 
-            var dest = new Texture2D(width, height, TextureFormat.RGBA32, false);
+            var dest = new Texture2D(width, height, TextureFormat.RGBA32, true);
             var rt = RenderTexture.GetTemporary(width, height);
             var temp = RenderTexture.active;
             try
@@ -98,8 +98,8 @@ namespace io.github.azukimochi
 
                 var request = AsyncGPUReadback.Request(rt);
                 request.WaitForCompletion();
-                dest.LoadRawTextureData(request.GetData<Color>());
-                dest.Apply();
+                dest.SetPixelData(request.GetData<Color>(), 0);
+                dest.Apply(true);
 
                 var format = (source as Texture2D)?.format ?? (Color.a == 1 ? TextureFormat.DXT1Crunched : TextureFormat.DXT5);
                 int quality = (AssetImporter.GetAtPath(AssetDatabase.GetAssetPath(source)) as TextureImporter)?.compressionQuality ?? 50;
