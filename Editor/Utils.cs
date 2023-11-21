@@ -8,6 +8,7 @@ using VRC.SDK3.Avatars.Components;
 using VRC.Core.Pool;
 
 using Object = UnityEngine.Object;
+using System.Runtime.CompilerServices;
 
 namespace io.github.azukimochi
 {
@@ -72,6 +73,32 @@ namespace io.github.azukimochi
                 default:
                     return true;
             }
+        }
+
+        public static Color With(this Color color, float? r = null, float? g = null, float? b = null, float? a = null)
+        {
+            color.r = r ?? color.r;
+            color.g = g ?? color.g;
+            color.b = b ?? color.b;
+            color.a = a ?? color.a;
+            return color;
+        }
+
+        public static bool Equals(this Color @this, Color other, ShaderInfoUtility.IncludeField field = ShaderInfoUtility.IncludeField.RGBA)
+        {
+            if (field.HasFlag(ShaderInfoUtility.IncludeField.R) && @this.r != other.r)
+                return false;
+
+            if (field.HasFlag(ShaderInfoUtility.IncludeField.G) && @this.g != other.g)
+                return false;
+
+            if (field.HasFlag(ShaderInfoUtility.IncludeField.B) && @this.b != other.b)
+                return false;
+
+            if (field.HasFlag(ShaderInfoUtility.IncludeField.A) && @this.a != other.a)
+                return false;
+
+            return true;
         }
 
         public static void ClearLayers(this AnimatorController controller) => controller.layers = Array.Empty<AnimatorControllerLayer>();
