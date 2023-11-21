@@ -68,10 +68,10 @@ namespace io.github.azukimochi
                         textureBaker.Texture = tex;
 
                     // MainColor
-                    if (material.GetColor(PropertyIDs.Color) != DefaultParameters.Color)
+                    if (!material.GetColor(PropertyIDs.Color).Equals(DefaultParameters.Color, ShaderInfoUtility.IncludeField.RGB)) 
                     {
                         textureBaker.Color = material.GetColor(PropertyIDs.Color);
-                        material.SetColor(PropertyIDs.Color, DefaultParameters.Color);
+                        material.SetColor(PropertyIDs.Color, DefaultParameters.Color.With(a: textureBaker.Color.a));
                         bakeFlag = true;
                     }
 
@@ -122,10 +122,10 @@ namespace io.github.azukimochi
                     if (tex != null)
                         textureBaker.Texture = tex;
 
-                    if (material.GetColor(PropertyIDs.Color2nd) != DefaultParameters.Color2nd)
+                    if (!material.GetColor(PropertyIDs.Color2nd).Equals(DefaultParameters.Color2nd, ShaderInfoUtility.IncludeField.RGB))
                     {
                         textureBaker.Color = material.GetColor(PropertyIDs.Color2nd);
-                        material.SetColor(PropertyIDs.Color2nd, DefaultParameters.Color2nd);
+                        material.SetColor(PropertyIDs.Color2nd, DefaultParameters.Color2nd.With(a: textureBaker.Color.a));
                         bakeFlag = true;
                     }
 
@@ -147,10 +147,10 @@ namespace io.github.azukimochi
                     if (tex != null)
                         textureBaker.Texture = tex;
 
-                    if (material.GetColor(PropertyIDs.Color3rd) != DefaultParameters.Color3rd)
+                    if (!material.GetColor(PropertyIDs.Color3rd).Equals(DefaultParameters.Color3rd, ShaderInfoUtility.IncludeField.RGB))
                     {
                         textureBaker.Color = material.GetColor(PropertyIDs.Color3rd);
-                        material.SetColor(PropertyIDs.Color3rd, DefaultParameters.Color3rd);
+                        material.SetColor(PropertyIDs.Color3rd, DefaultParameters.Color3rd.With(a: textureBaker.Color.a));
                         bakeFlag = true;
                     }
 
