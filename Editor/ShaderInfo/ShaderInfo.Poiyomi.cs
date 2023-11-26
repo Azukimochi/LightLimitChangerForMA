@@ -52,31 +52,34 @@ namespace io.github.azukimochi
                 {
                     bool bakeFlag = false;
                     var tex = material.GetOrDefault<Texture>(PropertyIDs.MainTex);
-                    if (tex != null)
-                        textureBaker.Texture = tex;
-
-                    var color = material.GetOrDefault(PropertyIDs.Color, DefaultParameters.Color);
-                    if (!color.Equals(DefaultParameters.Color, ShaderInfoUtility.IncludeField.RGB))
+                    if (!(tex is RenderTexture))
                     {
-                        textureBaker.Color = color;
-                        material.TrySet(PropertyIDs.Color, DefaultParameters.Color.With(a: textureBaker.Color.a));
-                        bakeFlag = true;
-                    }
+                        if (tex != null)
+                            textureBaker.Texture = tex;
 
-                    var saturation = material.GetOrDefault(PropertyIDs.Saturation, DefaultParameters.Saturation);
-                    if (saturation != DefaultParameters.Saturation)
-                    {
-                        textureBaker.HSVG = new Vector4(0, saturation, 1, 1);
-                        material.TrySet(PropertyIDs.Saturation, DefaultParameters.Saturation);
-                        bakeFlag = true;
-                    }
+                        var color = material.GetOrDefault(PropertyIDs.Color, DefaultParameters.Color);
+                        if (!color.Equals(DefaultParameters.Color, ShaderInfoUtility.IncludeField.RGB))
+                        {
+                            textureBaker.Color = color;
+                            material.TrySet(PropertyIDs.Color, DefaultParameters.Color.With(a: textureBaker.Color.a));
+                            bakeFlag = true;
+                        }
 
-                    if (bakeFlag)
-                    {
-                        material.TrySet(PropertyIDs.MainTex, cache.Register(textureBaker.Bake()));
-                    }
+                        var saturation = material.GetOrDefault(PropertyIDs.Saturation, DefaultParameters.Saturation);
+                        if (saturation != DefaultParameters.Saturation)
+                        {
+                            textureBaker.HSVG = new Vector4(0, saturation, 1, 1);
+                            material.TrySet(PropertyIDs.Saturation, DefaultParameters.Saturation);
+                            bakeFlag = true;
+                        }
 
-                    result |= bakeFlag;
+                        if (bakeFlag)
+                        {
+                            material.TrySet(PropertyIDs.MainTex, cache.Register(textureBaker.Bake()));
+                        }
+
+                        result |= bakeFlag;
+                    }
                 }
 
                 if (material.GetOrDefault(PropertyIDs.EnableDissolve, 0f) != 0)
@@ -85,23 +88,26 @@ namespace io.github.azukimochi
 
                     bool bakeFlag = false;
                     var tex = material.GetOrDefault<Texture>(PropertyIDs.DissolveToTexture);
-                    if (tex != null)
-                        textureBaker.Texture = tex;
-
-                    var color = material.GetOrDefault(PropertyIDs.DissolveTextureColor, DefaultParameters.Color);
-                    if (!color.Equals(DefaultParameters.Color, ShaderInfoUtility.IncludeField.RGB))
+                    if (!(tex is RenderTexture))
                     {
-                        textureBaker.Color = color;
-                        material.TrySet(PropertyIDs.DissolveTextureColor, DefaultParameters.Color.With(a: textureBaker.Color.a));
-                        bakeFlag = true;
-                    }
+                        if (tex != null)
+                            textureBaker.Texture = tex;
 
-                    if (bakeFlag)
-                    {
-                        material.TrySet(PropertyIDs.DissolveToTexture, cache.Register(textureBaker.Bake()));
-                    }
+                        var color = material.GetOrDefault(PropertyIDs.DissolveTextureColor, DefaultParameters.Color);
+                        if (!color.Equals(DefaultParameters.Color, ShaderInfoUtility.IncludeField.RGB))
+                        {
+                            textureBaker.Color = color;
+                            material.TrySet(PropertyIDs.DissolveTextureColor, DefaultParameters.Color.With(a: textureBaker.Color.a));
+                            bakeFlag = true;
+                        }
 
-                    result |= bakeFlag;
+                        if (bakeFlag)
+                        {
+                            material.TrySet(PropertyIDs.DissolveToTexture, cache.Register(textureBaker.Bake()));
+                        }
+
+                        result |= bakeFlag;
+                    }
                 }
 
 

@@ -55,113 +55,99 @@ namespace io.github.azukimochi
 
             public override bool TryNormalizeMaterial(Material material, LightLimitChangerObjectCache cache)
             {
-                bool result = false;
                 var textureBaker = TextureBaker.GetInstance<DefaultTextureBaker>(cache);
 
                 // MainTexture
+                return BakeMainTex(material, cache, textureBaker) ||
+                    Bake2ndOr3rdTex(material, cache, textureBaker, (PropertyIDs.Main2ndTex, PropertyIDs.Color2nd), DefaultParameters.Color2nd) ||
+                    Bake2ndOr3rdTex(material, cache, textureBaker, (PropertyIDs.Main3rdTex, PropertyIDs.Color3rd), DefaultParameters.Color3rd);
+            }
+
+            private bool BakeMainTex(Material material, LightLimitChangerObjectCache cache, DefaultTextureBaker textureBaker)
+            {
+                bool bakeFlag = false;
+                bool isColorAdjusted = false;
+
+                var tex = material.GetTexture(PropertyIDs.MainTex);
+                if (tex is RenderTexture)
+                    return false;
+
+                if (tex != null)
+                    textureBaker.Texture = tex;
+
+                // MainColor
+                if (!material.GetColor(PropertyIDs.Color).Equals(DefaultParameters.Color, ShaderInfoUtility.IncludeField.RGB))
                 {
-                    bool bakeFlag = false;
-                    bool isColorAdjusted = false;
-
-                    var tex = material.GetTexture(PropertyIDs.MainTex);
-                    if (tex != null)
-                        textureBaker.Texture = tex;
-
-                    // MainColor
-                    if (!material.GetColor(PropertyIDs.Color).Equals(DefaultParameters.Color, ShaderInfoUtility.IncludeField.RGB)) 
-                    {
-                        textureBaker.Color = material.GetColor(PropertyIDs.Color);
-                        material.SetColor(PropertyIDs.Color, DefaultParameters.Color.With(a: textureBaker.Color.a));
-                        bakeFlag = true;
-                    }
-
-                    // HSV / Gamma
-                    if (material.GetOrDefault(PropertyIDs.MainTexHSVG, DefaultParameters.MainTexHSVG) != DefaultParameters.MainTexHSVG)
-                    {
-                        textureBaker.HSVG = material.GetVector(PropertyIDs.MainTexHSVG);
-                        material.SetVector(PropertyIDs.MainTexHSVG, DefaultParameters.MainTexHSVG);
-                        bakeFlag = true;
-                        isColorAdjusted = true;
-                    }
-
-                    // Gradation
-                    if (material.GetOrDefault<Texture>(PropertyIDs.MainGradationTex) != null && material.GetFloat(PropertyIDs.MainGradationStrength) != DefaultParameters.MainGradationStrength)
-                    {
-                        textureBaker.GradationMap = material.GetTexture(PropertyIDs.MainGradationTex);
-                        textureBaker.GradationStrength = material.GetFloat(PropertyIDs.MainGradationStrength);
-                        material.SetTexture(PropertyIDs.MainGradationTex, null);
-                        material.SetFloat(PropertyIDs.MainGradationStrength, DefaultParameters.MainGradationStrength);
-                        bakeFlag = true;
-                        isColorAdjusted = true;
-                    }
-
-                    // Color Adujust Mask
-                    if (isColorAdjusted && material.GetOrDefault<Texture>(PropertyIDs.MainColorAdjustMask) != null)
-                    {
-                        textureBaker.Mask = material.GetTexture(PropertyIDs.MainColorAdjustMask);
-                        material.SetTexture(PropertyIDs.MainColorAdjustMask, null);
-                        bakeFlag = true;
-                    }
-
-                    // Run Bake
-                    if (bakeFlag)
-                    {
-                        material.SetTexture(PropertyIDs.MainTex, cache.Register(textureBaker.Bake()));
-                    }
-
-                    result |= bakeFlag;
+                    textureBaker.Color = material.GetColor(PropertyIDs.Color);
+                    material.SetColor(PropertyIDs.Color, DefaultParameters.Color.With(a: textureBaker.Color.a));
+                    bakeFlag = true;
                 }
 
-                // 2nd Texture
-                if (material.HasProperty(PropertyIDs.Main2ndTex))
+                // HSV / Gamma
+                if (material.GetOrDefault(PropertyIDs.MainTexHSVG, DefaultParameters.MainTexHSVG) != DefaultParameters.MainTexHSVG)
                 {
-                    textureBaker.Reset();
-                    bool bakeFlag = false;
-
-                    var tex = material.GetTexture(PropertyIDs.Main2ndTex);
-                    if (tex != null)
-                        textureBaker.Texture = tex;
-
-                    if (!material.GetColor(PropertyIDs.Color2nd).Equals(DefaultParameters.Color2nd, ShaderInfoUtility.IncludeField.RGB))
-                    {
-                        textureBaker.Color = material.GetColor(PropertyIDs.Color2nd);
-                        material.SetColor(PropertyIDs.Color2nd, DefaultParameters.Color2nd.With(a: textureBaker.Color.a));
-                        bakeFlag = true;
-                    }
-
-                    if (bakeFlag)
-                    {
-                        material.SetTexture(PropertyIDs.Main2ndTex, cache.Register(textureBaker.Bake()));
-                    }
-
-                    result |= bakeFlag;
+                    textureBaker.HSVG = material.GetVector(PropertyIDs.MainTexHSVG);
+                    material.SetVector(PropertyIDs.MainTexHSVG, DefaultParameters.MainTexHSVG);
+                    bakeFlag = true;
+                    isColorAdjusted = true;
                 }
 
-                // 3rd Texture
-                if (material.HasProperty(PropertyIDs.Main3rdTex))
+                // Gradation
+                if (material.GetOrDefault<Texture>(PropertyIDs.MainGradationTex) != null && material.GetFloat(PropertyIDs.MainGradationStrength) != DefaultParameters.MainGradationStrength)
                 {
-                    textureBaker.Reset();
-                    bool bakeFlag = false;
-
-                    var tex = material.GetTexture(PropertyIDs.Main3rdTex);
-                    if (tex != null)
-                        textureBaker.Texture = tex;
-
-                    if (!material.GetColor(PropertyIDs.Color3rd).Equals(DefaultParameters.Color3rd, ShaderInfoUtility.IncludeField.RGB))
-                    {
-                        textureBaker.Color = material.GetColor(PropertyIDs.Color3rd);
-                        material.SetColor(PropertyIDs.Color3rd, DefaultParameters.Color3rd.With(a: textureBaker.Color.a));
-                        bakeFlag = true;
-                    }
-
-                    if (bakeFlag)
-                    {
-                        material.SetTexture(PropertyIDs.Main3rdTex, cache.Register(textureBaker.Bake()));
-                    }
-                    result |= bakeFlag;
+                    textureBaker.GradationMap = material.GetTexture(PropertyIDs.MainGradationTex);
+                    textureBaker.GradationStrength = material.GetFloat(PropertyIDs.MainGradationStrength);
+                    material.SetTexture(PropertyIDs.MainGradationTex, null);
+                    material.SetFloat(PropertyIDs.MainGradationStrength, DefaultParameters.MainGradationStrength);
+                    bakeFlag = true;
+                    isColorAdjusted = true;
                 }
 
-                return result;
+                // Color Adujust Mask
+                if (isColorAdjusted && material.GetOrDefault<Texture>(PropertyIDs.MainColorAdjustMask) != null)
+                {
+                    textureBaker.Mask = material.GetTexture(PropertyIDs.MainColorAdjustMask);
+                    material.SetTexture(PropertyIDs.MainColorAdjustMask, null);
+                    bakeFlag = true;
+                }
+
+                // Run Bake
+                if (bakeFlag)
+                {
+                    material.SetTexture(PropertyIDs.MainTex, cache.Register(textureBaker.Bake()));
+                }
+
+                return bakeFlag;
+            }
+
+            private bool Bake2ndOr3rdTex(Material material, LightLimitChangerObjectCache cache, DefaultTextureBaker textureBaker, (int Texture, int Color) propertyIds, Color defaultColor)
+            {
+                if (!material.HasProperty(propertyIds.Texture))
+                    return false;
+
+                textureBaker.Reset();
+                bool bakeFlag = false;
+
+                var tex = material.GetTexture(propertyIds.Texture);
+                if (tex is RenderTexture)
+                    return false;
+
+                if (tex != null)
+                    textureBaker.Texture = tex;
+
+                if (!material.GetColor(propertyIds.Color).Equals(defaultColor, ShaderInfoUtility.IncludeField.RGB))
+                {
+                    textureBaker.Color = material.GetColor(propertyIds.Color);
+                    material.SetColor(propertyIds.Color, defaultColor.With(a: textureBaker.Color.a));
+                    bakeFlag = true;
+                }
+
+                if (bakeFlag)
+                {
+                    material.SetTexture(propertyIds.Texture, cache.Register(textureBaker.Bake()));
+                }
+
+                return bakeFlag;
             }
 
             public override bool IsTargetShader(Shader shader)
