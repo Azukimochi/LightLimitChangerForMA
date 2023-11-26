@@ -47,6 +47,9 @@ namespace io.github.azukimochi
 
                 {
                     var tex = material.GetTexture(PropertyIDs.MainTex);
+                    if (tex is RenderTexture)
+                        return false;
+
                     if (tex != null)
                         textureBaker.Texture = tex;
 
