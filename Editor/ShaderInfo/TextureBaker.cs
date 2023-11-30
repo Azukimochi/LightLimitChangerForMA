@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -90,6 +90,7 @@ namespace io.github.azukimochi
             }
 
             var dest = new Texture2D(width, height, TextureFormat.RGBA32, true);
+            dest.name = source?.name ?? Color.ToString();
             var rt = RenderTexture.GetTemporary(width, height);
             var temp = RenderTexture.active;
             try
