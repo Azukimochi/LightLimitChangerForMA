@@ -90,6 +90,7 @@ namespace io.github.azukimochi
             }
 
             var dest = new Texture2D(width, height, TextureFormat.RGBA32, true);
+            dest.name = source?.name ?? Color.ToString();
             var rt = RenderTexture.GetTemporary(width, height);
             var temp = RenderTexture.active;
             try
@@ -101,7 +102,25 @@ namespace io.github.azukimochi
                 dest.SetPixelData(request.GetData<Color>(), 0);
                 dest.Apply(true);
 
-                var format = (source as Texture2D)?.format ?? (Color.a == 1 ? TextureFormat.DXT1Crunched : TextureFormat.DXT5);
+                TextureFormat format;
+                if (source is Texture2D == false)
+                {
+                    format = Color.a < 1 ? TextureFormat.DXT5 : TextureFormat.DXT1;
+                }
+                else
+                {
+                    var tex = source as Texture2D;
+                    format = tex.format;
+                    if (Color.a < 1)
+                    {
+                        switch(format)
+                        {
+                            case TextureFormat.RGB24: format = TextureFormat.RGBA32; break;
+                            case TextureFormat.DXT1: format = TextureFormat.DXT5; break;
+                            case TextureFormat.DXT1Crunched: format = TextureFormat.DXT5Crunched; break;
+                        }
+                    }
+                }
                 int quality = (AssetImporter.GetAtPath(AssetDatabase.GetAssetPath(source)) as TextureImporter)?.compressionQuality ?? 50;
                 EditorUtility.CompressTexture(dest, format, quality);
 
