@@ -19,6 +19,8 @@ namespace io.github.azukimochi
         private SerializedProperty IsValueSave;
         private SerializedProperty OverwriteDefaultLightMinMax;
         private SerializedProperty DefaultLightValue;
+        private SerializedProperty DefaultMinLightValue;
+        private SerializedProperty DefaultMaxLightValue;
         private SerializedProperty MaxLightValue;
         private SerializedProperty MinLightValue;
         private SerializedProperty TargetShaders;
@@ -32,6 +34,7 @@ namespace io.github.azukimochi
         private SerializedProperty WriteDefaults;
 
         private static bool _isOptionFoldoutOpen = true;
+        private static bool _isCepareteInitValFoldoutOpen = false;
 
         internal bool IsWindowMode = false;
 
@@ -42,6 +45,8 @@ namespace io.github.azukimochi
             IsValueSave =                   parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.IsValueSave));
             OverwriteDefaultLightMinMax =   parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.OverwriteDefaultLightMinMax));
             DefaultLightValue =             parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.DefaultLightValue));
+            DefaultMinLightValue =          parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.DefaultMinLightValue));
+            DefaultMaxLightValue =          parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.DefaultMaxLightValue));
             MaxLightValue =                 parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.MaxLightValue));
             MinLightValue =                 parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.MinLightValue));
             TargetShaders =                 parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.TargetShaders));
@@ -71,8 +76,9 @@ namespace io.github.azukimochi
             EditorGUILayout.PropertyField(OverwriteDefaultLightMinMax, Localization.G("label.override_min_max", "tip.override_min_max"));
             EditorGUILayout.PropertyField(MaxLightValue, Localization.G("label.light_max", "tip.light_max"));
             EditorGUILayout.PropertyField(MinLightValue, Localization.G("label.light_min", "tip.light_min"));
+            EditorGUI.BeginDisabledGroup(IsSeparateLightControl.boolValue == true);
             EditorGUILayout.PropertyField(DefaultLightValue, Localization.G("label.light_default", "tip.light_default"));
-
+            EditorGUI.EndDisabledGroup();
             EditorGUILayout.PropertyField(AllowColorTempControl, Localization.G("label.allow_color_tmp", "tip.allow_color_tmp"));
             EditorGUILayout.PropertyField(AllowSaturationControl, Localization.G("label.allow_saturation", "tip.allow_saturation"));
             EditorGUILayout.PropertyField(AllowUnlitControl, Localization.G("label.allow_unlit", "tip.allow_unlit"));
@@ -84,12 +90,23 @@ namespace io.github.azukimochi
                 {
                     EditorGUILayout.PropertyField(TargetShaders, Localization.G("label.target_shader", "tip.target_shader"));
                     EditorGUILayout.PropertyField(IsSeparateLightControl, Localization.G("label.separate_light_control"));
+
+                    EditorGUI.BeginDisabledGroup(IsSeparateLightControl.boolValue == false);
+                    _isCepareteInitValFoldoutOpen = EditorGUILayout.Foldout(_isCepareteInitValFoldoutOpen,
+                        Localization.G("label.separate_light_control_init_val"));
+                    if(_isCepareteInitValFoldoutOpen)
+                    {
+                        EditorGUILayout.PropertyField(DefaultMinLightValue, Localization.G("label.light_min_default"));
+                        EditorGUILayout.PropertyField(DefaultMaxLightValue, Localization.G("label.light_max_default"));
+                    }
+                    EditorGUI.EndDisabledGroup();
+                    
                     EditorGUILayout.PropertyField(IsGroupingAdditionalControls, Localization.G("label.grouping_additional_controls"));
                     WriteDefaults.intValue = EditorGUILayout.Popup(Utils.Label("Write Defaults"), WriteDefaults.intValue, new[] { Localization.S("label.match_avatar"), "OFF", "ON" });
                     EditorGUILayout.PropertyField(Excludes, Localization.G("label.excludes"));
                 }
             }
-
+            
             if (EditorGUI.EndChangeCheck())
             {
                 serializedObject.ApplyModifiedProperties();

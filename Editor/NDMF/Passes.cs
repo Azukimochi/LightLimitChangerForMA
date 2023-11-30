@@ -112,8 +112,8 @@ namespace io.github.azukimochi
                 }
                 else
                 {
-                    controls.Add(ControlAnimationContainer.Create(LightLimitControlType.LightMin, "Min Light", ParameterName_Min, parameters.DefaultLightValue, Icons.Light_Min));
-                    controls.Add(ControlAnimationContainer.Create(LightLimitControlType.LightMax, "Max Light", ParameterName_Max, parameters.DefaultLightValue, Icons.Light_Max));
+                    controls.Add(ControlAnimationContainer.Create(LightLimitControlType.LightMin, "Min Light", ParameterName_Min, parameters.DefaultMinLightValue, Icons.Light_Min));
+                    controls.Add(ControlAnimationContainer.Create(LightLimitControlType.LightMax, "Max Light", ParameterName_Max, parameters.DefaultMaxLightValue, Icons.Light_Max));
                 }
 
                 controls.AddRange(new[]
