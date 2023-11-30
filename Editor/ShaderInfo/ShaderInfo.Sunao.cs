@@ -53,10 +53,10 @@ namespace io.github.azukimochi
                     if (tex != null)
                         textureBaker.Texture = tex;
 
-                    if (material.GetColor(PropertyIDs.Color) != DefaultParameters.Color)
+                    if (!material.GetColor(PropertyIDs.Color).Equals(DefaultParameters.Color, ShaderInfoUtility.IncludeField.RGB))
                     {
                         textureBaker.Color = material.GetColor(PropertyIDs.Color);
-                        material.SetColor(PropertyIDs.Color, DefaultParameters.Color);
+                        material.SetColor(PropertyIDs.Color, DefaultParameters.Color.With(a: textureBaker.Color.a));
                         bakeFlag = true;
                     }
 
