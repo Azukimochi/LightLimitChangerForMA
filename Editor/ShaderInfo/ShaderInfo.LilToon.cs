@@ -76,10 +76,10 @@ namespace io.github.azukimochi
                     textureBaker.Texture = tex;
 
                 // MainColor
-                if (!material.GetColor(PropertyIDs.Color).Equals(DefaultParameters.Color, ShaderInfoUtility.IncludeField.RGB))
+                if (material.GetColor(PropertyIDs.Color) != DefaultParameters.Color)
                 {
                     textureBaker.Color = material.GetColor(PropertyIDs.Color);
-                    material.SetColor(PropertyIDs.Color, DefaultParameters.Color.With(a: textureBaker.Color.a));
+                    material.SetColor(PropertyIDs.Color, DefaultParameters.Color);
                     bakeFlag = true;
                 }
 
@@ -135,10 +135,10 @@ namespace io.github.azukimochi
                 if (tex != null)
                     textureBaker.Texture = tex;
 
-                if (!material.GetColor(propertyIds.Color).Equals(defaultColor, ShaderInfoUtility.IncludeField.RGB))
+                if (material.GetColor(propertyIds.Color) != defaultColor)
                 {
                     textureBaker.Color = material.GetColor(propertyIds.Color);
-                    material.SetColor(propertyIds.Color, defaultColor.With(a: textureBaker.Color.a));
+                    material.SetColor(propertyIds.Color, defaultColor);
                     bakeFlag = true;
                 }
 
