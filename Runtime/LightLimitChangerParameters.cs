@@ -17,6 +17,12 @@ namespace io.github.azukimochi
 
         [Range(0, 1)]
         public float DefaultLightValue;
+        
+        [Range(0, 1)]
+        public float DefaultMinLightValue;
+        
+        [Range(0, 1)]
+        public float DefaultMaxLightValue;
 
         [Range(0, 10)]
         public float MaxLightValue;
@@ -44,6 +50,8 @@ namespace io.github.azukimochi
             IsValueSave = false,
             OverwriteDefaultLightMinMax = true,
             DefaultLightValue = 0.5f,
+            DefaultMinLightValue = 0.0f,
+            DefaultMaxLightValue = 1.0f,
             MaxLightValue = 1.0f,
             MinLightValue = 0.0f,
             //TargetShader = -1, // Everything
