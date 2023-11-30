@@ -37,7 +37,7 @@ namespace io.github.azukimochi
             { "label.grouping_additional_controls", new[]{ "Grouping additional controls", "追加コントロールをグループ化する"} },
             { "label.separate_light_control", new[] { "Setting the upper and lower brightness limits separately", "明るさの上限と下限を別々に設定する" } },
             { "label.match_avatar", new[]{ "Match Avatar", "アバターに合わせる" } },
-            { "label.separate_light_control_init_val", new []{ "Setting initial brightness values individually", "明るさの初期値を個別に設定する"}},
+            { "label.separate_light_control_init_val", new []{ "Individual initial value settings", "個別の初期値設定"}},
             { "label.light_min_default", new []{"Min Default Value", "明るさの下限の初期値"}},
             { "label.light_max_default", new []{ "Max Default value", "明るさの上限の初期値"}},
             { "info.generate", new[] { "Generate", "生成" } },

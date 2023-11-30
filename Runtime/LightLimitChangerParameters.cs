@@ -24,10 +24,10 @@ namespace io.github.azukimochi
         [Range(0, 1)]
         public float DefaultMaxLightValue;
 
-        [Range(0, 10)]
+        [Range(0, 1)]
         public float MaxLightValue;
 
-        [Range(0, 10)]
+        [Range(0, 1)]
         public float MinLightValue;
 
         [Obsolete]
