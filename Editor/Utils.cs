@@ -8,6 +8,19 @@ namespace io.github.azukimochi
 {
     internal static class Utils
     {
+        // ContainsとDeconstructは2019との互換性の為に必要なので消さないこと！
+
+        public static bool Contains(this string str, string value, StringComparison comparison)
+        {
+            return str.IndexOf(value, comparison) != -1;
+        }
+
+        public static void Deconstruct<TKey, TValue>(this KeyValuePair<TKey, TValue> kvp, out TKey key, out TValue value)
+        {
+            key = kvp.Key;
+            value = kvp.Value;
+        }
+
         public static void Destroy(this Object obj)
         {
             Object.DestroyImmediate(obj);
