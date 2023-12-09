@@ -31,7 +31,7 @@ namespace io.github.azukimochi
                 AssetDatabase.CreateFolder(Path.GetDirectoryName(directory), Path.GetFileName(directory));
             }
             var obj = new GameObject(Path.GetFileNameWithoutExtension(PrefabPath)) { hideFlags = HideFlags.HideInHierarchy };
-            
+
             obj.AddComponent<LightLimitChangerSettings>();
             obj.AddComponent<ModularAvatarMenuInstaller>();
 

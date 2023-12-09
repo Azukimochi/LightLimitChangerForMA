@@ -29,7 +29,7 @@ namespace io.github.azukimochi
                         continue;
                     }
 
-                    foreach(var material in renderer.sharedMaterials)
+                    foreach (var material in renderer.sharedMaterials)
                     {
                         if (ShaderInfo.TryGetShaderInfo(material, out var shaderInfo) && targetShaders.Contains(shaderInfo.Name))
                         {
@@ -55,7 +55,7 @@ namespace io.github.azukimochi
                         {
                             if (p.objectReferenceValue is RuntimeAnimatorController controller)
                             {
-                                foreach(var x in controller.animationClips)
+                                foreach (var x in controller.animationClips)
                                 {
                                     if (!clips.ContainsKey(x))
                                         clips.Add(x, component);
@@ -67,9 +67,9 @@ namespace io.github.azukimochi
                     }
                 }
 
-                foreach(var (clip, component) in clips)
+                foreach (var (clip, component) in clips)
                 {
-                    foreach(var bind in AnimationUtility.GetObjectReferenceCurveBindings(clip) ?? Array.Empty<EditorCurveBinding>())
+                    foreach (var bind in AnimationUtility.GetObjectReferenceCurveBindings(clip) ?? Array.Empty<EditorCurveBinding>())
                     {
                         var rootObj = component.gameObject;
                         if (component is ModularAvatarMergeAnimator mamaaaa && mamaaaa.pathMode == MergeAnimatorPathMode.Absolute)

@@ -1,14 +1,9 @@
 ﻿using System.Collections.Generic;
-using System;
-using UnityEngine;
-using UnityEditor;
-using UnityEditor.Animations;
-using VRC.SDK3.Avatars.Components;
-using VRC.SDK3.Avatars.ScriptableObjects;
-using VRC.Core;
-using nadena.dev.modular_avatar.core;
-using UnityEngine.SceneManagement;
 using System.Linq;
+using nadena.dev.modular_avatar.core;
+using UnityEditor;
+using UnityEngine;
+using VRC.SDK3.Avatars.Components;
 
 namespace io.github.azukimochi
 {
@@ -61,7 +56,7 @@ namespace io.github.azukimochi
             var session = new Passes.Session();
             var container = new nadena.dev.ndmf.runtime.GeneratedAssets();
             AssetDatabase.CreateAsset(container, path);
-            
+
             var cache = new LightLimitChangerObjectCache() { Container = container };
             var settings = command.context as LightLimitChangerSettings;
             session.InitializeSession(settings, cache);
@@ -72,11 +67,11 @@ namespace io.github.azukimochi
 
         private void OnDestroy()
         {
-            if (_temp != null )
+            if (_temp != null)
             {
                 DestroyImmediate(_temp);
             }
-            if (_editor != null )
+            if (_editor != null)
             {
                 DestroyImmediate(_editor);
             }
@@ -85,7 +80,7 @@ namespace io.github.azukimochi
         private void OnGUI()
         {
             EditorGUIUtility.labelWidth = 280;
-            Utils.ShowVersionInfo(); 
+            Utils.ShowVersionInfo();
             EditorGUILayout.Separator();
 
             var style = new GUIStyle(EditorStyles.helpBox);
@@ -200,7 +195,7 @@ namespace io.github.azukimochi
             // おおもとのプレハブからLLCを消す不届き者がいるかもしれない、、、
             if (prefab.GetComponent<LightLimitChangerSettings>() == null)
                 prefab.AddComponent<LightLimitChangerSettings>();
-            
+
             return prefab;
 
             GameObject CreateNonPrefabLLC()

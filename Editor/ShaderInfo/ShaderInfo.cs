@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.Rendering;
-using Object = UnityEngine.Object;
 
 namespace io.github.azukimochi
 {
