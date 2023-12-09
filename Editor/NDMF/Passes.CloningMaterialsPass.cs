@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using Anatawa12.AvatarOptimizer;
+﻿using Anatawa12.AvatarOptimizer;
 using nadena.dev.ndmf;
 using UnityEditor;
-using UnityEditor.Animations;
 using UnityEngine;
-using static io.github.azukimochi.Passes;
-using Object = UnityEngine.Object;
 
 namespace io.github.azukimochi
 {

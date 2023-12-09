@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using io.github.azukimochi;
+﻿using io.github.azukimochi;
 using nadena.dev.ndmf;
-using UnityEngine;
 
 [assembly: ExportsPlugin(typeof(PluginDefinition))]
 
@@ -21,7 +15,7 @@ namespace io.github.azukimochi
 
         protected override void Configure()
         {
-            var sequence = 
+            var sequence =
                 InPhase(BuildPhase.Transforming)
                 .BeforePlugin(ModularAvatarQualifiedName);
 

@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Serialization;
 using VRC.SDKBase;
 
 namespace io.github.azukimochi
@@ -12,6 +10,9 @@ namespace io.github.azukimochi
     {
         public LightLimitChangerParameters Parameters = LightLimitChangerParameters.Default;
 
+#if UNITY_2022_1_OR_NEWER
+        [NonReorderable]
+#endif
         public List<UnityEngine.Object> Excludes = new List<UnityEngine.Object>();
         public WriteDefaultsSetting WriteDefaults;
 

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEditor;
+﻿using UnityEditor;
 using UnityEngine;
 
 namespace io.github.azukimochi
@@ -20,7 +15,7 @@ namespace io.github.azukimochi
             var isEverything = property.FindPropertyRelative(nameof(TargetShaders.IsEverything));
             var targets = property.FindPropertyRelative(nameof(TargetShaders.Targets));
             string[] array = new string[targets.arraySize];
-            for( int i = 0; i < array.Length; i++)
+            for (int i = 0; i < array.Length; i++)
             {
                 array[i] = targets.GetArrayElementAtIndex(i).stringValue;
             }
@@ -39,11 +34,11 @@ namespace io.github.azukimochi
                 targets.ClearArray();
 
                 if (a.Targets != null)
-                for(int i = 0; i < a.Targets.Length; i++)
-                {
-                    targets.InsertArrayElementAtIndex(i);
-                    targets.GetArrayElementAtIndex(i).stringValue = a.Targets[i];
-                }
+                    for (int i = 0; i < a.Targets.Length; i++)
+                    {
+                        targets.InsertArrayElementAtIndex(i);
+                        targets.GetArrayElementAtIndex(i).stringValue = a.Targets[i];
+                    }
             }
             EditorGUI.EndProperty();
         }
