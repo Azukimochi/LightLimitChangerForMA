@@ -10,6 +10,9 @@ namespace io.github.azukimochi
     {
         public LightLimitChangerParameters Parameters = LightLimitChangerParameters.Default;
 
+#if UNITY_2022_1_OR_NEWER
+        [NonReorderable]
+#endif
         public List<UnityEngine.Object> Excludes = new List<UnityEngine.Object>();
         public WriteDefaultsSetting WriteDefaults;
 
