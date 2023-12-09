@@ -2,7 +2,6 @@
 // Copyright (c) 2022 anatawa12
 
 using System;
-using System.Collections.Generic;
 using io.github.azukimochi;
 using UnityEditor;
 using UnityEditor.Animations;

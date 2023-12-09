@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
 namespace io.github.azukimochi
 {

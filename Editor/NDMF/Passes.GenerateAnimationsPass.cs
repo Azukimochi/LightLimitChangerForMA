@@ -1,12 +1,9 @@
 ﻿using System;
-using nadena.dev.modular_avatar.core;
 using nadena.dev.ndmf;
 using nadena.dev.ndmf.util;
 using UnityEditor.Animations;
 using UnityEngine;
-using VRC.Core;
 using VRC.SDK3.Avatars.Components;
-using static io.github.azukimochi.Passes;
 
 namespace io.github.azukimochi
 {
@@ -42,7 +39,7 @@ namespace io.github.azukimochi
                         {
                             if (!(!parameters.OverwriteDefaultLightMinMax &&
                                   (renderer.sharedMaterials?.Length ?? 0) > 0 &&
-                                  renderer.sharedMaterials[0] is Material mat && 
+                                  renderer.sharedMaterials[0] is Material mat &&
                                   x.IsTargetShader(mat?.shader) &&
                                   x.TryGetLightMinMaxValue(mat, out var min, out var max)))
                             {

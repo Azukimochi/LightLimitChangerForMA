@@ -18,7 +18,7 @@ namespace io.github.azukimochi
             if (IsEverything)
                 return true;
 
-            for(int i = 0; i < Targets?.Length; i++)
+            for (int i = 0; i < Targets?.Length; i++)
             {
                 if (Targets[i] == name)
                     return true;
