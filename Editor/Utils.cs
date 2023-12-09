@@ -5,41 +5,16 @@ using System.Linq;
 using System;
 using UnityEditor.Animations;
 using VRC.SDK3.Avatars.Components;
-using VRC.Core.Pool;
 
 using Object = UnityEngine.Object;
-using System.Runtime.CompilerServices;
 
 namespace io.github.azukimochi
 {
     internal static class Utils
     {
-        public static bool HasFlag(this int x, int y) => (x & y) == y;
-
         public static void Destroy(this Object obj)
         {
             Object.DestroyImmediate(obj);
-        }
-
-        public static void ClearSubAssets(this Object obj)
-        {
-            var path = AssetDatabase.GetAssetPath(obj);
-            if (path != null)
-            {
-                foreach(var asset in AssetDatabase.LoadAllAssetsAtPath(path))
-                {
-                    if (AssetDatabase.IsSubAsset(asset))
-                    {
-                        GameObject.DestroyImmediate(asset, true);
-                    }
-                }
-            }
-        }
-
-        public static void Deconstruct<TKey, TValue>(this KeyValuePair<TKey, TValue> kvp, out TKey key, out TValue value)
-        {
-            key = kvp.Key;
-            value = kvp.Value;
         }
 
         public static bool IsNeedToEnterChildren(this SerializedPropertyType type)
@@ -101,46 +76,10 @@ namespace io.github.azukimochi
             return true;
         }
 
-        public static void ClearLayers(this AnimatorController controller) => controller.layers = Array.Empty<AnimatorControllerLayer>();
-
-        public static bool TryGetComponentInChildren<T>(this Component component, out T result) where T : Component => component.gameObject.TryGetComponentInChildren(out result);
-
         public static bool TryGetComponentInChildren<T>(this GameObject obj, out T result) where T : Component
         {
             result = obj.GetComponentInChildren<T>();
             return result != null;
-        }
-
-        public static GameObject GetOrAddChild(this GameObject obj, string name)
-        {
-            var c = obj.transform.EnumerateChildren().FirstOrDefault(x => x.name == name)?.gameObject;
-            if (c == null)
-            {
-                c = new GameObject(name);
-                c.transform.parent = obj.transform;
-            }
-            return c;
-        }
-
-        public static T UndoGetOrAddComponent<T>(this GameObject obj) where T : Component
-        {
-            var component = obj.GetComponent<T>();
-            if (component == null)
-            {
-                component = Undo.AddComponent<T>(obj);
-            }
-            return component;
-        }
-
-        public static VRCAvatarDescriptor FindAvatarFromParent(this GameObject obj) => obj.GetComponentInParent<VRCAvatarDescriptor>();
-
-        public static IEnumerable<Transform> EnumerateChildren(this Transform tr)
-        {
-            int count = tr.childCount;
-            for(int i = 0 ; i < count; i++)
-            {
-                yield return tr.GetChild(i);
-            }
         }
 
         public static T AddTo<T>(this T obj, LightLimitChangerObjectCache cache) where T : Object
@@ -173,36 +112,6 @@ namespace io.github.azukimochi
                     }
                 }
             }
-        }
-
-        public static string GetRelativePath(this Transform transform, Transform root, bool includeRelativeTo = false)
-        {
-            var buffer = _relativePathBuffer;
-            if (buffer is null)
-            {
-                buffer = _relativePathBuffer = new string[128];
-            }
-
-            var t = transform;
-            int idx = buffer.Length;
-            while (t != null && t != root)
-            {
-                buffer[--idx] = t.name;
-                t = t.parent;
-            }
-            if (includeRelativeTo && t != null && t == root)
-            {
-                buffer[--idx] = t.name;
-            }
-
-            return string.Join("/", buffer, idx, buffer.Length - idx);
-        }
-
-        private static string[] _relativePathBuffer;
-
-        public static bool Contains(this string str, string value, StringComparison comparison)
-        {
-            return str.IndexOf(value, comparison) != -1;
         }
 
         public static IEnumerable<int> EnumeratePropertyNameIDs(this Shader shader)
@@ -256,27 +165,6 @@ namespace io.github.azukimochi
                 return false;
 
             return true;
-        }
-
-        // https://github.com/bdunderscore/modular-avatar/blob/b15520271455350cf728bc1b95b874dc30682eb2/Packages/nadena.dev.modular-avatar/Editor/Util.cs#L162C9-L178C10
-        // Originally under MIT License
-        // Copyright (c) 2022 bd_
-        public static string GetGeneratedAssetsFolder()
-        {
-            var path = "Assets/999_Modular_Avatar_Generated";
-
-            var pathParts = path.Split('/');
-
-            for (int i = 1; i < pathParts.Length; i++)
-            {
-                var subPath = string.Join("/", pathParts, 0, i + 1);
-                if (!AssetDatabase.IsValidFolder(subPath))
-                {
-                    AssetDatabase.CreateFolder(string.Join("/", pathParts, 0, i), pathParts[i]);
-                }
-            }
-
-            return path;
         }
 
         public static string GetVersion()
@@ -341,40 +229,6 @@ namespace io.github.azukimochi
         private struct PackageInfo
         {
             public string version;
-        }
-
-        public struct DisabledScope : IDisposable
-        {
-            public DisabledScope(bool disabled)
-            {
-                EditorGUI.BeginDisabledGroup(disabled);
-            }
-
-            public void Dispose()
-            {
-                EditorGUI.EndDisabledGroup();
-            }
-        }
-
-        public struct GroupScope : IDisposable
-        {
-            private float _originalLabelWidth;
-
-            public GroupScope(string header, float labelWidth)
-            {
-                GUILayout.Label($"---- {header}", EditorStyles.boldLabel);
-                _originalLabelWidth = EditorGUIUtility.labelWidth;
-                EditorGUIUtility.labelWidth = labelWidth;
-
-                EditorGUI.indentLevel++;
-            }
-
-            public void Dispose()
-            {
-                EditorGUIUtility.labelWidth = _originalLabelWidth;
-                EditorGUI.indentLevel--;
-                EditorGUILayout.Space();
-            }
         }
 
         public struct FoldoutHeaderGroupScope : IDisposable
