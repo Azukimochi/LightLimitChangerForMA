@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using UnityEditor;
+﻿using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -38,7 +37,7 @@ namespace io.github.azukimochi
         private static readonly int _HSVGPropertyID = Shader.PropertyToID($"_{nameof(HSVG)}");
         private static readonly int _GradationStrengthPropertyID = Shader.PropertyToID($"_{nameof(GradationStrength)}");
 
-        protected Material Material 
+        protected Material Material
         {
             get
             {
@@ -113,7 +112,7 @@ namespace io.github.azukimochi
                     format = tex.format;
                     if (Color.a < 1)
                     {
-                        switch(format)
+                        switch (format)
                         {
                             case TextureFormat.RGB24: format = TextureFormat.RGBA32; break;
                             case TextureFormat.DXT1: format = TextureFormat.DXT5; break;

@@ -1,11 +1,7 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using System;
+using System.Collections.Generic;
 using UnityEditor;
-using System.Linq;
-using System;
-using UnityEditor.Animations;
-using VRC.SDK3.Avatars.Components;
-
+using UnityEngine;
 using Object = UnityEngine.Object;
 
 namespace io.github.azukimochi
@@ -161,7 +157,7 @@ namespace io.github.azukimochi
                 material.SetInt(nameID, (int)(object)value);
             else if (typeof(T) == typeof(float))
                 material.SetFloat(nameID, (float)(object)value);
-            else 
+            else
                 return false;
 
             return true;
@@ -204,7 +200,7 @@ namespace io.github.azukimochi
             var position = EditorGUI.IndentedRect(EditorGUILayout.GetControlRect());
             var icon = EditorGUIUtility.IconContent("BuildSettings.Web.Small");
             icon.text = text;
-            
+
             var style = new GUIStyle(EditorStyles.label) { padding = new RectOffset() };
             style.normal.textColor = style.focused.textColor;
             style.hover.textColor = style.focused.textColor;

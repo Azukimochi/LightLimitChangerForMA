@@ -1,13 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEditor;
-using UnityEditor.Animations;
-using UnityEngine;
-using VRC.Core;
-using VRC.SDK3.Avatars.Components;
+﻿using UnityEditor;
 
 namespace io.github.azukimochi
 {
@@ -40,24 +31,24 @@ namespace io.github.azukimochi
 
         private void OnEnable()
         {
-            var parameters =                serializedObject.FindProperty  (nameof(LightLimitChangerSettings.Parameters));
-            IsDefaultUse =                  parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.IsDefaultUse));
-            IsValueSave =                   parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.IsValueSave));
-            OverwriteDefaultLightMinMax =   parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.OverwriteDefaultLightMinMax));
-            DefaultLightValue =             parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.DefaultLightValue));
-            DefaultMinLightValue =          parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.DefaultMinLightValue));
-            DefaultMaxLightValue =          parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.DefaultMaxLightValue));
-            MaxLightValue =                 parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.MaxLightValue));
-            MinLightValue =                 parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.MinLightValue));
-            TargetShaders =                 parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.TargetShaders));
-            AllowColorTempControl =         parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.AllowColorTempControl));
-            AllowSaturationControl =        parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.AllowSaturationControl));
-            AllowUnlitControl =             parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.AllowUnlitControl));
-            AddResetButton =                parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.AddResetButton));
-            IsSeparateLightControl =        parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.IsSeparateLightControl));
-            IsGroupingAdditionalControls =  parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.IsGroupingAdditionalControls));
-            Excludes =                      serializedObject.FindProperty  (nameof(LightLimitChangerSettings.Excludes));
-            WriteDefaults =                 serializedObject.FindProperty  (nameof(LightLimitChangerSettings.WriteDefaults));
+            var parameters = serializedObject.FindProperty(nameof(LightLimitChangerSettings.Parameters));
+            IsDefaultUse = parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.IsDefaultUse));
+            IsValueSave = parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.IsValueSave));
+            OverwriteDefaultLightMinMax = parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.OverwriteDefaultLightMinMax));
+            DefaultLightValue = parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.DefaultLightValue));
+            DefaultMinLightValue = parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.DefaultMinLightValue));
+            DefaultMaxLightValue = parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.DefaultMaxLightValue));
+            MaxLightValue = parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.MaxLightValue));
+            MinLightValue = parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.MinLightValue));
+            TargetShaders = parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.TargetShaders));
+            AllowColorTempControl = parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.AllowColorTempControl));
+            AllowSaturationControl = parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.AllowSaturationControl));
+            AllowUnlitControl = parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.AllowUnlitControl));
+            AddResetButton = parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.AddResetButton));
+            IsSeparateLightControl = parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.IsSeparateLightControl));
+            IsGroupingAdditionalControls = parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.IsGroupingAdditionalControls));
+            Excludes = serializedObject.FindProperty(nameof(LightLimitChangerSettings.Excludes));
+            WriteDefaults = serializedObject.FindProperty(nameof(LightLimitChangerSettings.WriteDefaults));
         }
 
         public override void OnInspectorGUI()
@@ -94,19 +85,19 @@ namespace io.github.azukimochi
                     EditorGUI.BeginDisabledGroup(IsSeparateLightControl.boolValue == false);
                     _isCepareteInitValFoldoutOpen = EditorGUILayout.Foldout(_isCepareteInitValFoldoutOpen,
                         Localization.G("label.separate_light_control_init_val"));
-                    if(_isCepareteInitValFoldoutOpen)
+                    if (_isCepareteInitValFoldoutOpen)
                     {
                         EditorGUILayout.PropertyField(DefaultMinLightValue, Localization.G("label.light_min_default"));
                         EditorGUILayout.PropertyField(DefaultMaxLightValue, Localization.G("label.light_max_default"));
                     }
                     EditorGUI.EndDisabledGroup();
-                    
+
                     EditorGUILayout.PropertyField(IsGroupingAdditionalControls, Localization.G("label.grouping_additional_controls"));
                     WriteDefaults.intValue = EditorGUILayout.Popup(Utils.Label("Write Defaults"), WriteDefaults.intValue, new[] { Localization.S("label.match_avatar"), "OFF", "ON" });
                     EditorGUILayout.PropertyField(Excludes, Localization.G("label.excludes"));
                 }
             }
-            
+
             if (EditorGUI.EndChangeCheck())
             {
                 serializedObject.ApplyModifiedProperties();

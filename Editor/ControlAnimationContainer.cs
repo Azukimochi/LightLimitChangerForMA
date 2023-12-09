@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using Object = UnityEngine.Object;
 
 namespace io.github.azukimochi
 {
@@ -28,7 +27,7 @@ namespace io.github.azukimochi
         }
 
         public static ControlAnimationContainer Create(LightLimitControlType controlType, string animationName, string parameterName, float defaultValue, Texture2D icon = null)
-            => new ControlAnimationContainer(controlType, animationName, parameterName, defaultValue, icon, new AnimationClip() { name = $"{animationName} Default" }, new AnimationClip() { name = $"{animationName} Control"});
+            => new ControlAnimationContainer(controlType, animationName, parameterName, defaultValue, icon, new AnimationClip() { name = $"{animationName} Default" }, new AnimationClip() { name = $"{animationName} Control" });
 
         public void AddTo(LightLimitChangerObjectCache cache)
         {

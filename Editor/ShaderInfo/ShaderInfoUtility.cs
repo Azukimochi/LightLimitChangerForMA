@@ -9,7 +9,7 @@ namespace io.github.azukimochi
     {
         public const string MaterialAnimationKeyPrefix = "material.";
 
-        public static AnimationClip SetParameterAnimation(this AnimationClip animationClip, in ControlAnimationParameters parameters, string propertyName, float value) 
+        public static AnimationClip SetParameterAnimation(this AnimationClip animationClip, in ControlAnimationParameters parameters, string propertyName, float value)
             => animationClip.SetParameterAnimation(parameters, propertyName, Utils.Animation.Constant(value));
 
         public static AnimationClip SetParameterAnimation(this AnimationClip animationClip, in ControlAnimationParameters parameters, string propertyName, float start, float end)
@@ -90,7 +90,7 @@ namespace io.github.azukimochi
 
             int result = 0;
             var infos = ShaderInfo.RegisteredShaderInfoNames;
-            for(int i = 0; i < infos.Length; i++)
+            for (int i = 0; i < infos.Length; i++)
             {
                 if (targetShaders.Targets.Contains(infos[i]))
                 {
