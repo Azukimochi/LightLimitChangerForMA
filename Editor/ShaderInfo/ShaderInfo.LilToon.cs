@@ -57,9 +57,13 @@ namespace io.github.azukimochi
                 var textureBaker = TextureBaker.GetInstance<DefaultTextureBaker>(cache);
 
                 // MainTexture
-                return BakeMainTex(material, cache, textureBaker) ||
-                    Bake2ndOr3rdTex(material, cache, textureBaker, (PropertyIDs.Main2ndTex, PropertyIDs.Color2nd), DefaultParameters.Color2nd) ||
-                    Bake2ndOr3rdTex(material, cache, textureBaker, (PropertyIDs.Main3rdTex, PropertyIDs.Color3rd), DefaultParameters.Color3rd);
+                bool bakeProcessed = false;
+
+                bakeProcessed |= BakeMainTex(material, cache, textureBaker);
+                bakeProcessed |= Bake2ndOr3rdTex(material, cache, textureBaker, (PropertyIDs.Main2ndTex, PropertyIDs.Color2nd), DefaultParameters.Color2nd);
+                bakeProcessed |= Bake2ndOr3rdTex(material, cache, textureBaker, (PropertyIDs.Main3rdTex, PropertyIDs.Color3rd), DefaultParameters.Color3rd);
+
+                return bakeProcessed;
             }
 
             private bool BakeMainTex(Material material, LightLimitChangerObjectCache cache, DefaultTextureBaker textureBaker)
