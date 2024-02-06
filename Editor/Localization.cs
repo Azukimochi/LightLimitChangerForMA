@@ -87,19 +87,32 @@ namespace io.github.azukimochi
             },
             { "tip.allow_gen_playmode", new[] { "Automatically generate animations at build/play mode", "ビルド・実行時にアニメーションを自動生成します" } },
             { "window.info.deprecated", new[] { "The settings window has been deprecated. See below for new ways of doing things.", "設定ウィンドウは非推奨になりました。新しいやり方については以下をご覧ください。" } },
+            
+            { "NDMF.info.useColorTemporSaturation", new []
+            {
+                @"Color temperature or saturation changes are enabled.
+
+This feature modifies the material, so bugs may exist and texture memory may increase. 
+If the color of the material becomes strange, please do not use this function and report it to the author.",
+                @"色温度または彩度の変更が有効になっています。
+
+この機能はマテリアルを変更するため、バグが存在する可能性があり、テクスチャメモリが増加する可能性があります。
+マテリアルの色がおかしくなった場合にはこの機能を使用せず、作者に報告をお願いします。"
+            }}
         };
 
-        public static string S(string text)
+        public static string S(string text, int? language = null)
         {
             if (text != null)
             {
                 if (_LocalizedText.TryGetValue(text, out var res))
-                    return res[_SelectedLanguage];
+                    return res[language ?? _SelectedLanguage];
             }
             return text;
         }
 
         public static GUIContent G(string text, string textTip = null) => Utils.Label(S(text), S(textTip));
+        
 
         public static void ShowLocalizationUI()
         {
