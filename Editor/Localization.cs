@@ -92,11 +92,11 @@ namespace io.github.azukimochi
             {
                 @"Color temperature or saturation changes are enabled.
 
-This feature modifies the material, so bugs may exist and texture memory may increase. 
+This feature non-destructively modifies materials and textures at runtime, which may result in potential bugs and increased texture memory. 
 If the color of the material becomes strange, please do not use this function and report it to the author.",
                 @"色温度または彩度の変更が有効になっています。
 
-この機能はマテリアルを変更するため、バグが存在する可能性があり、テクスチャメモリが増加する可能性があります。
+この機能は実行時に非破壊でマテリアル・テクスチャを変更するため、潜在的なバグやテクスチャメモリが増加する可能性があります。
 マテリアルの色がおかしくなった場合にはこの機能を使用せず、作者に報告をお願いします。"
             }}
         };
