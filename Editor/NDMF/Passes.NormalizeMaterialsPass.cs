@@ -13,6 +13,11 @@ namespace io.github.azukimochi
                 if (!session.Parameters.AllowColorTempControl && !session.Parameters.AllowSaturationControl)
                     return;
 
+                //Report ColorTempCont or SaturationCnt information in NDMF error reporting  
+
+                IError error = new ErrorMessage("NDMF.info.useColorTemporSaturation", ErrorSeverity.NonFatal);
+                ErrorReport.ReportError(error);
+                
                 foreach (var material in cache.MappedObjects.Select(x => x as Material).Where(x => x != null).ToArray())
                 {
                     if (ShaderInfo.TryGetShaderInfo(material, out var shaderInfo))
