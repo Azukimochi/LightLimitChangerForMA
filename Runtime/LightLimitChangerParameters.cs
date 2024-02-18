@@ -32,6 +32,7 @@ namespace io.github.azukimochi
 
         public bool AllowColorTempControl;
         public bool AllowSaturationControl;
+        public bool AllowMonochromeControl;
         public bool AllowUnlitControl;
         public bool AddResetButton;
 
@@ -53,6 +54,7 @@ namespace io.github.azukimochi
             TargetShaders = TargetShaders.Everything,
             AllowColorTempControl = false,
             AllowSaturationControl = false,
+            AllowMonochromeControl = false,
             AllowUnlitControl = false,
             AddResetButton = false,
             IsGroupingAdditionalControls = false,

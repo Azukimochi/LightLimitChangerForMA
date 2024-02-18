@@ -28,6 +28,7 @@ namespace io.github.azukimochi
             { "info.shader_must_select" , new []{"Target Shader must be selected", "対象シェーダーを選択してください"} },
             { "label.allow_color_tmp", new[] { "Allow Color Temperature Ctrl", "色温度調整を有効にする" } },
             { "label.allow_saturation", new[] { "Allow Saturation Control", "彩度調整を有効にする" } },
+            { "label.allow_monochrome", new []{ "Allow Monochrome Control", "ライトのモノクロ化調整を有効にする"}},
             { "label.allow_unlit", new[] { "Allow Unlit Control", "Unlit調整を有効にする" } },
             { "label.allow_reset", new[] { "Add Reset Button", "リセットボタンを追加する" } },
             { "label.allow_override_poiyomi", new[] { "Allow Override Poiyomi AnimatedFlag", "PoiyomiのAnimatedフラグを上書きする" } },
@@ -65,6 +66,7 @@ namespace io.github.azukimochi
             { "tip.target_shader", new[] { "You can choose which shader to control", "制御するシェーダーを選択できます" } },
             { "tip.allow_color_tmp", new[] { "You can enable the Color Temperature adjustment function", "色温度の調節機能を有効化することができます" } },
             { "tip.allow_saturation", new[] { "You can enable the saturation adjustment function", "彩度の調整機能を有効化することができます" } },
+            { "tip.allow_monochrome", new []{ "You can enable the monochrome adjustment function", "ライトのモノクロ化の調整機能を有効化することができます"} },
             {
                 "tip.allow_unlit",
                 new[]
