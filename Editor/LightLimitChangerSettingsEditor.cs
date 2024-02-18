@@ -1,4 +1,5 @@
 ﻿using UnityEditor;
+using UnityEngine;
 
 namespace io.github.azukimochi
 {
@@ -17,6 +18,7 @@ namespace io.github.azukimochi
         private SerializedProperty TargetShaders;
         private SerializedProperty AllowColorTempControl;
         private SerializedProperty AllowSaturationControl;
+        private SerializedProperty AllowMonochromeControl;
         private SerializedProperty AllowUnlitControl;
         private SerializedProperty AddResetButton;
         private SerializedProperty IsGroupingAdditionalControls;
@@ -43,6 +45,7 @@ namespace io.github.azukimochi
             TargetShaders = parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.TargetShaders));
             AllowColorTempControl = parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.AllowColorTempControl));
             AllowSaturationControl = parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.AllowSaturationControl));
+            AllowMonochromeControl = parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.AllowMonochromeControl));
             AllowUnlitControl = parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.AllowUnlitControl));
             AddResetButton = parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.AddResetButton));
             IsSeparateLightControl = parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.IsSeparateLightControl));
@@ -53,6 +56,9 @@ namespace io.github.azukimochi
 
         public override void OnInspectorGUI()
         {
+            //new custom Editor styles include bold and large labels
+            GUIStyle boldLabel = new GUIStyle(EditorStyles.label) { fontStyle = FontStyle.Bold, fontSize = 15};
+            
             if (!IsWindowMode)
             {
                 Utils.ShowVersionInfo();
@@ -62,37 +68,46 @@ namespace io.github.azukimochi
             serializedObject.Update();
             EditorGUI.BeginChangeCheck();
 
+            EditorGUILayout.LabelField(Localization.S("label.category.general_settings"), boldLabel);
+            
             EditorGUILayout.PropertyField(IsDefaultUse, Localization.G("label.use_default", "tip.use_default"));
             EditorGUILayout.PropertyField(IsValueSave, Localization.G("label.save_value", "tip.save_value"));
-            EditorGUILayout.PropertyField(OverwriteDefaultLightMinMax, Localization.G("label.override_min_max", "tip.override_min_max"));
+            EditorGUILayout.Space(10);
+            EditorGUILayout.PropertyField(IsSeparateLightControl, Localization.G("label.separate_light_control"));
             EditorGUILayout.PropertyField(MaxLightValue, Localization.G("label.light_max", "tip.light_max"));
             EditorGUILayout.PropertyField(MinLightValue, Localization.G("label.light_min", "tip.light_min"));
             EditorGUI.BeginDisabledGroup(IsSeparateLightControl.boolValue == true);
             EditorGUILayout.PropertyField(DefaultLightValue, Localization.G("label.light_default", "tip.light_default"));
             EditorGUI.EndDisabledGroup();
+            
+            EditorGUI.BeginDisabledGroup(IsSeparateLightControl.boolValue == false);
+            _isCepareteInitValFoldoutOpen = EditorGUILayout.Foldout(_isCepareteInitValFoldoutOpen,
+                Localization.G("label.separate_light_control_init_val"));
+            if (_isCepareteInitValFoldoutOpen)
+            {
+                EditorGUILayout.PropertyField(DefaultMinLightValue, Localization.G("label.light_min_default"));
+                EditorGUILayout.PropertyField(DefaultMaxLightValue, Localization.G("label.light_max_default"));
+            }
+            EditorGUI.EndDisabledGroup();
+            
+            EditorGUILayout.Space(10);
+            EditorGUILayout.LabelField(Localization.S("label.category.additional_settings"), boldLabel);
             EditorGUILayout.PropertyField(AllowColorTempControl, Localization.G("label.allow_color_tmp", "tip.allow_color_tmp"));
             EditorGUILayout.PropertyField(AllowSaturationControl, Localization.G("label.allow_saturation", "tip.allow_saturation"));
+            EditorGUILayout.PropertyField(AllowMonochromeControl, Localization.G("label.allow_monochrome", "tip.allow_monochrome"));
             EditorGUILayout.PropertyField(AllowUnlitControl, Localization.G("label.allow_unlit", "tip.allow_unlit"));
             EditorGUILayout.PropertyField(AddResetButton, Localization.G("label.allow_reset", "tip.allow_reset"));
+            EditorGUILayout.Space(5);
+            EditorGUILayout.PropertyField(IsGroupingAdditionalControls, Localization.G("label.grouping_additional_controls"));
 
+
+            EditorGUILayout.Space(10);
             using (var group = new Utils.FoldoutHeaderGroupScope(ref _isOptionFoldoutOpen, Localization.G("category.select_option")))
             {
                 if (group.IsOpen)
                 {
+                    EditorGUILayout.PropertyField(OverwriteDefaultLightMinMax, Localization.G("label.override_min_max", "tip.override_min_max"));
                     EditorGUILayout.PropertyField(TargetShaders, Localization.G("label.target_shader", "tip.target_shader"));
-                    EditorGUILayout.PropertyField(IsSeparateLightControl, Localization.G("label.separate_light_control"));
-
-                    EditorGUI.BeginDisabledGroup(IsSeparateLightControl.boolValue == false);
-                    _isCepareteInitValFoldoutOpen = EditorGUILayout.Foldout(_isCepareteInitValFoldoutOpen,
-                        Localization.G("label.separate_light_control_init_val"));
-                    if (_isCepareteInitValFoldoutOpen)
-                    {
-                        EditorGUILayout.PropertyField(DefaultMinLightValue, Localization.G("label.light_min_default"));
-                        EditorGUILayout.PropertyField(DefaultMaxLightValue, Localization.G("label.light_max_default"));
-                    }
-                    EditorGUI.EndDisabledGroup();
-
-                    EditorGUILayout.PropertyField(IsGroupingAdditionalControls, Localization.G("label.grouping_additional_controls"));
                     WriteDefaults.intValue = EditorGUILayout.Popup(Utils.Label("Write Defaults"), WriteDefaults.intValue, new[] { Localization.S("label.match_avatar"), "OFF", "ON" });
                     EditorGUILayout.PropertyField(Excludes, Localization.G("label.excludes"));
                 }

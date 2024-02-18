@@ -16,6 +16,7 @@ namespace io.github.azukimochi
         public static Texture2D Reset => FromGUID("46b69c6755e703048845eef57e51a329");
         public static Texture2D Settings => FromGUID("75cdf4ab5baf72a4f8b6463d3720bd35");
 
+        public static Texture2D Monochrome => FromGUID("4c8792d0c75948a42a1f2be8cc2aa6cb");
         private static Texture2D FromGUID(string guid) => AssetDatabase.LoadAssetAtPath<Texture2D>(AssetDatabase.GUIDToAssetPath(guid));
     }
 }
