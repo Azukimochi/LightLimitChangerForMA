@@ -16,6 +16,8 @@ namespace io.github.azukimochi
             { "category.select_avatar", new[] { "Select Avatar", "アバターを選択" } },
             { "label.avatar", new[] { "Avatar", "アバター" } },
             { "category.select_parameter", new[] { "Parameter", "パラメーター" } },
+            { "label.category.general_settings", new []{ "General settings", "一般設定"} },
+            { "label.category.additional_settings", new []{ "Additional settings", "追加設定"}},
             { "label.use_default", new[] { "DefaultUse", "初期状態で適用する" } },
             { "label.save_value", new[] { "SaveValue", "パラメータを保持する" } },
             { "label.override_min_max", new[] { "Overwrite Default Min/Max", "初期の上限と下限を上書きする" } },
