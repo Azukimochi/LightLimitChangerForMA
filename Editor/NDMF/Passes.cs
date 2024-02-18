@@ -36,6 +36,7 @@ namespace io.github.azukimochi
         internal const string ParameterName_Unlit = "LightLimitUnlit";
         internal const string ParameterName_ColorTemp = "LightLimitColorTemp";
         internal const string ParameterName_Reset = "LightLimitReset";
+        internal const string ParameterName_Monochrome = "LightLimitMonochrome";
 
         private static Session GetSession(BuildContext context)
         {
@@ -119,6 +120,7 @@ namespace io.github.azukimochi
                     ControlAnimationContainer.Create(LightLimitControlType.Saturation, "Saturation", ParameterName_Saturation, 0.5f, Icons.Color),
                     ControlAnimationContainer.Create(LightLimitControlType.Unlit, "Unlit", ParameterName_Unlit, 0, Icons.Unlit),
                     ControlAnimationContainer.Create(LightLimitControlType.ColorTemperature, "ColorTemp", ParameterName_ColorTemp, 0.5f, Icons.Temp),
+                    ControlAnimationContainer.Create(LightLimitControlType.Monochrome, "Monochrome", ParameterName_Monochrome, 0, Icons.Monochrome), 
                 });
 
                 Controls = controls.ToArray();
@@ -136,6 +138,10 @@ namespace io.github.azukimochi
                 if (parameters.AllowUnlitControl)
                 {
                     targetControl |= LightLimitControlType.Unlit;
+                }
+                if (parameters.AllowMonochromeControl)
+                {
+                    targetControl |= LightLimitControlType.Monochrome;
                 }
 
                 TargetControl = targetControl;

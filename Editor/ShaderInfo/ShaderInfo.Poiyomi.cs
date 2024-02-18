@@ -13,6 +13,7 @@ namespace io.github.azukimochi
             public const string _LightingCap = "_LightingCap";
             public const string _MainColorAdjustToggle = "_MainColorAdjustToggle";
             public const string _Saturation = "_Saturation";
+            public const string _MonochromeLighting = "_LightingMonochromatic";
             public const string _Color = "_Color";
             public const string _MainTex = "_MainTex";
 
@@ -148,6 +149,11 @@ namespace io.github.azukimochi
                     container.Default.SetParameterAnimation(parameters, _DissolveTextureColor, DefaultParameters.Color);
                     container.Control.SetColorTempertureAnimation(parameters, _DissolveTextureColor, DefaultParameters.Color);
                 }
+                if (container.ControlType.HasFlag(LightLimitControlType.Monochrome))
+                {
+                    container.Default.SetParameterAnimation(parameters, _MonochromeLighting, 0);
+                    container.Control.SetParameterAnimation(parameters, _MonochromeLighting, 0, 1);
+                }
             }
 
             public override void AdditionalControl(Material material, in LightLimitChangerParameters parameters)
@@ -172,6 +178,11 @@ namespace io.github.azukimochi
                     {
                         material.SetOverrideTag($"{_Saturation}{Animated_Suffix}", Flag_IsAnimated);
                     }
+                }
+
+                if (parameters.AllowMonochromeControl)
+                {
+                    material.SetOverrideTag($"{_MonochromeLighting}{Animated_Suffix}", Flag_IsAnimated);
                 }
             }
 

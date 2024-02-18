@@ -18,6 +18,7 @@ namespace io.github.azukimochi
             public const string _MainTex = "_MainTex";
             public const string _SubTex = "_SubTex";
             public const string _SubColor = "_SubColor";
+            public const string _MonochromeLit = "_MonochromeLit";
 
             private static class PropertyIDs
             {
@@ -95,6 +96,12 @@ namespace io.github.azukimochi
                     container.Control.SetParameterAnimation(parameters, _DirectionalLight, curve);
                     container.Control.SetParameterAnimation(parameters, _PointLight, curve);
                     container.Control.SetParameterAnimation(parameters, _SHLight, curve);
+                }
+
+                if (container.ControlType.HasFlag(LightLimitControlType.Monochrome))
+                {
+                    container.Default.SetParameterAnimation(parameters, _MonochromeLit, 0);
+                    container.Control.SetParameterAnimation(parameters, _MonochromeLit, 0, 1);
                 }
 
                 if (container.ControlType.HasFlag(LightLimitControlType.Unlit))

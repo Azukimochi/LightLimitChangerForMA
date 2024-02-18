@@ -11,7 +11,8 @@ namespace io.github.azukimochi
         ColorTemperature = 1 << 3,
         LightMin = 1 << 4,
         LightMax = 1 << 5,
+        Monochrome = 1 << 6,
 
-        AdditionalControls = Saturation | Unlit | ColorTemperature,
+        AdditionalControls = Saturation | Unlit | ColorTemperature | Monochrome,
     }
 }
