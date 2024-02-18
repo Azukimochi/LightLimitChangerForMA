@@ -23,6 +23,7 @@ namespace io.github.azukimochi
             public const string _MainGradationTex = "_MainGradationTex";
             public const string _MainGradationStrength = "_MainGradationStrength";
             public const string _MainColorAdjustMask = "_MainColorAdjustMask";
+            public const string _MonochromeLighting = "_MonochromeLighting";
 
             private static class PropertyIDs
             {
@@ -189,6 +190,11 @@ namespace io.github.azukimochi
 
                     container.Control.SetParameterAnimation(parameters, _MainTexHSVG, DefaultParameters.MainTexHSVG, ~ShaderInfoUtility.IncludeField.Y);
                     container.Control.SetParameterAnimation(parameters, $"{_MainTexHSVG}.y", 0, 2);
+                }
+                if (container.ControlType.HasFlag(LightLimitControlType.Monochrome))
+                {
+                    container.Default.SetParameterAnimation(parameters, _MonochromeLighting, 0);
+                    container.Control.SetParameterAnimation(parameters, _MonochromeLighting, 0, 1);
                 }
 
                 if (container.ControlType.HasFlag(LightLimitControlType.Unlit))
