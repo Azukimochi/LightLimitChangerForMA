@@ -20,6 +20,10 @@ namespace io.github.azukimochi
         private SerializedProperty AllowSaturationControl;
         private SerializedProperty AllowMonochromeControl;
         private SerializedProperty AllowUnlitControl;
+        private SerializedProperty InitialTempControlValue;
+        private SerializedProperty InitialSaturationControlValue;
+        private SerializedProperty InitialMonochromeControlValue;
+        private SerializedProperty InitialUnlitControlValue;
         private SerializedProperty AddResetButton;
         private SerializedProperty IsGroupingAdditionalControls;
         private SerializedProperty IsSeparateLightControl;
@@ -47,6 +51,10 @@ namespace io.github.azukimochi
             AllowSaturationControl = parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.AllowSaturationControl));
             AllowMonochromeControl = parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.AllowMonochromeControl));
             AllowUnlitControl = parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.AllowUnlitControl));
+            InitialTempControlValue = parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.InitialTempControlValue));
+            InitialSaturationControlValue = parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.InitialSaturationControlValue));
+            InitialMonochromeControlValue = parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.InitialMonochromeControlValue));
+            InitialUnlitControlValue = parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.InitialUnlitControlValue));
             AddResetButton = parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.AddResetButton));
             IsSeparateLightControl = parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.IsSeparateLightControl));
             IsGroupingAdditionalControls = parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.IsGroupingAdditionalControls));
@@ -92,10 +100,35 @@ namespace io.github.azukimochi
             
             EditorGUILayout.Space(10);
             EditorGUILayout.LabelField(Localization.S("label.category.additional_settings"), boldLabel);
+            
+            EditorGUILayout.BeginHorizontal();
             EditorGUILayout.PropertyField(AllowColorTempControl, Localization.G("label.allow_color_tmp", "tip.allow_color_tmp"));
+            EditorGUI.BeginDisabledGroup(AllowColorTempControl.boolValue == false);
+            EditorGUILayout.PropertyField(InitialTempControlValue, Localization.G(""));
+            EditorGUI.EndDisabledGroup();
+            EditorGUILayout.EndHorizontal();
+            
+            EditorGUILayout.BeginHorizontal();
             EditorGUILayout.PropertyField(AllowSaturationControl, Localization.G("label.allow_saturation", "tip.allow_saturation"));
+            EditorGUI.BeginDisabledGroup(AllowSaturationControl.boolValue == false);
+            EditorGUILayout.PropertyField(InitialSaturationControlValue, Localization.G(""));
+            EditorGUI.EndDisabledGroup();
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.BeginHorizontal();
             EditorGUILayout.PropertyField(AllowMonochromeControl, Localization.G("label.allow_monochrome", "tip.allow_monochrome"));
+            EditorGUI.BeginDisabledGroup(AllowMonochromeControl.boolValue == false);
+            EditorGUILayout.PropertyField(InitialMonochromeControlValue, Localization.G(""));
+            EditorGUI.EndDisabledGroup();
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.BeginHorizontal();
             EditorGUILayout.PropertyField(AllowUnlitControl, Localization.G("label.allow_unlit", "tip.allow_unlit"));
+            EditorGUI.BeginDisabledGroup(AllowUnlitControl.boolValue == false);
+            EditorGUILayout.PropertyField(InitialUnlitControlValue, Localization.G(""));
+            EditorGUI.EndDisabledGroup();
+            EditorGUILayout.EndHorizontal();
+            
             EditorGUILayout.PropertyField(AddResetButton, Localization.G("label.allow_reset", "tip.allow_reset"));
             EditorGUILayout.Space(5);
             EditorGUILayout.PropertyField(IsGroupingAdditionalControls, Localization.G("label.grouping_additional_controls"));

@@ -101,7 +101,7 @@ namespace io.github.azukimochi
 
                 Controller = new AnimatorController() { name = "Light Limit Controller" }.AddTo(cache);
                 Settings = settings;
-                var parameters = Parameters = Settings?.Parameters ?? LightLimitChangerParameters.Default;
+                var parameters = Parameters = Settings?.Parameters ?? new LightLimitChangerParameters();
                 Excludes = new HashSet<Object>(Settings?.Excludes ?? (IEnumerable<Object>)Array.Empty<Object>());
 
                 List<ControlAnimationContainer> controls = new List<ControlAnimationContainer>();
@@ -117,10 +117,10 @@ namespace io.github.azukimochi
 
                 controls.AddRange(new[]
                 {
-                    ControlAnimationContainer.Create(LightLimitControlType.Saturation, "Saturation", ParameterName_Saturation, 0.5f, Icons.Color),
-                    ControlAnimationContainer.Create(LightLimitControlType.Unlit, "Unlit", ParameterName_Unlit, 0, Icons.Unlit),
-                    ControlAnimationContainer.Create(LightLimitControlType.ColorTemperature, "ColorTemp", ParameterName_ColorTemp, 0.5f, Icons.Temp),
-                    ControlAnimationContainer.Create(LightLimitControlType.Monochrome, "Monochrome", ParameterName_Monochrome, 0, Icons.Monochrome), 
+                    ControlAnimationContainer.Create(LightLimitControlType.Saturation, "Saturation", ParameterName_Saturation, parameters.InitialSaturationControlValue, Icons.Color),
+                    ControlAnimationContainer.Create(LightLimitControlType.Unlit, "Unlit", ParameterName_Unlit, parameters.InitialUnlitControlValue, Icons.Unlit),
+                    ControlAnimationContainer.Create(LightLimitControlType.ColorTemperature, "ColorTemp", ParameterName_ColorTemp, parameters.InitialTempControlValue, Icons.Temp),
+                    ControlAnimationContainer.Create(LightLimitControlType.Monochrome, "Monochrome", ParameterName_Monochrome, parameters.InitialMonochromeControlValue, Icons.Monochrome), 
                 });
 
                 Controls = controls.ToArray();

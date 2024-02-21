@@ -8,7 +8,7 @@ namespace io.github.azukimochi
     [AddComponentMenu("Modular Avatar/Light Limit Changer")]
     public sealed class LightLimitChangerSettings : MonoBehaviour, IEditorOnly, ISerializationCallbackReceiver
     {
-        public LightLimitChangerParameters Parameters = LightLimitChangerParameters.Default;
+        public LightLimitChangerParameters Parameters = new LightLimitChangerParameters();
 
 #if UNITY_2022_1_OR_NEWER
         [NonReorderable]
