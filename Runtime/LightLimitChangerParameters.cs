@@ -4,60 +4,51 @@ using UnityEngine;
 namespace io.github.azukimochi
 {
     [Serializable]
-    public struct LightLimitChangerParameters
+    public class LightLimitChangerParameters
     {
-        public bool IsDefaultUse;
-        public bool IsValueSave;
-        public bool OverwriteDefaultLightMinMax;
+        public bool IsDefaultUse  = false;
+        public bool IsValueSave = false;
+        public bool OverwriteDefaultLightMinMax = true;
 
         [Range(0, 1)]
-        public float DefaultLightValue;
+        public float DefaultLightValue = 0.5f;
 
         [Range(0, 1)]
-        public float DefaultMinLightValue;
+        public float DefaultMinLightValue = 0.0f;
 
         [Range(0, 1)]
-        public float DefaultMaxLightValue;
+        public float DefaultMaxLightValue = 1.0f;
 
         [Range(0, 10)]
-        public float MaxLightValue;
+        public float MaxLightValue = 1.0f;
 
         [Range(0, 10)]
-        public float MinLightValue;
+        public float MinLightValue = 0.0f;
 
-        [Obsolete]
-        public int TargetShader;
+        [Obsolete] public int TargetShader = -1;
 
-        public TargetShaders TargetShaders;
+        public TargetShaders TargetShaders = TargetShaders.Everything;
 
-        public bool AllowColorTempControl;
-        public bool AllowSaturationControl;
-        public bool AllowMonochromeControl;
-        public bool AllowUnlitControl;
-        public bool AddResetButton;
+        public bool AllowColorTempControl = false;
+        public bool AllowSaturationControl = false;
+        public bool AllowMonochromeControl = false;
+        public bool AllowUnlitControl = false;
+        public bool AddResetButton = false;
+        
+        [Range(0,1)]
+        public float InitialTempControlValue = 0.5f;
 
-        public bool IsSeparateLightControl;
+        [Range(0,1)]
+        public float InitialSaturationControlValue = 0.5f;
+        
+        [Range(0,1)]
+        public float InitialMonochromeControlValue = 0.0f;
+        
+        [Range(0,1)]
+        public float InitialUnlitControlValue = 0.0f;
+        
+        public bool IsSeparateLightControl = false;
 
-        public bool IsGroupingAdditionalControls;
-
-        public static LightLimitChangerParameters Default => new LightLimitChangerParameters()
-        {
-            IsDefaultUse = false,
-            IsValueSave = false,
-            OverwriteDefaultLightMinMax = true,
-            DefaultLightValue = 0.5f,
-            DefaultMinLightValue = 0.0f,
-            DefaultMaxLightValue = 1.0f,
-            MaxLightValue = 1.0f,
-            MinLightValue = 0.0f,
-            //TargetShader = -1, // Everything
-            TargetShaders = TargetShaders.Everything,
-            AllowColorTempControl = false,
-            AllowSaturationControl = false,
-            AllowMonochromeControl = false,
-            AllowUnlitControl = false,
-            AddResetButton = false,
-            IsGroupingAdditionalControls = false,
-        };
+        public bool IsGroupingAdditionalControls = false;
     }
 }
