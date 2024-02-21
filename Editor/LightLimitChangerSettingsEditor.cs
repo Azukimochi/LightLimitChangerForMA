@@ -93,8 +93,8 @@ namespace io.github.azukimochi
                 Localization.G("label.separate_light_control_init_val"));
             if (_isCepareteInitValFoldoutOpen)
             {
-                EditorGUILayout.PropertyField(DefaultMinLightValue, Localization.G("label.light_min_default"));
                 EditorGUILayout.PropertyField(DefaultMaxLightValue, Localization.G("label.light_max_default"));
+                EditorGUILayout.PropertyField(DefaultMinLightValue, Localization.G("label.light_min_default"));
             }
             EditorGUI.EndDisabledGroup();
             
