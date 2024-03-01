@@ -118,7 +118,7 @@ namespace io.github.azukimochi
             public override bool IsTargetShader(Shader shader)
             {
                 //return shader.name.Contains("poiyomi", StringComparison.OrdinalIgnoreCase);
-                return shader.name.Contains("Poiyomi 8", StringComparison.OrdinalIgnoreCase);
+                return shader.name.Contains("Poiyomi 8", StringComparison.OrdinalIgnoreCase) || shader.name.Contains(".poiyomi/Old Versions/8", StringComparison.OrdinalIgnoreCase);
             }
 
             public override void SetControlAnimation(in ControlAnimationContainer container, in ControlAnimationParameters parameters)
