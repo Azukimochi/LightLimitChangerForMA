@@ -1,4 +1,5 @@
 ﻿using System;
+using nadena.dev.ndmf;
 using UnityEngine;
 
 namespace io.github.azukimochi
@@ -20,6 +21,8 @@ namespace io.github.azukimochi
             public const string _EnableDissolve = "_EnableDissolve";
             public const string _DissolveTextureColor = "_DissolveTextureColor";
             public const string _DissolveToTexture = "_DissolveToTexture";
+            
+            private bool isDetectOldVersion = false;
 
             private static class PropertyIDs
             {
@@ -117,8 +120,15 @@ namespace io.github.azukimochi
 
             public override bool IsTargetShader(Shader shader)
             {
+                if (shader.name.Contains("7.3", StringComparison.OrdinalIgnoreCase) && !isDetectOldVersion)
+                {
+                    IError error = new ErrorMessage("NDMF.info.poiyomi_old_version", ErrorSeverity.NonFatal);
+                    ErrorReport.ReportError(error);
+                    isDetectOldVersion = true;
+                }
                 //return shader.name.Contains("poiyomi", StringComparison.OrdinalIgnoreCase);
-                return shader.name.Contains("Poiyomi 8", StringComparison.OrdinalIgnoreCase);
+                return shader.name.Contains(".poiyomi", StringComparison.OrdinalIgnoreCase) &&
+                       ! shader.name.Contains("7.3", StringComparison.OrdinalIgnoreCase);
             }
 
             public override void SetControlAnimation(in ControlAnimationContainer container, in ControlAnimationParameters parameters)
