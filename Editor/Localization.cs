@@ -85,7 +85,10 @@ namespace io.github.azukimochi
             {
                 "tip.allow_reset", new[] { "Adds a reset button to return parameters to selected values", "パラメータを設定値に戻すリセットボタンを追加します" }
             },
-            { "tip.allow_override_poiyomi", new[] { "Automatically set animation flags at build time", "ビルド時に自動的にアニメーションフラグをセットします" } },
+            {
+                "tip.allow_override_poiyomi",
+                new[] { "Automatically set animation flags at build time", "ビルド時に自動的にアニメーションフラグをセットします" }
+            },
             {
                 "tip.allow_editor_only",
                 new[]
@@ -94,11 +97,22 @@ namespace io.github.azukimochi
                     "EditorOnlyタグに設定されているオブジェクトをアニメーションから除外します"
                 }
             },
-            { "tip.allow_gen_playmode", new[] { "Automatically generate animations at build/play mode", "ビルド・実行時にアニメーションを自動生成します" } },
-            { "window.info.deprecated", new[] { "The settings window has been deprecated. See below for new ways of doing things.", "設定ウィンドウは非推奨になりました。新しいやり方については以下をご覧ください。" } },
-            
-            { "NDMF.info.useColorTemporSaturation", new []
             {
+                "tip.allow_gen_playmode",
+                new[] { "Automatically generate animations at build/play mode", "ビルド・実行時にアニメーションを自動生成します" }
+            },
+            {
+                "window.info.deprecated",
+                new[]
+                {
+                    "The settings window has been deprecated. See below for new ways of doing things.",
+                    "設定ウィンドウは非推奨になりました。新しいやり方については以下をご覧ください。"
+                }
+            },
+
+            {
+                "NDMF.info.useColorTemporSaturation", new[]
+                {
                 @"Color temperature and/or saturation controls are enabled.
 
 This feature non-destructively modifies materials and textures at runtime, which may cause unexpected bugs and increase texture memory consumption. 
@@ -107,7 +121,17 @@ If material colors appear abnormal, please disable these controls and file a bug
 
 この機能は実行時に非破壊でマテリアル・テクスチャを変更するため、潜在的なバグやテクスチャメモリが増加する可能性があります。
 マテリアルの色がおかしくなった場合にはこの機能を使用せず、作者に報告をお願いします。"
-            }}
+                }
+            },
+            {
+                "NDMF.info.poiyomi_old_version", new[]
+                {
+                    @"Poiyomi Shader version 7.3 is detected.
+Please update to the latest version of Poiyomi Shader.",
+                    @"Poiyomi Shader のバージョン 7.3 が検出されました。
+Poiyomi Shaderの最新版へのアップデートをお願いします"
+                }
+            }
         };
 
         public static string S(string text, int? language = null)
