@@ -8,7 +8,7 @@ namespace io.github.azukimochi
     {
         private const string PreferenceKey = "io.github.azukimochi.light-limit-changer.lang";
         private static int _SelectedLanguage = EditorPrefs.GetInt(PreferenceKey, 1);
-        private static readonly GUIContent[] _SupportedLanguages = new GUIContent[] { new GUIContent("English"), new GUIContent("日本語"), new GUIContent("繁體中文") };
+        private static readonly GUIContent[] _SupportedLanguages = new GUIContent[] { new GUIContent("English (United States)"), new GUIContent("日本語 (日本)"), new GUIContent("中文 (繁體)") };
         private static readonly GUIContent _Label = new GUIContent("Language");
 
         private static Dictionary<string, string[]> _LocalizedText = new Dictionary<string, string[]>()
