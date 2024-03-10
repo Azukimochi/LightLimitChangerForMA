@@ -17,7 +17,8 @@ namespace io.github.azukimochi
             Localizer = new Localizer("en-US", () => new List<(string, Func<string, string>)>
             {
                 ("en-US", key => Localization.S(key,0)),
-                ("ja-JP", key => Localization.S(key,1))
+                ("ja-JP", key => Localization.S(key,1)),
+                ("zh-Hant", key => Localization.S(key,2))
             });
         }
         public override Localizer Localizer { get; }
