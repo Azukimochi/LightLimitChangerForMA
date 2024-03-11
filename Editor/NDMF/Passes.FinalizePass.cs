@@ -31,6 +31,12 @@ namespace io.github.azukimochi
                 var maParameters = obj.GetOrAddComponent<ModularAvatarParameters>();
                 var menuInstaller = obj.GetOrAddComponent<ModularAvatarMenuInstaller>();
 
+                var layer = session.DirectBlendTree.ToAnimatorControllerLayer(cache.Container);
+                layer.name = "LightLimitChanger";
+                layer.defaultWeight = 1;
+                session.Controller.AddLayer(layer);
+                session.Controller.AddParameter(new AnimatorControllerParameter() { name = session.DirectBlendTree.ParameterName, defaultInt = 1, type = AnimatorControllerParameterType.Float });
+
                 mergeAnimator.animator = session.Controller;
                 mergeAnimator.layerType = VRCAvatarDescriptor.AnimLayerType.FX;
                 mergeAnimator.pathMode = MergeAnimatorPathMode.Absolute;

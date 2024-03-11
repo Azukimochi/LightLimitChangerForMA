@@ -1,4 +1,5 @@
 ﻿using System;
+using gomoru.su;
 using nadena.dev.ndmf;
 using nadena.dev.ndmf.util;
 using UnityEditor.Animations;
@@ -15,8 +16,6 @@ namespace io.github.azukimochi
 
             internal static void Run(Session session, LightLimitChangerObjectCache cache)
             {
-                var controller = session.Controller;
-
                 ReadOnlySpan<ControlAnimationContainer> animationContainers = session.Controls;
                 var parameters = session.Parameters;
 
@@ -52,14 +51,20 @@ namespace io.github.azukimochi
                     }
                 }
 
-                controller.AddParameter(new AnimatorControllerParameter() { name = ParameterName_Toggle, defaultBool = parameters.IsDefaultUse, type = AnimatorControllerParameterType.Bool });
+                
+                var toggleTree = session.DirectBlendTree.AddAndGate("Enable");
+                toggleTree.OFF = session.Controls[0].Default;
+                toggleTree.Parameters = new[] { ParameterName_Toggle };
+                var animationTree = toggleTree.AddDirectBlendTree(DirectBlendTree.Target.ON, "Animation");
 
                 foreach (ref readonly var container in animationContainers)
                 {
                     if (session.TargetControl.HasFlag(container.ControlType))
                     {
                         container.AddTo(cache);
-                        AddLayer(session, cache, container, container.ParameterName);
+                        var puppet = animationTree.AddRadialPuppet(container.Name);
+                        puppet.ParameterName = container.ParameterName;
+                        puppet.Animation = container.Control;
 
                         controller.AddParameter(new AnimatorControllerParameter() { name = container.ParameterName, defaultFloat = container.DefaultValue, type = AnimatorControllerParameterType.Float });
                     }
@@ -116,44 +121,6 @@ namespace io.github.azukimochi
                 stateMachine.AddState(on, stateMachine.entryPosition + new Vector3(-20, 100));
 
                 session.Controller.AddParameter(ParameterName_Reset, AnimatorControllerParameterType.Bool);
-
-                session.Controller.AddLayer(layer);
-            }
-
-            private static void AddLayer(Session session, LightLimitChangerObjectCache cache, ControlAnimationContainer container, string parameterName)
-            {
-                var layer = new AnimatorControllerLayer() { name = container.Name, defaultWeight = 1, stateMachine = new AnimatorStateMachine().HideInHierarchy().AddTo(cache) };
-                var stateMachine = layer.stateMachine;
-                var defaultState = new AnimatorState() { name = "Default", writeDefaultValues = session.Settings.WriteDefaults == WriteDefaultsSetting.ON, motion = container.Default }.HideInHierarchy().AddTo(cache);
-                var state = new AnimatorState() { name = "Control", writeDefaultValues = session.Settings.WriteDefaults == WriteDefaultsSetting.ON, motion = container.Control, timeParameterActive = true, timeParameter = parameterName }.HideInHierarchy().AddTo(cache);
-
-                var condition = new AnimatorCondition[] { new AnimatorCondition() { parameter = ParameterName_Toggle, mode = AnimatorConditionMode.If, threshold = 0 } };
-
-                var tr = new AnimatorStateTransition()
-                {
-                    destinationState = state,
-                    duration = 0,
-                    hasExitTime = false,
-                    conditions = condition,
-                }.HideInHierarchy().AddTo(cache);
-
-                defaultState.AddTransition(tr);
-
-                condition[0].mode = AnimatorConditionMode.IfNot;
-                tr = new AnimatorStateTransition()
-                {
-                    destinationState = defaultState,
-                    duration = 0,
-                    hasExitTime = false,
-                    conditions = condition,
-                }.HideInHierarchy().AddTo(cache);
-
-                state.AddTransition(tr);
-
-                stateMachine.AddState(defaultState, stateMachine.entryPosition + new Vector3(-20, 50));
-                stateMachine.AddState(state, stateMachine.entryPosition + new Vector3(-20, 100));
-
-                session.Controller.AddLayer(layer);
             }
         }
     }
