@@ -1,6 +1,7 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using gomoru.su;
+using nadena.dev.modular_avatar.core;
 using nadena.dev.ndmf;
 using nadena.dev.ndmf.fluent;
 using UnityEditor.Animations;
@@ -84,6 +85,7 @@ namespace io.github.azukimochi
             public LightLimitControlType TargetControl;
             public HashSet<Renderer> TargetRenderers;
             public DirectBlendTree DirectBlendTree;
+            public List<ParameterConfig> AvatarParameters;
 
             public HashSet<Object> Excludes;
 
@@ -109,6 +111,7 @@ namespace io.github.azukimochi
                 var targetControl = LightLimitControlType.Light;
                 List<ControlAnimationContainer> controls = new List<ControlAnimationContainer>();
                 var defaultAnimation = new AnimationClip() { name = "Default" };
+                AvatarParameters = new List<ParameterConfig>();
 
                 if (!parameters.IsSeparateLightControl)
                 {
@@ -153,6 +156,8 @@ namespace io.github.azukimochi
 
                 _initialized = true;
             }
+
+            public void AddParameter(ParameterConfig parameterConfig) => AvatarParameters.Add(parameterConfig);
         }
     }
 }
