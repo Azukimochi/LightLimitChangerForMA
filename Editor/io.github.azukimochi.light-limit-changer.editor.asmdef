@@ -5,7 +5,8 @@
         "io.github.azukimochi.light-limit-changer",
         "nadena.dev.modular-avatar.core.editor",
         "nadena.dev.ndmf",
-        "nadena.dev.ndmf.runtime"
+        "nadena.dev.ndmf.runtime",
+        "nadena.dev.ndmf.vrchat"
     ],
     "includePlatforms": [
         "Editor"
