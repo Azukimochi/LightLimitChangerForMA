@@ -24,13 +24,38 @@ namespace io.github.azukimochi
             var parameters = instance.Parameters;
 
             yield return Parameter<bool>(Passes.ParameterName_Toggle);
+
+            if (!parameters.IsSeparateLightControl)
+            {
+                yield return Parameter<float>(Passes.ParameterName_Value);
+            }
+            else
+            {
+                yield return Parameter<float>(Passes.ParameterName_Min);
+                yield return Parameter<float>(Passes.ParameterName_Max);
+            }
+
+            if (parameters.AllowColorTempControl)
+                yield return Parameter<float>(Passes.ParameterName_ColorTemp);
+
+            if (parameters.AllowSaturationControl)
+                yield return Parameter<float>(Passes.ParameterName_Saturation);
+
+            if (parameters.AllowMonochromeControl)
+                yield return Parameter<float>(Passes.ParameterName_Monochrome);
+
+            if (parameters.AllowUnlitControl)
+                yield return Parameter<float>(Passes.ParameterName_Unlit);
         }
 
-        private ProvidedParameter Parameter<T>(string name, ParameterNamespace @namespace = ParameterNamespace.Animator) 
-            => Parameter(name, @namespace, typeof(T) == typeof(int) ? AnimatorControllerParameterType.Int : typeof(T) == typeof(float) ? AnimatorControllerParameterType.Float : typeof(T) == typeof(bool) ? AnimatorControllerParameterType.Bool : default);
+        private ProvidedParameter Parameter<T>(string name, bool sync = true, ParameterNamespace @namespace = ParameterNamespace.Animator) 
+            => Parameter(name, sync, @namespace, typeof(T) == typeof(int) ? AnimatorControllerParameterType.Int : typeof(T) == typeof(float) ? AnimatorControllerParameterType.Float : typeof(T) == typeof(bool) ? AnimatorControllerParameterType.Bool : default);
 
-        private ProvidedParameter Parameter(string name, ParameterNamespace @namespace = ParameterNamespace.Animator, AnimatorControllerParameterType? type = null) 
-            => new ProvidedParameter(name, @namespace, instance, PluginDefinition.Instance, type);
+        private ProvidedParameter Parameter(string name, bool sync = true, ParameterNamespace @namespace = ParameterNamespace.Animator, AnimatorControllerParameterType? type = null)
+            => new ProvidedParameter(name, @namespace, instance, PluginDefinition.Instance, type)
+            {
+                WantSynced = sync,
+            };
 
         public void RemapParameters(ref ImmutableDictionary<(ParameterNamespace, string), ParameterMapping> nameMap, BuildContext context = null)
         {
