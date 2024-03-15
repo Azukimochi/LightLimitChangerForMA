@@ -5,7 +5,8 @@
         "io.github.azukimochi.light-limit-changer",
         "nadena.dev.modular-avatar.core.editor",
         "nadena.dev.ndmf",
-        "nadena.dev.ndmf.runtime"
+        "nadena.dev.ndmf.runtime",
+        "nadena.dev.ndmf.vrchat"
     ],
     "includePlatforms": [
         "Editor"
@@ -19,7 +20,8 @@
         "VRCSDKBase-Editor.dll",
         "VRC.Utility.dll",
         "VRCCore-Editor.dll",
-        "System.Memory.dll"
+        "System.Memory.dll",
+        "System.Collections.Immutable.dll"
     ],
     "autoReferenced": false,
     "defineConstraints": [],
