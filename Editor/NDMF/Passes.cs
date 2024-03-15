@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using gomoru.su;
+using nadena.dev.modular_avatar.core;
 using nadena.dev.ndmf;
 using nadena.dev.ndmf.fluent;
 using UnityEditor.Animations;
@@ -82,6 +84,8 @@ namespace io.github.azukimochi
             public AnimatorController Controller;
             public LightLimitControlType TargetControl;
             public HashSet<Renderer> TargetRenderers;
+            public DirectBlendTree DirectBlendTree;
+            public List<ParameterConfig> AvatarParameters;
 
             public HashSet<Object> Excludes;
 
@@ -100,49 +104,51 @@ namespace io.github.azukimochi
                     return;
 
                 Controller = new AnimatorController() { name = "Light Limit Controller" }.AddTo(cache);
+                DirectBlendTree = new DirectBlendTree();
                 Settings = settings;
                 var parameters = Parameters = Settings?.Parameters ?? new LightLimitChangerParameters();
                 Excludes = new HashSet<Object>(Settings?.Excludes ?? (IEnumerable<Object>)Array.Empty<Object>());
-
+                var targetControl = LightLimitControlType.Light;
                 List<ControlAnimationContainer> controls = new List<ControlAnimationContainer>();
+                var defaultAnimation = new AnimationClip() { name = "Default" };
+                AvatarParameters = new List<ParameterConfig>();
+
                 if (!parameters.IsSeparateLightControl)
                 {
-                    controls.Add(ControlAnimationContainer.Create(LightLimitControlType.Light, "Light", ParameterName_Value, parameters.DefaultLightValue, Icons.Light));
+                    controls.Add(ControlAnimationContainer.Create(LightLimitControlType.Light, "Light", ParameterName_Value, parameters.DefaultLightValue, Icons.Light, defaultAnimation));
                 }
                 else
                 {
-                    controls.Add(ControlAnimationContainer.Create(LightLimitControlType.LightMin, "Min Light", ParameterName_Min, parameters.DefaultMinLightValue, Icons.Light_Min));
-                    controls.Add(ControlAnimationContainer.Create(LightLimitControlType.LightMax, "Max Light", ParameterName_Max, parameters.DefaultMaxLightValue, Icons.Light_Max));
+                    controls.Add(ControlAnimationContainer.Create(LightLimitControlType.LightMin, "Min Light", ParameterName_Min, parameters.DefaultMinLightValue, Icons.Light_Min, defaultAnimation));
+                    controls.Add(ControlAnimationContainer.Create(LightLimitControlType.LightMax, "Max Light", ParameterName_Max, parameters.DefaultMaxLightValue, Icons.Light_Max, defaultAnimation));
                 }
-
-                controls.AddRange(new[]
-                {
-                    ControlAnimationContainer.Create(LightLimitControlType.Saturation, "Saturation", ParameterName_Saturation, parameters.InitialSaturationControlValue, Icons.Color),
-                    ControlAnimationContainer.Create(LightLimitControlType.Unlit, "Unlit", ParameterName_Unlit, parameters.InitialUnlitControlValue, Icons.Unlit),
-                    ControlAnimationContainer.Create(LightLimitControlType.ColorTemperature, "ColorTemp", ParameterName_ColorTemp, parameters.InitialTempControlValue, Icons.Temp),
-                    ControlAnimationContainer.Create(LightLimitControlType.Monochrome, "Monochrome", ParameterName_Monochrome, parameters.InitialMonochromeControlValue, Icons.Monochrome), 
-                });
-
-                Controls = controls.ToArray();
-
-                var targetControl = LightLimitControlType.Light;
 
                 if (parameters.AllowColorTempControl)
                 {
                     targetControl |= LightLimitControlType.ColorTemperature;
+                    controls.Add(ControlAnimationContainer.Create(LightLimitControlType.ColorTemperature, "ColorTemp", ParameterName_ColorTemp, parameters.InitialTempControlValue, Icons.Temp, defaultAnimation));
                 }
+
                 if (parameters.AllowSaturationControl)
                 {
                     targetControl |= LightLimitControlType.Saturation;
+                    controls.Add(ControlAnimationContainer.Create(LightLimitControlType.Saturation, "Saturation", ParameterName_Saturation, parameters.InitialSaturationControlValue, Icons.Color, defaultAnimation));
                 }
+
                 if (parameters.AllowUnlitControl)
                 {
                     targetControl |= LightLimitControlType.Unlit;
+                    controls.Add(ControlAnimationContainer.Create(LightLimitControlType.Unlit, "Unlit", ParameterName_Unlit, parameters.InitialUnlitControlValue, Icons.Unlit, defaultAnimation));
                 }
+
                 if (parameters.AllowMonochromeControl)
                 {
                     targetControl |= LightLimitControlType.Monochrome;
+                    controls.Add(ControlAnimationContainer.Create(LightLimitControlType.Monochrome, "Monochrome", ParameterName_Monochrome, parameters.InitialMonochromeControlValue, Icons.Monochrome, defaultAnimation));
                 }
+
+
+                Controls = controls.ToArray();
 
                 TargetControl = targetControl;
 
@@ -150,6 +156,8 @@ namespace io.github.azukimochi
 
                 _initialized = true;
             }
+
+            public void AddParameter(ParameterConfig parameterConfig) => AvatarParameters.Add(parameterConfig);
         }
     }
 }

@@ -26,8 +26,8 @@ namespace io.github.azukimochi
             Icon = icon;
         }
 
-        public static ControlAnimationContainer Create(LightLimitControlType controlType, string animationName, string parameterName, float defaultValue, Texture2D icon = null)
-            => new ControlAnimationContainer(controlType, animationName, parameterName, defaultValue, icon, new AnimationClip() { name = $"{animationName} Default" }, new AnimationClip() { name = $"{animationName} Control" });
+        public static ControlAnimationContainer Create(LightLimitControlType controlType, string animationName, string parameterName, float defaultValue, Texture2D icon = null, AnimationClip defaultAnimation = null)
+            => new ControlAnimationContainer(controlType, animationName, parameterName, defaultValue, icon, defaultAnimation ?? new AnimationClip() { name = $"{animationName} Default" }, new AnimationClip() { name = $"{animationName} Control" });
 
         public void AddTo(LightLimitChangerObjectCache cache)
         {
