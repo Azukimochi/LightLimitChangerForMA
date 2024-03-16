@@ -27,22 +27,36 @@ namespace io.github.azukimochi
             internal static void Run(GameObject avatarObject, Session session, LightLimitChangerObjectCache cache)
             {
                 var obj = session.Settings.gameObject;
-                var mergeAnimator = obj.GetOrAddComponent<ModularAvatarMergeAnimator>();
+                var mergeAnimator_wd = obj.AddComponent<ModularAvatarMergeAnimator>();
+                var mergeAnimator = obj.AddComponent<ModularAvatarMergeAnimator>();
                 var maParameters = obj.GetOrAddComponent<ModularAvatarParameters>();
                 var menuInstaller = obj.GetOrAddComponent<ModularAvatarMenuInstaller>();
-                
+
+
+                var animator = new AnimatorController() { name = "LLC" }.AddTo(cache);
+                mergeAnimator.animator = animator;
+                mergeAnimator.layerType = VRCAvatarDescriptor.AnimLayerType.FX;
+                mergeAnimator.pathMode = MergeAnimatorPathMode.Absolute;
+                mergeAnimator.matchAvatarWriteDefaults = session.Settings.WriteDefaults == WriteDefaultsSetting.MatchAvatar;
+
+                var animatorWD = new AnimatorController() { name = "LLC WD ON" }.AddTo(cache);
+                mergeAnimator_wd.animator = animatorWD;
+                mergeAnimator_wd.layerType = VRCAvatarDescriptor.AnimLayerType.FX;
+                mergeAnimator_wd.pathMode = MergeAnimatorPathMode.Absolute;
+                mergeAnimator_wd.matchAvatarWriteDefaults = false;
+
                 // DirectBlendTree to AnimatorController layer
                 {
                     var layer = session.DirectBlendTree.ToAnimatorControllerLayer(cache.Container);
                     layer.name = "LightLimitChanger";
                     layer.defaultWeight = 1;
-                    session.Controller.AddLayer(layer);
+                    animatorWD.AddLayer(layer);
                 }
 
                 if (session.Parameters.AddResetButton)
                 {
-                    session.Controller.AddLayer("LightLimitChanger Reset");
-                    var layer = session.Controller.layers.Last();
+                    animator.AddLayer("LightLimitChanger Reset");
+                    var layer = animator.layers.Last();
                     layer.defaultWeight = 1;
                     var stateMachine = layer.stateMachine;
 
@@ -88,10 +102,6 @@ namespace io.github.azukimochi
 
                     session.AddParameter(new ParameterConfig() { nameOrPrefix = ParameterName_Reset, syncType = ParameterSyncType.Bool, localOnly = true });
                 }
-                mergeAnimator.animator = session.Controller;
-                mergeAnimator.layerType = VRCAvatarDescriptor.AnimLayerType.FX;
-                mergeAnimator.pathMode = MergeAnimatorPathMode.Absolute;
-                mergeAnimator.matchAvatarWriteDefaults = session.Settings.WriteDefaults == WriteDefaultsSetting.MatchAvatar;
 
                 /*
                 maParameters.parameters = session.AvatarParameters;
@@ -108,15 +118,18 @@ namespace io.github.azukimochi
                     param.internalParameter = true;
                     maParameters.parameters.Add(param);
 
-                    session.Controller.AddParameter(new AnimatorControllerParameter()
+                    var animatorParam = new AnimatorControllerParameter()
                     {
                         name = param.nameOrPrefix,
                         type = AnimatorControllerParameterType.Float,
                         defaultFloat = param.defaultValue,
-                    });
+                    };
+
+                    animator.AddParameter(animatorParam);
+                    animatorWD.AddParameter(animatorParam);
                 }
                 maParameters.parameters.Add(new ParameterConfig() { nameOrPrefix = "1", defaultValue = 1, localOnly = true, syncType = ParameterSyncType.NotSynced });
-                session.Controller.AddParameter(new AnimatorControllerParameter() { name = session.DirectBlendTree.ParameterName, defaultFloat = 1, type = AnimatorControllerParameterType.Float });
+                animatorWD.AddParameter(new AnimatorControllerParameter() { name = "1", defaultFloat = 1, type = AnimatorControllerParameterType.Float });
 
                 menuInstaller.menuToAppend = CreateMenu(session, cache);
 
