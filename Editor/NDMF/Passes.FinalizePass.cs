@@ -33,10 +33,10 @@ namespace io.github.azukimochi
                 
                 // DirectBlendTree to AnimatorController layer
                 {
-                    var mabm = obj.GetOrAddComponent<ModularAvatarMergeBlendTree>();
-                    mabm.BlendTree = session.DirectBlendTree.ToBlendTree(cache.Container);
-                    mabm.PathMode = MergeAnimatorPathMode.Absolute;
-                    session.AddParameter(new ParameterConfig() { nameOrPrefix = ParameterName_One, syncType = ParameterSyncType.Float, defaultValue = 1, localOnly = true, internalParameter = false });
+                    var layer = session.DirectBlendTree.ToAnimatorControllerLayer(cache.Container);
+                    layer.name = "LightLimitChanger";
+                    layer.defaultWeight = 1;
+                    session.Controller.AddLayer(layer);
                 }
 
                 if (session.Parameters.AddResetButton)
@@ -105,7 +105,7 @@ namespace io.github.azukimochi
                 {
                     var param = parameter;
                     param.saved = session.Parameters.IsValueSave;
-                    param.internalParameter = param.nameOrPrefix != ParameterName_One;
+                    param.internalParameter = true;
                     maParameters.parameters.Add(param);
 
                     session.Controller.AddParameter(new AnimatorControllerParameter()
