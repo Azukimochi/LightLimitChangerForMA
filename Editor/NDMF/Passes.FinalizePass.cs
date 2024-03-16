@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using nadena.dev.modular_avatar.core;
 using nadena.dev.ndmf;
-using UnityEditor;
+using UnityEditor.Animations;
 using UnityEngine;
 using VRC.Core;
 using VRC.SDK3.Avatars.Components;
@@ -27,24 +27,109 @@ namespace io.github.azukimochi
             internal static void Run(GameObject avatarObject, Session session, LightLimitChangerObjectCache cache)
             {
                 var obj = session.Settings.gameObject;
-                var mergeAnimator = obj.GetOrAddComponent<ModularAvatarMergeAnimator>();
+                var mergeAnimator_wd = obj.AddComponent<ModularAvatarMergeAnimator>();
+                var mergeAnimator = obj.AddComponent<ModularAvatarMergeAnimator>();
                 var maParameters = obj.GetOrAddComponent<ModularAvatarParameters>();
                 var menuInstaller = obj.GetOrAddComponent<ModularAvatarMenuInstaller>();
 
-                mergeAnimator.animator = session.Controller;
+
+                var animator = new AnimatorController() { name = "LLC" }.AddTo(cache);
+                mergeAnimator.animator = animator;
                 mergeAnimator.layerType = VRCAvatarDescriptor.AnimLayerType.FX;
                 mergeAnimator.pathMode = MergeAnimatorPathMode.Absolute;
                 mergeAnimator.matchAvatarWriteDefaults = session.Settings.WriteDefaults == WriteDefaultsSetting.MatchAvatar;
 
-                maParameters.parameters.AddRange(session.Controller.parameters.Select(x => new ParameterConfig()
+                var animatorWD = new AnimatorController() { name = "LLC WD ON" }.AddTo(cache);
+                mergeAnimator_wd.animator = animatorWD;
+                mergeAnimator_wd.layerType = VRCAvatarDescriptor.AnimLayerType.FX;
+                mergeAnimator_wd.pathMode = MergeAnimatorPathMode.Absolute;
+                mergeAnimator_wd.matchAvatarWriteDefaults = false;
+
+                // DirectBlendTree to AnimatorController layer
                 {
-                    nameOrPrefix = x.name,
-                    internalParameter = true,
-                    syncType = x.type == AnimatorControllerParameterType.Float ? ParameterSyncType.Float : ParameterSyncType.Bool,
-                    defaultValue = x.type == AnimatorControllerParameterType.Float ? x.defaultFloat : (x.defaultBool ? 1 : 0),
-                    saved = session.Parameters.IsValueSave,
-                    localOnly = x.name == ParameterName_Reset
-                }));
+                    var layer = session.DirectBlendTree.ToAnimatorControllerLayer(cache.Container);
+                    layer.name = "LightLimitChanger";
+                    layer.defaultWeight = 1;
+                    animatorWD.AddLayer(layer);
+                }
+
+                if (session.Parameters.AddResetButton)
+                {
+                    animator.AddLayer("LightLimitChanger Reset");
+                    var layer = animator.layers.Last();
+                    layer.defaultWeight = 1;
+                    var stateMachine = layer.stateMachine;
+
+                    var blank = new AnimationClip() { name = "Blank" }.HideInHierarchy().AddTo(cache);
+                    var off = new AnimatorState() { name = "Off", writeDefaultValues = session.Settings.WriteDefaults == WriteDefaultsSetting.ON, motion = blank }.HideInHierarchy().AddTo(cache);
+                    var on = new AnimatorState() { name = "On", writeDefaultValues = session.Settings.WriteDefaults == WriteDefaultsSetting.ON, motion = blank }.HideInHierarchy().AddTo(cache);
+
+                    var cond = new AnimatorCondition[] { new AnimatorCondition() { mode = AnimatorConditionMode.If, parameter = ParameterName_Reset } };
+
+                    var t = new AnimatorStateTransition()
+                    {
+                        destinationState = on,
+                        duration = 0,
+                        hasExitTime = false,
+                        conditions = cond
+                    }.HideInHierarchy().AddTo(cache);
+
+                    off.AddTransition(t);
+
+                    cond[0].mode = AnimatorConditionMode.IfNot;
+                    t = new AnimatorStateTransition()
+                    {
+                        destinationState = off,
+                        duration = 0,
+                        hasExitTime = false,
+                        conditions = cond
+                    }.HideInHierarchy().AddTo(cache);
+
+                    on.AddTransition(t);
+
+                    var dr = on.AddStateMachineBehaviour<VRCAvatarParameterDriver>();
+
+                    foreach (ref readonly var container in (ReadOnlySpan<ControlAnimationContainer>)session.Controls)
+                    {
+                        if (session.TargetControl.HasFlag(container.ControlType))
+                        {
+                            dr.parameters.Add(new VRC.SDKBase.VRC_AvatarParameterDriver.Parameter() { type = VRC.SDKBase.VRC_AvatarParameterDriver.ChangeType.Set, name = container.ParameterName, value = container.DefaultValue });
+                        }
+                    }
+
+                    stateMachine.AddState(off, stateMachine.entryPosition + new Vector3(-20, 50));
+                    stateMachine.AddState(on, stateMachine.entryPosition + new Vector3(-20, 100));
+
+                    session.AddParameter(new ParameterConfig() { nameOrPrefix = ParameterName_Reset, syncType = ParameterSyncType.Bool, localOnly = true });
+                }
+
+                /*
+                maParameters.parameters = session.AvatarParameters;
+                foreach(ref var parameter in maParameters.parameters.AsSpan())
+                {
+                    parameter.saved = session.Parameters.IsValueSave;
+                }
+                */
+
+                foreach(var parameter in session.AvatarParameters)
+                {
+                    var param = parameter;
+                    param.saved = session.Parameters.IsValueSave;
+                    param.internalParameter = true;
+                    maParameters.parameters.Add(param);
+
+                    var animatorParam = new AnimatorControllerParameter()
+                    {
+                        name = param.nameOrPrefix,
+                        type = AnimatorControllerParameterType.Float,
+                        defaultFloat = param.defaultValue,
+                    };
+
+                    animator.AddParameter(animatorParam);
+                    animatorWD.AddParameter(animatorParam);
+                }
+                maParameters.parameters.Add(new ParameterConfig() { nameOrPrefix = "1", defaultValue = 1, localOnly = true, syncType = ParameterSyncType.NotSynced });
+                animatorWD.AddParameter(new AnimatorControllerParameter() { name = "1", defaultFloat = 1, type = AnimatorControllerParameterType.Float });
 
                 menuInstaller.menuToAppend = CreateMenu(session, cache);
 
