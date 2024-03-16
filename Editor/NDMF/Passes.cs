@@ -39,6 +39,7 @@ namespace io.github.azukimochi
         internal const string ParameterName_ColorTemp = "LightLimitColorTemp";
         internal const string ParameterName_Reset = "LightLimitReset";
         internal const string ParameterName_Monochrome = "LightLimitMonochrome";
+        internal const string ParameterName_One = "__LightLimitChanger/One";
 
         private static Session GetSession(BuildContext context)
         {
@@ -104,7 +105,11 @@ namespace io.github.azukimochi
                     return;
 
                 Controller = new AnimatorController() { name = "Light Limit Controller" }.AddTo(cache);
-                DirectBlendTree = new DirectBlendTree();
+                DirectBlendTree.DirectBlendParameter = "__LightLimitChanger/One";
+                DirectBlendTree = new DirectBlendTree()
+                {
+                    Name = "Light Limit Changer"
+                };
                 Settings = settings;
                 var parameters = Parameters = Settings?.Parameters ?? new LightLimitChangerParameters();
                 Excludes = new HashSet<Object>(Settings?.Excludes ?? (IEnumerable<Object>)Array.Empty<Object>());

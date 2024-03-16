@@ -14,10 +14,12 @@ namespace gomoru.su
 
         public string ParameterName { get; }
 
-        public DirectBlendTree(string parameterName = "1")
+        public static string DirectBlendParameter { get; set; } = "1";
+
+        public DirectBlendTree(string parameterName = null)
         {
             _items = new List<IDirectBlendTreeItem>();
-            ParameterName = parameterName;
+            ParameterName = parameterName ?? DirectBlendParameter;
         }
 
         public void Add(IDirectBlendTreeItem item) => _items.Add(item);
@@ -84,6 +86,6 @@ namespace gomoru.su
     {
         public static DirectBlendTree AddDirectBlendTree<T>(this T directBlendTree, string name = null) where T : IDirectBlendTreeContainer => new DirectBlendTree(directBlendTree is DirectBlendTree tree ? tree.ParameterName : "1") { Name = name }.AddTo(directBlendTree);
 
-        public static DirectBlendTree AddDirectBlendTree<T>(this T directBlendTree, DirectBlendTree.Target target, string name = null) where T : IDirectBlendTreeONOFFContainer => new DirectBlendTree(directBlendTree is DirectBlendTree tree ? tree.ParameterName : "1") { Name = name }.AddTo(directBlendTree, target);
+        public static DirectBlendTree AddDirectBlendTree<T>(this T directBlendTree, DirectBlendTree.Target target, string name = null) where T : IDirectBlendTreeONOFFContainer => new DirectBlendTree(directBlendTree is DirectBlendTree tree ? tree.ParameterName : null) { Name = name }.AddTo(directBlendTree, target);
     }
 }
