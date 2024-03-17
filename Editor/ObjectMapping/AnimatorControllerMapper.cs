@@ -133,6 +133,8 @@ namespace Anatawa12.AvatarOptimizer
                 case StateMachineBehaviour _:
                     break; // We want to clone these types
 
+                case AudioClip _: // Used in VRC Animator Play Audio State Behavior
+
                 case AvatarMask _:
                     return original;
 
