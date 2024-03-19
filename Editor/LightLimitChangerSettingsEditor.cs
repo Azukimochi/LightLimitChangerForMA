@@ -73,6 +73,7 @@ namespace io.github.azukimochi
             if (!IsWindowMode)
             {
                 Utils.ShowVersionInfo();
+                Utils.ShowDocumentLink();
                 EditorGUILayout.Separator();
             }
 
@@ -84,6 +85,7 @@ namespace io.github.azukimochi
                 using (new EditorGUILayout.VerticalScope())
                 {
                     EditorGUILayout.LabelField(Localization.S("label.category.general_settings"), boldLabel);
+                    EditorGUILayout.Space(5);
             
                     EditorGUILayout.PropertyField(IsDefaultUse, Localization.G("label.use_default", "tip.use_default"));
                     EditorGUILayout.PropertyField(IsValueSave, Localization.G("label.save_value", "tip.save_value"));
@@ -92,6 +94,7 @@ namespace io.github.azukimochi
                 using (new EditorGUILayout.VerticalScope(GUI.skin.box))
                 {
                     EditorGUILayout.LabelField(Localization.S("category.save_settings"), boldLabel);
+                    EditorGUILayout.Space(5);
                     
                     var settings = target as LightLimitChangerSettings;
                     var parameter = settings?.Parameters;
@@ -141,24 +144,12 @@ namespace io.github.azukimochi
             
             EditorGUILayout.Space(10);
             EditorGUILayout.LabelField(Localization.S("label.category.additional_settings"), boldLabel);
-
             
-            /*
-            using (new EditorGUILayout.HorizontalScope())
-            {
-                EditorGUILayout.PropertyField(AllowColorTempControl,Localization.G("label.allow_color_tmp", "tip.allow_color_tmp"));
-                EditorGUILayout.LabelField(Localization.G("label.initial_val"));
-                EditorGUI.BeginDisabledGroup(AllowColorTempControl.boolValue == false);
-                EditorGUILayout.PropertyField(InitialTempControlValue, Localization.G(""));
-                EditorGUI.EndDisabledGroup();
-            }
-            */
             using (new EditorGUILayout.HorizontalScope())
             {
                 using (new EditorGUILayout.VerticalScope())
                 {
-                    EditorGUILayout.LabelField(Localization.G(" "));
-                    //EditorGUILayout.Space(10);
+                    EditorGUILayout.Space(5);
                     EditorGUILayout.PropertyField(AllowColorTempControl,
                         Localization.G("label.allow_color_tmp", "tip.allow_color_tmp"));
                     EditorGUILayout.PropertyField(AllowSaturationControl,

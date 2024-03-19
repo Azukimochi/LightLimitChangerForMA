@@ -8,6 +8,23 @@ namespace io.github.azukimochi
 {
     internal static class Utils
     {
+        private static GUIStyle Bluestyle = new GUIStyle(EditorStyles.foldout)
+        {
+            fontStyle = FontStyle.Bold,
+            fontSize = 14,
+            
+        };
+        static Utils()
+        {
+            Bluestyle.focused.textColor = EditorStyles.linkLabel.focused.textColor;
+            Bluestyle.active.textColor = EditorStyles.linkLabel.focused.textColor;
+            Bluestyle.normal.textColor = EditorStyles.linkLabel.focused.textColor;
+            Bluestyle.onFocused.textColor = EditorStyles.linkLabel.focused.textColor;
+            Bluestyle.onActive.textColor = EditorStyles.linkLabel.focused.textColor;
+            Bluestyle.onNormal.textColor = EditorStyles.linkLabel.focused.textColor;
+        }
+        
+
         // ContainsとDeconstructは2019との互換性の為に必要なので消さないこと！
 
         public static bool Contains(this string str, string value, StringComparison comparison)
@@ -183,32 +200,36 @@ namespace io.github.azukimochi
         }
 
         private static bool _isVersionInfoFoldoutOpen = true;
+        private static bool _isDocumentLinkFoldoutOpen = true;
         private static GUIContent _titleCache = null;
 
         public static void ShowVersionInfo()
         {
-            GUIStyle style = new GUIStyle(EditorStyles.foldout);
-            style.fontStyle = FontStyle.Bold;
-            style.fontSize = 14;
-            style.focused.textColor = EditorStyles.linkLabel.focused.textColor;
-            style.active.textColor = EditorStyles.linkLabel.focused.textColor;
-            style.normal.textColor = EditorStyles.linkLabel.focused.textColor;
-            style.onFocused.textColor = EditorStyles.linkLabel.focused.textColor;
-            style.onActive.textColor = EditorStyles.linkLabel.focused.textColor;
-            style.onNormal.textColor = EditorStyles.linkLabel.focused.textColor;
-            
             if (_titleCache == null)
             {
                 _titleCache = new GUIContent($"{LightLimitChanger.Title} {GetVersion()}");
             }
             EditorGUILayout.LabelField(_titleCache, new GUIStyle(EditorStyles.label) { fontStyle = FontStyle.Bold, fontSize = 15});
             var changeLog = new GUIContent(Localization.G("label.changelog"));
-            using (var foldout = new FoldoutHeaderGroupScope(ref _isVersionInfoFoldoutOpen, changeLog, style))
+            using (var foldout = new FoldoutHeaderGroupScope(ref _isVersionInfoFoldoutOpen, changeLog, Bluestyle))
             {
                 if (foldout.IsOpen)
                 {
-                    DrawWebButton("Light Limit Changer OfficialSite | Changelog", "https://azukimochi.github.io/LLC-Docs/docs/changelog");
+                    DrawWebButton("Light Limit Changer OfficialSite | 更新履歴 Changelog", "https://azukimochi.github.io/LLC-Docs/docs/changelog");
                     DrawWebButton("X|Twitter", "https://twitter.com/search?q=from%3Aazukimochi25%20%23LightLimitChanger&src=typed_query&f=live");
+                }
+            }
+        }
+
+        public static void ShowDocumentLink()
+        {
+            var document = new GUIContent(Localization.G("label.document"));
+            using (var foldout = new FoldoutHeaderGroupScope(ref _isDocumentLinkFoldoutOpen, document, Bluestyle))
+            {
+                if (foldout.IsOpen)
+                {
+                    DrawWebButton("Light Limit Changer OfficialSite | おすすめ設定 RecomentSetting", "https://azukimochi.github.io/LLC-Docs/docs/tutorial/howtouse-recommend");
+                    DrawWebButton("Light Limit Changer OfficialSite | 設定概要 Discription", "https://azukimochi.github.io/LLC-Docs/docs/discription/disc_param");
                 }
             }
         }
