@@ -20,8 +20,6 @@ namespace io.github.azukimochi
             { "category.select_option", new[] { "Options", "オプション", "可選設定" } },
             { "category.select_advanced", new[] { "Advanced Settings", "詳細設定", "進階設定" } },
             { "category.save_settings", new [] { "Save Settings", "設定を保存", "保存設定" } },
-            { "category.select_option", new[] { "Options", "オプション", "可選設定" } },
-            { "category.select_advanced", new[] { "Advanced Settings", "詳細設定", "進階設定" } },
 
             ///////////////////////////////////////////////////////
             // ラベル label
