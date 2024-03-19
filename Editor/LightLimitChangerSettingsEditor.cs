@@ -95,18 +95,17 @@ namespace io.github.azukimochi
                     
                     EditorGUI.BeginDisabledGroup(PrefabUtility.IsPartOfAnyPrefab(target) == false);
                     
+                    var parameter = (target as LightLimitChangerSettings)?.Parameters;
                     ApplySettingToAvatar = GUILayout.Button("現在の設定をデフォルトにして他のアバターへ適用", EditorStyles.miniButton);
                     if (ApplySettingToAvatar)
                     {
-                        GameObject llcObj = (target as Component).gameObject;
-                        LightLimitChangerPrefab.SavePrefabSetting(llcObj);
+                        LightLimitChangerPrefab.SavePrefabSetting(parameter);
                     }
                     ApplySettingToProject = GUILayout.Button("Unityプロジェクトすべてに適用", EditorStyles.miniButton);
                     if (ApplySettingToProject)
                     {
                         if (EditorUtility.DisplayDialog("Unityプロジェクトすべてに適用", "この設定を使用すると、他のすべてのUnityプロジェクトへ設定が適用されます。", "Yes", "No"))
                         {
-                            var parameter = (target as LightLimitChangerSettings)?.Parameters;
                             if (parameter != null)
                                 LightLimitChangerPrefab.SavePrefabSettingAsGlobal(parameter);
 
