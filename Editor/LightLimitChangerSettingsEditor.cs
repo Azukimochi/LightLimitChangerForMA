@@ -35,6 +35,9 @@ namespace io.github.azukimochi
 
         internal bool IsWindowMode = false;
 
+        private bool ApplySettingToAvatar = false;
+        private bool ApplySettingToProject = false;
+
         private void OnEnable()
         {
             var parameters = serializedObject.FindProperty(nameof(LightLimitChangerSettings.Parameters));
@@ -76,10 +79,33 @@ namespace io.github.azukimochi
             serializedObject.Update();
             EditorGUI.BeginChangeCheck();
 
-            EditorGUILayout.LabelField(Localization.S("label.category.general_settings"), boldLabel);
+            using (new EditorGUILayout.HorizontalScope())
+            {
+                using (new EditorGUILayout.VerticalScope())
+                {
+                    EditorGUILayout.LabelField(Localization.S("label.category.general_settings"), boldLabel);
             
-            EditorGUILayout.PropertyField(IsDefaultUse, Localization.G("label.use_default", "tip.use_default"));
-            EditorGUILayout.PropertyField(IsValueSave, Localization.G("label.save_value", "tip.save_value"));
+                    EditorGUILayout.PropertyField(IsDefaultUse, Localization.G("label.use_default", "tip.use_default"));
+                    EditorGUILayout.PropertyField(IsValueSave, Localization.G("label.save_value", "tip.save_value"));
+                }
+
+                using (new EditorGUILayout.VerticalScope())
+                {
+                    EditorGUILayout.LabelField("設定の保存", boldLabel);
+                    
+                    ApplySettingToAvatar = GUILayout.Button("すべてのアバターに適用", EditorStyles.miniButton);
+                    if (ApplySettingToAvatar)
+                    {
+                        GameObject llcObj = (target as Component).gameObject;
+                        LightLimitChangerPrefab.SavePrefabSetting(llcObj);
+                    }
+                    GUILayout.Button("Unityプロジェクトすべてに適用", EditorStyles.miniButton);
+                    if (ApplySettingToProject)
+                    {
+                        
+                    }
+                }
+            }
             EditorGUILayout.Space(10);
             EditorGUILayout.PropertyField(IsSeparateLightControl, Localization.G("label.separate_light_control"));
             EditorGUILayout.PropertyField(MaxLightValue, Localization.G("label.light_max", "tip.light_max"));

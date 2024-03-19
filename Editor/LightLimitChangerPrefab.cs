@@ -42,5 +42,11 @@ namespace io.github.azukimochi
             PlayerPrefs.SetString(GeneratedPrefabGUIDKey, guid);
             return guid;
         }
+
+        public static void SavePrefabSetting(GameObject obj)
+        {
+            //PrefabUtility.SaveAsPrefabAsset(obj, PrefabPath);
+            PrefabUtility.ApplyPrefabInstance(obj, InteractionMode.UserAction);
+        }
     }
 }
