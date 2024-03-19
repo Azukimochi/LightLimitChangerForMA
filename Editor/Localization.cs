@@ -65,7 +65,14 @@ namespace io.github.azukimochi
                 "全てのUnityプロジェクトに適用する",
                 "Apply to all Unity projects",
             }},
-            
+            { "label.document", new []
+                {
+                    "Documentation",
+                    "説明書",
+                    "Documentation"
+                }
+            },
+
             ///////////////////////////////////////////////////////
             // 情報　info
             { "info.shader_must_select" , new []{"Target shader must be selected", "対象シェーダーを選択してください", "必須選擇目標 Shader"} },
