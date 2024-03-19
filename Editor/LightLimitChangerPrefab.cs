@@ -24,11 +24,37 @@ namespace io.github.azukimochi
 
 
                 Handles.BeginGUI();
-
-                // TODO: ここでGUIをぐいっと
-                if (GUILayout.Button("更新"))
+                
+                using (new EditorGUILayout.HorizontalScope())
                 {
-                    CheckChangeGlobalSettings();
+                    GUILayout.Space(10);
+                    using (new EditorGUILayout.VerticalScope())
+                    {
+                        GUILayout.FlexibleSpace();
+                        
+                        using (new EditorGUILayout.VerticalScope(GUI.skin.box))
+                        {
+                            GUILayout.Label("Light Limit Changerのグローバル設定が変更されました");
+                            if (GUILayout.Button("設定を更新"))
+                            {
+                                var globalID = EditorPrefs.GetString(GlobalSettingsIDKey);
+                                
+                                if(EditorUtility.DisplayDialog("グローバル設定の読み込み", "グローバル設定を読み込みますか？", "はい", "いいえ"))
+                                {
+                                    var value = JsonUtility.FromJson<LightLimitChangerParameters>(EditorPrefs.GetString(GlobalSettingsValueKey));
+                                    SavePrefabSetting(value);
+                                    PlayerPrefs.SetString(GlobalSettingsLocalIDKey, globalID);
+                                }
+                                else
+                                {
+                                    PlayerPrefs.SetString(GlobalSettingsLocalIDKey, globalID);
+                                }
+                            }
+                        }
+                        
+                        GUILayout.Space(10);
+                    }
+                    GUILayout.FlexibleSpace();
                 }
                 Handles.EndGUI();
             };
@@ -87,17 +113,6 @@ namespace io.github.azukimochi
             EditorPrefs.SetString(GlobalSettingsIDKey, key);
             PlayerPrefs.SetString(GlobalSettingsLocalIDKey, key);
             EditorPrefs.SetString(GlobalSettingsValueKey, json);
-        }
-
-        private static void CheckChangeGlobalSettings()
-        {
-            var globalID = EditorPrefs.GetString(GlobalSettingsIDKey);
-            if (EditorPrefs.GetString(GlobalSettingsIDKey) == PlayerPrefs.GetString(GlobalSettingsLocalIDKey))
-                return;
-
-            var value = JsonUtility.FromJson<LightLimitChangerParameters>(EditorPrefs.GetString(GlobalSettingsValueKey));
-            SavePrefabSetting(value);
-            PlayerPrefs.SetString(GlobalSettingsLocalIDKey, globalID);
         }
 
         private readonly ref struct PrefabEditScope
