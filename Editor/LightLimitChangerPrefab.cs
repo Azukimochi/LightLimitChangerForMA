@@ -67,6 +67,7 @@ namespace io.github.azukimochi
 
         public static void SavePrefabSettingAsGlobal(LightLimitChangerParameters parameters)
         {
+            SavePrefabSetting(parameters);
             var json = JsonUtility.ToJson(parameters);
             var key = GUID.Generate().ToString();
             EditorPrefs.SetString(GlobalSettingsIDKey, key);
