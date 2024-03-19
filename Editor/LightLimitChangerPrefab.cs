@@ -15,7 +15,8 @@ namespace io.github.azukimochi
             get
             {
                 var guid = PlayerPrefs.GetString(GeneratedPrefabGUIDKey, null);
-                if (string.IsNullOrEmpty(guid) || string.IsNullOrEmpty(AssetDatabase.GUIDToAssetPath(guid)) || !File.Exists(AssetDatabase.GUIDToAssetPath(guid)))
+                var path = AssetDatabase.GUIDToAssetPath(guid);
+                if (string.IsNullOrEmpty(guid) || string.IsNullOrEmpty(path) || AssetDatabase.LoadAssetAtPath(path, typeof(GameObject)) == null)
                 {
                     guid = CreatePrefab();
                 }
