@@ -25,7 +25,7 @@ namespace io.github.azukimochi
         [Range(0, 10)]
         public float MinLightValue = 0.0f;
 
-        [Obsolete] public int TargetShader = -1;
+        [Obsolete] public int TargetShader = 0;
 
         public TargetShaders TargetShaders = TargetShaders.Everything;
 
