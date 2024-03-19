@@ -1,14 +1,24 @@
-﻿using System.IO;
+using System.IO;
 using nadena.dev.modular_avatar.core;
 using UnityEditor;
 using UnityEngine;
 
 namespace io.github.azukimochi
 {
+    [InitializeOnLoad]
     internal static class LightLimitChangerPrefab
     {
         private const string GeneratedPrefabGUIDKey = "io.github.azukimochi.LightLimitChanger.Prefab";
         private const string PrefabPath = "Assets/LightLimitChanger/Light Limit Changer.prefab";
+
+        private const string GlobalSettingsIDKey = "io.github.azukimochi.LightLimitChanger.GlobalSettings.ID.Global";
+        private const string GlobalSettingsLocalIDKey = "io.github.azukimochi.LightLimitChanger.GlobalSettings.ID.Local";
+        private const string GlobalSettingsValueKey = "io.github.azukimochi.LightLimitChanger.GlobalSettings.Value";
+
+        static LightLimitChangerPrefab()
+        {
+            EditorApplication.delayCall += CheckChangeGlobalSettings;
+        }
 
         public static GameObject Object
         {
@@ -47,6 +57,58 @@ namespace io.github.azukimochi
         {
             //PrefabUtility.SaveAsPrefabAsset(obj, PrefabPath);
             PrefabUtility.ApplyPrefabInstance(obj, InteractionMode.UserAction);
+        }
+
+        private static void CheckChangeGlobalSettings()
+        {
+            var globalID = EditorPrefs.GetString(GlobalSettingsIDKey);
+            if (EditorPrefs.GetString(GlobalSettingsIDKey) == PlayerPrefs.GetString(GlobalSettingsLocalIDKey))
+                return;
+
+            Color32 color = PluginDefinition.Instance.ThemeColor ?? Color.white;
+            Debug.Log($"[<color=#{color.r:X02}{color.g:X02}{color.b:X02}>Light Limit Changer</color>] Update Prefab");
+
+            var value = JsonUtility.FromJson<LightLimitChangerParameters>(EditorPrefs.GetString(GlobalSettingsValueKey));
+            using (var scope = new PrefabEditScope(AssetDatabase.GetAssetPath(Object)))
+            {
+                var prefab = scope.Prefab;
+                if (prefab.TryGetComponent<LightLimitChangerSettings>(out var llc))
+                {
+                    llc.Parameters = value;
+                    EditorUtility.SetDirty(llc);
+                }
+            }
+
+            PlayerPrefs.SetString(GlobalSettingsLocalIDKey, globalID);
+        }
+
+        public static void SavePrefabSettingAsGlobal(LightLimitChangerParameters parameters)
+        {
+            var json = JsonUtility.ToJson(parameters);
+            var key = GUID.Generate().ToString();
+            EditorPrefs.SetString(GlobalSettingsIDKey, key);
+            PlayerPrefs.SetString(GlobalSettingsLocalIDKey, key);
+            EditorPrefs.SetString(GlobalSettingsValueKey, json);
+        }
+
+        private readonly ref struct PrefabEditScope
+        {
+            private readonly GameObject instance;
+            private readonly string path;
+
+            public GameObject Prefab => instance;
+
+            public PrefabEditScope(string path)
+            {
+                this.path = path;
+                instance = PrefabUtility.LoadPrefabContents(path);
+            }
+
+            public void Dispose()
+            {
+                PrefabUtility.SaveAsPrefabAsset(instance, path);
+                PrefabUtility.UnloadPrefabContents(instance);
+            }
         }
     }
 }

@@ -106,11 +106,10 @@ namespace io.github.azukimochi
                     {
                         if (EditorUtility.DisplayDialog("Unityプロジェクトすべてに適用", "この設定を使用すると、他のすべてのUnityプロジェクトへ設定が適用されます。", "Yes", "No"))
                         {
-                            Debug.Log("Yes");
-                        }
-                        else
-                        {
-                            Debug.Log("No");
+                            var parameter = (target as LightLimitChangerSettings)?.Parameters;
+                            if (parameter != null)
+                                LightLimitChangerPrefab.SavePrefabSettingAsGlobal(parameter);
+
                         }
                     }
                     
