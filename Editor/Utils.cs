@@ -187,15 +187,27 @@ namespace io.github.azukimochi
 
         public static void ShowVersionInfo()
         {
+            GUIStyle style = new GUIStyle(EditorStyles.foldout);
+            style.fontStyle = FontStyle.Bold;
+            style.fontSize = 14;
+            style.focused.textColor = EditorStyles.linkLabel.focused.textColor;
+            style.active.textColor = EditorStyles.linkLabel.focused.textColor;
+            style.normal.textColor = EditorStyles.linkLabel.focused.textColor;
+            style.onFocused.textColor = EditorStyles.linkLabel.focused.textColor;
+            style.onActive.textColor = EditorStyles.linkLabel.focused.textColor;
+            style.onNormal.textColor = EditorStyles.linkLabel.focused.textColor;
+            
             if (_titleCache == null)
             {
                 _titleCache = new GUIContent($"{LightLimitChanger.Title} {GetVersion()}");
             }
-            using (var foldout = new FoldoutHeaderGroupScope(ref _isVersionInfoFoldoutOpen, _titleCache))
+            EditorGUILayout.LabelField(_titleCache, new GUIStyle(EditorStyles.label) { fontStyle = FontStyle.Bold, fontSize = 15});
+            var changeLog = new GUIContent(Localization.G("label.changelog"));
+            using (var foldout = new FoldoutHeaderGroupScope(ref _isVersionInfoFoldoutOpen, changeLog, style))
             {
                 if (foldout.IsOpen)
                 {
-                    DrawWebButton("Light Limit Changer OfficialSite", "https://azukimochi.github.io/LLC-Docs/");
+                    DrawWebButton("Light Limit Changer OfficialSite | Changelog", "https://azukimochi.github.io/LLC-Docs/docs/changelog");
                     DrawWebButton("X|Twitter", "https://twitter.com/search?q=from%3Aazukimochi25%20%23LightLimitChanger&src=typed_query&f=live");
                 }
             }
@@ -246,9 +258,9 @@ namespace io.github.azukimochi
             public FoldoutHeaderGroupScope(ref bool isOpen, string content) : this(ref isOpen, Label(content))
             { }
 
-            public FoldoutHeaderGroupScope(ref bool isOpen, GUIContent content)
+            public FoldoutHeaderGroupScope(ref bool isOpen, GUIContent content, GUIStyle style = null)
             {
-                IsOpen = isOpen = EditorGUILayout.BeginFoldoutHeaderGroup(isOpen, content);
+                IsOpen = isOpen = EditorGUILayout.BeginFoldoutHeaderGroup(isOpen, content, style);
                 if (isOpen)
                 {
                     EditorGUI.indentLevel++;

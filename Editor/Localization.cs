@@ -20,6 +20,8 @@ namespace io.github.azukimochi
             { "category.select_option", new[] { "Options", "オプション", "可選設定" } },
             { "category.select_advanced", new[] { "Advanced Settings", "詳細設定", "進階設定" } },
             { "category.save_settings", new [] { "Save Settings", "設定を保存", "保存設定" } },
+            { "category.select_option", new[] { "Options", "オプション", "可選設定" } },
+            { "category.select_advanced", new[] { "Advanced Settings", "詳細設定", "進階設定" } },
 
             ///////////////////////////////////////////////////////
             // ラベル label
@@ -32,6 +34,7 @@ namespace io.github.azukimochi
             { "label.light_max", new[] { "Max Brightness", "明るさの上限", "亮度上限" } },
             { "label.light_min", new[] { "Min Brightness", "明るさの下限", "亮度下限" } },
             { "label.light_default", new[] { "Default Brightness", "明るさの初期値", "預設亮度" } },
+            { "label.changelog", new[] {"Changelog", "更新履歴", "Changelog" } },
             { "label.target_shader", new[] { "Target Shader", "対象シェーダー", "目標 Shader" } },
             { "label.allow_color_tmp", new[] { "Enable Color Temperature Control", "色温度調整を有効にする", "啟用色溫控制" } },
             { "label.allow_saturation", new[] { "Enable Saturation Control", "彩度調整を有効にする", "啟用飽和度控制" } },
