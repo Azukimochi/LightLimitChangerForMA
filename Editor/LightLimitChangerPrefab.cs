@@ -1,4 +1,4 @@
-using System.IO;
+﻿using System.IO;
 using nadena.dev.modular_avatar.core;
 using UnityEditor;
 using UnityEngine;
@@ -53,10 +53,25 @@ namespace io.github.azukimochi
             return guid;
         }
 
-        public static void SavePrefabSetting(GameObject obj)
+        public static void SavePrefabSetting(LightLimitChangerParameters parameters)
         {
-            //PrefabUtility.SaveAsPrefabAsset(obj, PrefabPath);
-            PrefabUtility.ApplyPrefabInstance(obj, InteractionMode.UserAction);
+            using (var scope = new PrefabEditScope(AssetDatabase.GetAssetPath(Object)))
+            {
+                if (scope.Prefab.TryGetComponent<LightLimitChangerSettings>(out var llc))
+                {
+                    llc.Parameters = parameters;
+                    EditorUtility.SetDirty(llc);
+                }
+            }
+        }
+
+        public static void SavePrefabSettingAsGlobal(LightLimitChangerParameters parameters)
+        {
+            var json = JsonUtility.ToJson(parameters);
+            var key = GUID.Generate().ToString();
+            EditorPrefs.SetString(GlobalSettingsIDKey, key);
+            PlayerPrefs.SetString(GlobalSettingsLocalIDKey, key);
+            EditorPrefs.SetString(GlobalSettingsValueKey, json);
         }
 
         private static void CheckChangeGlobalSettings()
@@ -69,26 +84,9 @@ namespace io.github.azukimochi
             Debug.Log($"[<color=#{color.r:X02}{color.g:X02}{color.b:X02}>Light Limit Changer</color>] Update Prefab");
 
             var value = JsonUtility.FromJson<LightLimitChangerParameters>(EditorPrefs.GetString(GlobalSettingsValueKey));
-            using (var scope = new PrefabEditScope(AssetDatabase.GetAssetPath(Object)))
-            {
-                var prefab = scope.Prefab;
-                if (prefab.TryGetComponent<LightLimitChangerSettings>(out var llc))
-                {
-                    llc.Parameters = value;
-                    EditorUtility.SetDirty(llc);
-                }
-            }
+            SavePrefabSetting(value);
 
             PlayerPrefs.SetString(GlobalSettingsLocalIDKey, globalID);
-        }
-
-        public static void SavePrefabSettingAsGlobal(LightLimitChangerParameters parameters)
-        {
-            var json = JsonUtility.ToJson(parameters);
-            var key = GUID.Generate().ToString();
-            EditorPrefs.SetString(GlobalSettingsIDKey, key);
-            PlayerPrefs.SetString(GlobalSettingsLocalIDKey, key);
-            EditorPrefs.SetString(GlobalSettingsValueKey, json);
         }
 
         private readonly ref struct PrefabEditScope
