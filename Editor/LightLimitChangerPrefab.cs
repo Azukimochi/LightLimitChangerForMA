@@ -17,7 +17,21 @@ namespace io.github.azukimochi
 
         static LightLimitChangerPrefab()
         {
-            EditorApplication.delayCall += CheckChangeGlobalSettings;
+            SceneView.duringSceneGui += scene =>
+            {
+                if (EditorPrefs.GetString(GlobalSettingsIDKey) == PlayerPrefs.GetString(GlobalSettingsLocalIDKey))
+                    return;
+
+
+                Handles.BeginGUI();
+
+                // TODO: ここでGUIをぐいっと
+                if (GUILayout.Button("更新"))
+                {
+                    CheckChangeGlobalSettings();
+                }
+                Handles.EndGUI();
+            };
         }
 
         public static GameObject Object
@@ -81,12 +95,8 @@ namespace io.github.azukimochi
             if (EditorPrefs.GetString(GlobalSettingsIDKey) == PlayerPrefs.GetString(GlobalSettingsLocalIDKey))
                 return;
 
-            Color32 color = PluginDefinition.Instance.ThemeColor ?? Color.white;
-            Debug.Log($"[<color=#{color.r:X02}{color.g:X02}{color.b:X02}>Light Limit Changer</color>] Update Prefab");
-
             var value = JsonUtility.FromJson<LightLimitChangerParameters>(EditorPrefs.GetString(GlobalSettingsValueKey));
             SavePrefabSetting(value);
-
             PlayerPrefs.SetString(GlobalSettingsLocalIDKey, globalID);
         }
 
