@@ -35,6 +35,9 @@ namespace io.github.azukimochi
 
         internal bool IsWindowMode = false;
 
+        private bool ApplySettingToAvatar = false;
+        private bool ApplySettingToProject = false;
+
         private void OnEnable()
         {
             var parameters = serializedObject.FindProperty(nameof(LightLimitChangerSettings.Parameters));
@@ -76,10 +79,48 @@ namespace io.github.azukimochi
             serializedObject.Update();
             EditorGUI.BeginChangeCheck();
 
-            EditorGUILayout.LabelField(Localization.S("label.category.general_settings"), boldLabel);
+            using (new EditorGUILayout.HorizontalScope())
+            {
+                using (new EditorGUILayout.VerticalScope())
+                {
+                    EditorGUILayout.LabelField(Localization.S("label.category.general_settings"), boldLabel);
             
-            EditorGUILayout.PropertyField(IsDefaultUse, Localization.G("label.use_default", "tip.use_default"));
-            EditorGUILayout.PropertyField(IsValueSave, Localization.G("label.save_value", "tip.save_value"));
+                    EditorGUILayout.PropertyField(IsDefaultUse, Localization.G("label.use_default", "tip.use_default"));
+                    EditorGUILayout.PropertyField(IsValueSave, Localization.G("label.save_value", "tip.save_value"));
+                }
+
+                using (new EditorGUILayout.VerticalScope(GUI.skin.box))
+                {
+                    EditorGUILayout.LabelField(Localization.S("category.save_settings"), boldLabel);
+                    
+                    var settings = target as LightLimitChangerSettings;
+                    var parameter = settings?.Parameters;
+                    EditorGUI.BeginDisabledGroup(parameter == null || PrefabUtility.IsPartOfAnyPrefab(target) == false);
+
+                    ApplySettingToAvatar = GUILayout.Button(Localization.S("label.apply_settings_avatar"), EditorStyles.miniButton);
+                    if (ApplySettingToAvatar)
+                    {
+                        LightLimitChangerPrefab.SavePrefabSetting(parameter);
+                        PrefabUtility.RevertPrefabInstance(settings.gameObject, InteractionMode.AutomatedAction);
+                    }
+                    ApplySettingToProject = GUILayout.Button(Localization.S("label.apply_settings_project"), EditorStyles.miniButton);
+                    if (ApplySettingToProject)
+                    {
+                        if (EditorUtility.DisplayDialog(Localization.S("Window.info.gloabl_settings.save"), Localization.S("Window.info.global_settings.save_message"), Localization.S("Window.info.choice.apply_save"), Localization.S("Window.info.cancel")))
+                        {
+                            LightLimitChangerPrefab.SavePrefabSettingAsGlobal(parameter);
+                            PrefabUtility.RevertPrefabInstance(settings.gameObject, InteractionMode.AutomatedAction);
+                        }
+                    }
+                    
+                    EditorGUI.EndDisabledGroup();
+
+                    if (PrefabUtility.IsPartOfAnyPrefab(target) == false)
+                    {
+                        EditorGUILayout.HelpBox("UnpackPrefabされているので保存できません", MessageType.Info);
+                    }
+                }
+            }
             EditorGUILayout.Space(10);
             EditorGUILayout.PropertyField(IsSeparateLightControl, Localization.G("label.separate_light_control"));
             EditorGUILayout.PropertyField(MaxLightValue, Localization.G("label.light_max", "tip.light_max"));
