@@ -34,12 +34,12 @@ namespace io.github.azukimochi
                         
                         using (new EditorGUILayout.VerticalScope(GUI.skin.box))
                         {
-                            GUILayout.Label("Light Limit Changerのグローバル設定が変更されました");
-                            if (GUILayout.Button("設定を更新"))
+                            GUILayout.Label(Localization.S("Window.info.global_settings.changed"));
+                            if (GUILayout.Button(Localization.S("Window.info.global_settings.update_available")))
                             {
                                 var globalID = EditorPrefs.GetString(GlobalSettingsIDKey);
                                 
-                                if(EditorUtility.DisplayDialog("グローバル設定の読み込み", "グローバル設定を読み込みますか？", "はい", "いいえ"))
+                                if(EditorUtility.DisplayDialog(Localization.S("Window.info.global_settings.title"), Localization.S("Window.info.global_settings.message"), Localization.S("Window.info.choice.apply_load"), Localization.S("Window.info.cancel")))
                                 {
                                     var value = JsonUtility.FromJson<LightLimitChangerParameters>(EditorPrefs.GetString(GlobalSettingsValueKey));
                                     SavePrefabSetting(value);

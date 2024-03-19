@@ -13,9 +13,17 @@ namespace io.github.azukimochi
 
         private static Dictionary<string, string[]> _LocalizedText = new Dictionary<string, string[]>()
         {
+            ///////////////////////////////////////////////////////
+            // カテゴリ category
             { "category.select_avatar", new[] { "Select Avatar", "アバターを選択", "選擇 Avatar" } },
-            { "label.avatar", new[] { "Avatar", "アバター", "Avatar" } },
             { "category.select_parameter", new[] { "Parameter", "パラメーター", "參數" } },
+            { "category.select_option", new[] { "Options", "オプション", "可選設定" } },
+            { "category.select_advanced", new[] { "Advanced Settings", "詳細設定", "進階設定" } },
+            { "category.save_settings", new [] { "Save Settings", "設定を保存", "保存設定" } },
+
+            ///////////////////////////////////////////////////////
+            // ラベル label
+            { "label.avatar", new[] { "Avatar", "アバター", "Avatar" } },
             { "label.category.general_settings", new []{ "General Settings", "一般設定", "一般設定" } },
             { "label.category.additional_settings", new []{ "Additional Settings", "追加設定", "追加設定"}},
             { "label.use_default", new[] { "Apply on Initial State", "初期状態で適用する", "預設開啟使用" } },
@@ -24,10 +32,7 @@ namespace io.github.azukimochi
             { "label.light_max", new[] { "Max Brightness", "明るさの上限", "亮度上限" } },
             { "label.light_min", new[] { "Min Brightness", "明るさの下限", "亮度下限" } },
             { "label.light_default", new[] { "Default Brightness", "明るさの初期値", "預設亮度" } },
-            { "category.select_option", new[] { "Options", "オプション", "可選設定" } },
-            { "category.select_advanced", new[] { "Advanced Settings", "詳細設定", "進階設定" } },
             { "label.target_shader", new[] { "Target Shader", "対象シェーダー", "目標 Shader" } },
-            { "info.shader_must_select" , new []{"Target shader must be selected", "対象シェーダーを選択してください", "必須選擇目標 Shader"} },
             { "label.allow_color_tmp", new[] { "Enable Color Temperature Control", "色温度調整を有効にする", "啟用色溫控制" } },
             { "label.allow_saturation", new[] { "Enable Saturation Control", "彩度調整を有効にする", "啟用飽和度控制" } },
             { "label.allow_monochrome", new []{ "Enable Monochrome Control", "ライトのモノクロ化調整を有効にする", "啟用單色化控制"}},
@@ -47,6 +52,22 @@ namespace io.github.azukimochi
             { "label.saturation", new []{ "Saturation", "彩度", "飽和度"}},
             { "label.monochrome", new []{ "Monochrome", "モノクロ化", "單色化"}},
             { "label.unlit", new []{ "Unlit", "Unlit", "Unlit"}},
+            { "label.apply_settings_avatar", new []
+            {
+                "Set current settings as default and apply to other avatars",
+                "現在の設定をデフォルトにして他のアバターに適用する",
+                "Set current settings as default and apply to other avatars",
+            }},
+            { "label.apply_settings_project", new []
+            {
+                "Apply to all Unity projects",
+                "全てのUnityプロジェクトに適用する",
+                "Apply to all Unity projects",
+            }},
+            
+            ///////////////////////////////////////////////////////
+            // 情報　info
+            { "info.shader_must_select" , new []{"Target shader must be selected", "対象シェーダーを選択してください", "必須選擇目標 Shader"} },
             { "info.generate", new[] { "Generate", "生成", "生成" } },
             { "info.re_generate", new[] { "Regenerate", "再生成", "再生成" } },
             { "info.process", new[] { "Processing", "生成中", "生成中" } },
@@ -56,12 +77,14 @@ namespace io.github.azukimochi
             { "info.initial_val", new []{ "Default Values for Additional Settings", "追加設定の初期値", "追加設定的預設值" } },
             { "info.save_location", new[] { "Save Location", "アセットの保存場所", "資源保存位置" } },
             { "info.cancelled", new[] { "Cancelled", "キャンセルしました", "已取消" } },
+            
+            ///////////////////////////////////////////////////////
+            // ヒント tip
             { "tip.select_avatar", new[] { "Select the avatar to generate animations for", "アニメーションを生成するアバターをセットしてください", "選擇要為其生成動畫的 Avatar" } },
             { "tip.use_default", new[] { "Use the light animation in the initial state", "初期状態でライトのアニメーションを使用します", "在預設狀態下使用亮度動畫" } },
             { "tip.save_value", new[] { "Keep brightness changes in the avatar", "明るさの変更をアバターに保持したままにします", "保持 Avatar 的亮度變化" } },
             {
-                "tip.override_min_max",
-                new[]
+                "tip.override_min_max", new[]
                 {
                     "Override default avatar brightness with the lower and upper limit parameters below",
                     "デフォルトのアバターの明るさを下限上限設定パラメータで上書きします",
@@ -76,8 +99,7 @@ namespace io.github.azukimochi
             { "tip.allow_saturation", new[] { "Enables saturation adjustment functionality", "彩度の調整機能を有効化することができます", "啟用飽和度調整功能" } },
             { "tip.allow_monochrome", new []{ "Enables monochrome adjustment functionality", "ライトのモノクロ化の調整機能を有効化することができます", "啟用單色化調整功能"} },
             {
-                "tip.allow_unlit",
-                new[]
+                "tip.allow_unlit", new[]
                 {
                     "Enables Unlit adjustment functionality (Liltoon/Sunao Only)",
                     "Unlit の調整機能を有効化することができます(Liltoon/Sunao Only)",
@@ -92,8 +114,7 @@ namespace io.github.azukimochi
                 new[] { "Automatically set animation flags at build time", "ビルド時に自動的にアニメーションフラグをセットします", "在建置時自動設定動畫標誌" }
             },
             {
-                "tip.allow_editor_only",
-                new[]
+                "tip.allow_editor_only", new[]
                 {
                     "Exclude objects marked with EditorOnly tag from animations",
                     "EditorOnlyタグに設定されているオブジェクトをアニメーションから除外します",
@@ -104,16 +125,107 @@ namespace io.github.azukimochi
                 "tip.allow_gen_playmode",
                 new[] { "Automatically generate animations at build/play mode", "ビルド・実行時にアニメーションを自動生成します", "在播放模式或建置時自動生成動畫" }
             },
+            
+            ///////////////////////////////////////////////////////
+            // ウインドウ　window
             {
-                "window.info.deprecated",
-                new[]
+                "window.info.deprecated", new[]
                 {
                     "The settings window has been deprecated. See below for new ways of doing things.",
                     "設定ウィンドウは非推奨になりました。新しいやり方については以下をご覧ください。",
                     "這個設定介面已被棄用，請參閱下文以了解新方法。"
                 }
             },
-
+            {
+                "Window.info.global_settings.changed", new []
+                {
+                    "Light Limit Changer global settings changed",
+                    "Light Limit Changerのグローバル設定が変更されました",
+                    "Light Limit Changer global settings changed"
+                }
+            },
+            {
+                "Window.info.global_settings.update_available", new []
+                {
+                    "Update settings",
+                    "設定を更新",
+                    "Update settings"
+                }
+            },
+            {
+                "Window.info.global_settings.title", new []
+                {
+                    "Loading Global Settings",
+                    "グローバル設定の読み込み",
+                    "Loading Global Settings"
+                }
+            },
+            {
+                "Window.info.global_settings.message", new []
+                {
+                    @"Global settings are available. Would you like to load them?
+Pressing Cancel will discard the global settings and keep the current settings. ",
+                    @"グローバル設定が利用可能です。読み込みますか？
+キャンセルを押すとグローバル設定を破棄して現在の設定を保持します。",
+                    @"Global settings are available. Would you like to load them?
+Pressing Cancel will discard the global settings and keep the current settings. ",
+                }
+            },
+            {
+                "Window.info.gloabl_settings.save", new []
+                {
+                    "Save as Global Settings",
+                    "グローバル設定として保存",
+                    "Save as Global Settings"
+                }
+            },
+            {
+                "Window.info.global_settings.save_message", new []
+                {
+                    @"Using this setting will apply the setting to all other Unity projects.
+Settings will be loaded in another project only after Unity is restarted.",
+                    @"この設定を使用すると、他のすべてのUnityプロジェクトへ設定が適用されます。
+別のプロジェクトで設定が読み込まれるのはUnity再起動後です。",
+                    @"Using this setting will apply the setting to all other Unity projects.
+Settings will be loaded in another project only after Unity is restarted.",
+                }
+            },
+            {
+                "Window.info.choice.apply_save", new []
+                {
+                    "Apply as Global Settings",
+                    "グローバル設定として適用",
+                    "Apply as Global Settings"
+                }
+            },
+            {
+                "Window.info.choice.apply_load", new []
+                {
+                    "Load Global Settings",
+                    "グローバル設定を読み込む",
+                    "Load Global Settings"
+                }
+            },
+            {
+                "Window.info.cancel", new []
+                {
+                    "Cancel",
+                    "キャンセル",
+                    "Cancel"
+                }
+            },
+            {
+                "window.info.ok", new []
+                {
+                    "OK",
+                    "OK",
+                    "OK"
+                }
+            },
+            
+            
+            ///////////////////////////////////////////////////////
+            // NDMF
             {
                 "NDMF.info.useColorTemporSaturation", new[]
                 {

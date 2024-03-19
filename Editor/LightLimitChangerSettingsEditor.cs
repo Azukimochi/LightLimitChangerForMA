@@ -89,24 +89,24 @@ namespace io.github.azukimochi
                     EditorGUILayout.PropertyField(IsValueSave, Localization.G("label.save_value", "tip.save_value"));
                 }
 
-                using (new EditorGUILayout.VerticalScope())
+                using (new EditorGUILayout.VerticalScope(GUI.skin.box))
                 {
-                    EditorGUILayout.LabelField("設定の保存", boldLabel);
+                    EditorGUILayout.LabelField(Localization.S("category.save_settings"), boldLabel);
                     
                     var settings = target as LightLimitChangerSettings;
                     var parameter = settings?.Parameters;
                     EditorGUI.BeginDisabledGroup(parameter == null || PrefabUtility.IsPartOfAnyPrefab(target) == false);
 
-                    ApplySettingToAvatar = GUILayout.Button("現在の設定をデフォルトにして他のアバターへ適用", EditorStyles.miniButton);
+                    ApplySettingToAvatar = GUILayout.Button(Localization.S("label.apply_settings_avatar"), EditorStyles.miniButton);
                     if (ApplySettingToAvatar)
                     {
                         LightLimitChangerPrefab.SavePrefabSetting(parameter);
                         PrefabUtility.RevertPrefabInstance(settings.gameObject, InteractionMode.AutomatedAction);
                     }
-                    ApplySettingToProject = GUILayout.Button("Unityプロジェクトすべてに適用", EditorStyles.miniButton);
+                    ApplySettingToProject = GUILayout.Button(Localization.S("label.apply_settings_project"), EditorStyles.miniButton);
                     if (ApplySettingToProject)
                     {
-                        if (EditorUtility.DisplayDialog("Unityプロジェクトすべてに適用", "この設定を使用すると、他のすべてのUnityプロジェクトへ設定が適用されます。", "Yes", "No"))
+                        if (EditorUtility.DisplayDialog(Localization.S("Window.info.gloabl_settings.save"), Localization.S("Window.info.global_settings.save_message"), Localization.S("Window.info.choice.apply_save"), Localization.S("Window.info.cancel")))
                         {
                             LightLimitChangerPrefab.SavePrefabSettingAsGlobal(parameter);
                             PrefabUtility.RevertPrefabInstance(settings.gameObject, InteractionMode.AutomatedAction);
