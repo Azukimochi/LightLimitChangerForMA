@@ -19,7 +19,7 @@ namespace io.github.azukimochi
             { "category.select_parameter", new[] { "Parameter", "パラメーター", "參數" } },
             { "category.select_option", new[] { "Options", "オプション", "可選設定" } },
             { "category.select_advanced", new[] { "Advanced Settings", "詳細設定", "進階設定" } },
-            { "category.save_settings", new [] { "Save Settings", "設定を保存", "保存設定" } },
+            { "category.save_settings", new [] { "Save Settings", "設定を保存", "儲存設定" } },
 
             ///////////////////////////////////////////////////////
             // ラベル label
@@ -32,7 +32,7 @@ namespace io.github.azukimochi
             { "label.light_max", new[] { "Max Brightness", "明るさの上限", "亮度上限" } },
             { "label.light_min", new[] { "Min Brightness", "明るさの下限", "亮度下限" } },
             { "label.light_default", new[] { "Default Brightness", "明るさの初期値", "預設亮度" } },
-            { "label.changelog", new[] {"Changelog", "更新履歴", "Changelog" } },
+            { "label.changelog", new[] {"Changelog", "更新履歴", "更新日誌" } },
             { "label.target_shader", new[] { "Target Shader", "対象シェーダー", "目標 Shader" } },
             { "label.allow_color_tmp", new[] { "Enable Color Temperature Control", "色温度調整を有効にする", "啟用色溫控制" } },
             { "label.allow_saturation", new[] { "Enable Saturation Control", "彩度調整を有効にする", "啟用飽和度控制" } },
@@ -57,19 +57,19 @@ namespace io.github.azukimochi
             {
                 "Set current settings as default and apply to other avatars",
                 "現在の設定をデフォルトにして他のアバターに適用する",
-                "Set current settings as default and apply to other avatars",
+                "將目前的設定設為預設值並套用至其他 Avatar",
             }},
             { "label.apply_settings_project", new []
             {
                 "Apply to all Unity projects",
                 "全てのUnityプロジェクトに適用する",
-                "Apply to all Unity projects",
+                "套用至全部 Unity 專案",
             }},
             { "label.document", new []
                 {
                     "Documentation",
                     "説明書",
-                    "Documentation"
+                    "說明書"
                 }
             },
 
@@ -81,9 +81,9 @@ namespace io.github.azukimochi
             { "info.process", new[] { "Processing", "生成中", "生成中" } },
             { "info.complete", new[] { "Complete", "生成終了", "完成" } },
             { "info.error", new[] { "Error", "エラー", "錯誤" } },
-            { "info.save", new[] { "Save", "保存", "保存" } },
+            { "info.save", new[] { "Save", "保存", "儲存" } },
             { "info.initial_val", new []{ "Default Values for Additional Settings", "追加設定の初期値", "追加設定的預設值" } },
-            { "info.save_location", new[] { "Save Location", "アセットの保存場所", "資源保存位置" } },
+            { "info.save_location", new[] { "Save Location", "アセットの保存場所", "資源儲存位置" } },
             { "info.cancelled", new[] { "Cancelled", "キャンセルしました", "已取消" } },
             
             ///////////////////////////////////////////////////////
@@ -149,7 +149,7 @@ namespace io.github.azukimochi
                 {
                     "Light Limit Changer global settings changed",
                     "Light Limit Changerのグローバル設定が変更されました",
-                    "Light Limit Changer global settings changed"
+                    "Light Limit Changer 全域設定已變更。"
                 }
             },
             {
@@ -157,7 +157,7 @@ namespace io.github.azukimochi
                 {
                     "Update settings",
                     "設定を更新",
-                    "Update settings"
+                    "更新設定"
                 }
             },
             {
@@ -165,7 +165,7 @@ namespace io.github.azukimochi
                 {
                     "Loading Global Settings",
                     "グローバル設定の読み込み",
-                    "Loading Global Settings"
+                    "加載全域設定"
                 }
             },
             {
@@ -175,8 +175,8 @@ namespace io.github.azukimochi
 Pressing Cancel will discard the global settings and keep the current settings. ",
                     @"グローバル設定が利用可能です。読み込みますか？
 キャンセルを押すとグローバル設定を破棄して現在の設定を保持します。",
-                    @"Global settings are available. Would you like to load them?
-Pressing Cancel will discard the global settings and keep the current settings. ",
+                    @"全域設定為可用。要載入它嗎？
+按下取消將放棄全域設定並保留目前設定。",
                 }
             },
             {
@@ -184,7 +184,7 @@ Pressing Cancel will discard the global settings and keep the current settings. 
                 {
                     "Save as Global Settings",
                     "グローバル設定として保存",
-                    "Save as Global Settings"
+                    "儲存為全域設定"
                 }
             },
             {
@@ -194,8 +194,8 @@ Pressing Cancel will discard the global settings and keep the current settings. 
 Settings will be loaded in another project only after Unity is restarted.",
                     @"この設定を使用すると、他のすべてのUnityプロジェクトへ設定が適用されます。
 別のプロジェクトで設定が読み込まれるのはUnity再起動後です。",
-                    @"Using this setting will apply the setting to all other Unity projects.
-Settings will be loaded in another project only after Unity is restarted.",
+                    @"使用此設定將設置套用於其他所有的 Unity 專案。
+在另一個專案中，設定僅在重啟 Unity 後才會被加載。",
                 }
             },
             {
@@ -203,7 +203,7 @@ Settings will be loaded in another project only after Unity is restarted.",
                 {
                     "Apply as Global Settings",
                     "グローバル設定として適用",
-                    "Apply as Global Settings"
+                    "套用為全域設定"
                 }
             },
             {
@@ -211,7 +211,7 @@ Settings will be loaded in another project only after Unity is restarted.",
                 {
                     "Load Global Settings",
                     "グローバル設定を読み込む",
-                    "Load Global Settings"
+                    "載入全域設定"
                 }
             },
             {
@@ -219,7 +219,7 @@ Settings will be loaded in another project only after Unity is restarted.",
                 {
                     "Cancel",
                     "キャンセル",
-                    "Cancel"
+                    "取消"
                 }
             },
             {
