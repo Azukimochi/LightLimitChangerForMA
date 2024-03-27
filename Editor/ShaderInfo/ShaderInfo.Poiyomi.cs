@@ -168,14 +168,13 @@ namespace io.github.azukimochi
 
             public override void AdditionalControl(Material material, in LightLimitChangerParameters parameters)
             {
+                material.SetOverrideTag($"{_LightingCap}{Animated_Suffix}", Flag_IsAnimated);
+                material.SetOverrideTag($"{_LightingMinLightBrightness}{Animated_Suffix}", Flag_IsAnimated);
                 if (parameters.AllowSaturationControl || parameters.AllowColorTempControl)
                 {
                     material.TrySet(PropertyIDs.MainColorAdjustToggle, 1f);
                     material.EnableKeyword($"{_MainColorAdjustToggle.ToUpperInvariant()}_ON");
                     material.EnableKeyword("COLOR_GRADING_HDR");
-
-                    material.SetOverrideTag($"{_LightingCap}{Animated_Suffix}", Flag_IsAnimated);
-                    material.SetOverrideTag($"{_LightingMinLightBrightness}{Animated_Suffix}", Flag_IsAnimated);
 
                     if (parameters.AllowColorTempControl)
                     {
