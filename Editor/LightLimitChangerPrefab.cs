@@ -1,4 +1,5 @@
-﻿using System.IO;
+using System;
+using System.IO;
 using nadena.dev.modular_avatar.core;
 using UnityEditor;
 using UnityEngine;
@@ -115,7 +116,7 @@ namespace io.github.azukimochi
             EditorPrefs.SetString(GlobalSettingsValueKey, json);
         }
 
-        private readonly ref struct PrefabEditScope
+        private readonly struct PrefabEditScope : IDisposable
         {
             private readonly GameObject instance;
             private readonly string path;

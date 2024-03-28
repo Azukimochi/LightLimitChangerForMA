@@ -228,8 +228,8 @@ namespace io.github.azukimochi
             {
                 if (foldout.IsOpen)
                 {
-                    DrawWebButton("Light Limit Changer OfficialSite | おすすめ設定 RecomentSetting", "https://azukimochi.github.io/LLC-Docs/docs/tutorial/howtouse-recommend");
-                    DrawWebButton("Light Limit Changer OfficialSite | 設定概要 Discription", "https://azukimochi.github.io/LLC-Docs/docs/discription/disc_param");
+                    DrawWebButton("Light Limit Changer OfficialSite | おすすめ設定 Recommend Setting", "https://azukimochi.github.io/LLC-Docs/docs/tutorial/howtouse-recommend");
+                    DrawWebButton("Light Limit Changer OfficialSite | 設定概要 Description", "https://azukimochi.github.io/LLC-Docs/docs/discription/disc_param");
                 }
             }
         }
