@@ -230,7 +230,32 @@ Settings will be loaded in another project only after Unity is restarted.",
                     "OK"
                 }
             },
-            
+            ///////////////////////////////////////////////////////
+            // Links
+            {
+                "link.document.changelog", new []
+                {
+                    "Light Limit Changer OfficialSite | Changelog",
+                    "Light Limit Changer OfficialSite | 更新履歴",
+                    "Light Limit Changer OfficialSite | Changelog"
+                }
+            },
+            {
+                "link.document.recommend", new []
+                {
+                    "Light Limit Changer OfficialSite | Recommend Settings",
+                    "Light Limit Changer OfficialSite | おすすめ設定",
+                    "Light Limit Changer OfficialSite | Recommend Settings"
+                }
+            },
+            {
+                "link.document.description", new []
+                {
+                    "Light Limit Changer OfficialSite | Description",
+                    "Light Limit Changer OfficialSite | 設定概要",
+                    "Light Limit Changer OfficialSite | Description"
+                }
+            },
             
             ///////////////////////////////////////////////////////
             // NDMF
