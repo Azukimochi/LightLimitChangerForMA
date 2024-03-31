@@ -215,7 +215,7 @@ namespace io.github.azukimochi
             {
                 if (foldout.IsOpen)
                 {
-                    DrawWebButton("Light Limit Changer OfficialSite | 更新履歴 Changelog", "https://azukimochi.github.io/LLC-Docs/docs/changelog");
+                    DrawWebButton(Localization.S("link.document.changelog"), "https://azukimochi.github.io/LLC-Docs/docs/changelog");
                     DrawWebButton("X|Twitter", "https://twitter.com/search?q=from%3Aazukimochi25%20%23LightLimitChanger&src=typed_query&f=live");
                 }
             }
@@ -228,8 +228,8 @@ namespace io.github.azukimochi
             {
                 if (foldout.IsOpen)
                 {
-                    DrawWebButton("Light Limit Changer OfficialSite | おすすめ設定 Recommend Setting", "https://azukimochi.github.io/LLC-Docs/docs/tutorial/howtouse-recommend");
-                    DrawWebButton("Light Limit Changer OfficialSite | 設定概要 Description", "https://azukimochi.github.io/LLC-Docs/docs/discription/disc_param");
+                    DrawWebButton(Localization.S("link.document.recommend"), "https://azukimochi.github.io/LLC-Docs/docs/tutorial/howtouse-recommend");
+                    DrawWebButton(Localization.S("link.document.description"), "https://azukimochi.github.io/LLC-Docs/docs/discription/disc_param");
                 }
             }
         }
