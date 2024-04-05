@@ -21,6 +21,8 @@ namespace io.github.azukimochi
 
                 if (list.Count == 0)
                 {
+                    IError error = new ErrorMessage("NDMF.info.non_generated", ErrorSeverity.NonFatal);
+                    ErrorReport.ReportError(error);
                     session.IsFailed = true;
                 }
             }
