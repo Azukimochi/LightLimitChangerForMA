@@ -18,6 +18,11 @@ namespace io.github.azukimochi
 
                 CollectMeshRenderers(context.AvatarRootObject, session.Parameters.TargetShaders, list);
                 CollectMeshRenderersInAnimation(context.AvatarRootObject, session.Parameters.TargetShaders, list);
+
+                if (list.Count == 0)
+                {
+                    session.IsFailed = true;
+                }
             }
 
             private static void CollectMeshRenderers(GameObject avatarObject, in TargetShaders targetShaders, HashSet<Renderer> list)
