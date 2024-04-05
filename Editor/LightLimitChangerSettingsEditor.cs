@@ -104,7 +104,7 @@ namespace io.github.azukimochi
                     if (ApplySettingToAvatar)
                     {
                         LightLimitChangerPrefab.SavePrefabSetting(parameter);
-                        PrefabUtility.RevertPrefabInstance(settings.gameObject, InteractionMode.AutomatedAction);
+                        Utils.ResetPrefabInstance(settings.gameObject);
                     }
                     ApplySettingToProject = GUILayout.Button(Localization.S("label.apply_settings_project"), EditorStyles.miniButton);
                     if (ApplySettingToProject)
@@ -112,7 +112,7 @@ namespace io.github.azukimochi
                         if (EditorUtility.DisplayDialog(Localization.S("Window.info.gloabl_settings.save"), Localization.S("Window.info.global_settings.save_message"), Localization.S("Window.info.choice.apply_save"), Localization.S("Window.info.cancel")))
                         {
                             LightLimitChangerPrefab.SavePrefabSettingAsGlobal(parameter);
-                            PrefabUtility.RevertPrefabInstance(settings.gameObject, InteractionMode.AutomatedAction);
+                            Utils.ResetPrefabInstance(settings.gameObject);
                         }
                     }
                     

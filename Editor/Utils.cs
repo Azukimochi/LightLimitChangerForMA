@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using nadena.dev.ndmf.util;
 using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -73,6 +74,29 @@ namespace io.github.azukimochi
                     return false;
                 default:
                     return true;
+            }
+        }
+
+        public static void ResetPrefabInstance(GameObject prefab)
+        {
+            bool isPartOfPrefab = PrefabUtility.IsPartOfPrefabInstance(prefab);
+            if (isPartOfPrefab)
+            {
+                var parentPrefabPath = PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(prefab.transform.parent);
+                var relativePath = prefab.AvatarRootPath();
+                var parent = PrefabUtility.LoadPrefabContents(parentPrefabPath);
+                try
+                {
+                    PrefabUtility.RevertPrefabInstance(parent.transform.Find(relativePath).gameObject, InteractionMode.UserAction);
+                }
+                finally
+                {
+                    PrefabUtility.UnloadPrefabContents(parent);
+                }
+            }
+            else
+            {
+                PrefabUtility.RevertPrefabInstance(prefab, InteractionMode.UserAction);
             }
         }
 
