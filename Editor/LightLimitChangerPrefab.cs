@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using nadena.dev.modular_avatar.core;
+using nadena.dev.ndmf.util;
 using UnityEditor;
 using UnityEngine;
 
@@ -106,9 +107,20 @@ namespace io.github.azukimochi
             }
         }
 
-        public static void SavePrefabSettingAsGlobal(LightLimitChangerParameters parameters)
+        public static void SavePrefabSetting(SerializedObject serializedObject)
         {
-            SavePrefabSetting(parameters);
+            Undo.SetCurrentGroupName("Save LLC Prefab Settings");
+            var idx = Undo.GetCurrentGroup();
+            foreach (var x in serializedObject.AllProperties())
+            {
+                PrefabUtility.ApplyPropertyOverride(x, AssetDatabase.GetAssetPath(Object), InteractionMode.UserAction);
+            }
+            Undo.CollapseUndoOperations(idx);
+        }
+
+        public static void SavePrefabSettingAsGlobal(SerializedObject serializedObject, LightLimitChangerParameters parameters)
+        {
+            SavePrefabSetting(serializedObject);
             var json = JsonUtility.ToJson(parameters);
             var key = GUID.Generate().ToString();
             EditorPrefs.SetString(GlobalSettingsIDKey, key);
