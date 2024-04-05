@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using nadena.dev.ndmf.util;
 using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -73,6 +74,29 @@ namespace io.github.azukimochi
                     return false;
                 default:
                     return true;
+            }
+        }
+
+        public static void ResetPrefabInstance(GameObject prefab)
+        {
+            bool isPartOfPrefab = PrefabUtility.IsPartOfPrefabInstance(prefab);
+            if (isPartOfPrefab)
+            {
+                var parentPrefabPath = PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(prefab.transform.parent);
+                var relativePath = prefab.AvatarRootPath();
+                var parent = PrefabUtility.LoadPrefabContents(parentPrefabPath);
+                try
+                {
+                    PrefabUtility.RevertPrefabInstance(parent.transform.Find(relativePath).gameObject, InteractionMode.UserAction);
+                }
+                finally
+                {
+                    PrefabUtility.UnloadPrefabContents(parent);
+                }
+            }
+            else
+            {
+                PrefabUtility.RevertPrefabInstance(prefab, InteractionMode.UserAction);
             }
         }
 
@@ -215,7 +239,7 @@ namespace io.github.azukimochi
             {
                 if (foldout.IsOpen)
                 {
-                    DrawWebButton("Light Limit Changer OfficialSite | 更新履歴 Changelog", "https://azukimochi.github.io/LLC-Docs/docs/changelog");
+                    DrawWebButton(Localization.S("link.document.changelog"), "https://azukimochi.github.io/LLC-Docs/docs/changelog");
                     DrawWebButton("X|Twitter", "https://twitter.com/search?q=from%3Aazukimochi25%20%23LightLimitChanger&src=typed_query&f=live");
                 }
             }
@@ -228,8 +252,8 @@ namespace io.github.azukimochi
             {
                 if (foldout.IsOpen)
                 {
-                    DrawWebButton("Light Limit Changer OfficialSite | おすすめ設定 Recommend Setting", "https://azukimochi.github.io/LLC-Docs/docs/tutorial/howtouse-recommend");
-                    DrawWebButton("Light Limit Changer OfficialSite | 設定概要 Description", "https://azukimochi.github.io/LLC-Docs/docs/discription/disc_param");
+                    DrawWebButton(Localization.S("link.document.recommend"), "https://azukimochi.github.io/LLC-Docs/docs/tutorial/howtouse-recommend");
+                    DrawWebButton(Localization.S("link.document.description"), "https://azukimochi.github.io/LLC-Docs/docs/discription/disc_param");
                 }
             }
         }

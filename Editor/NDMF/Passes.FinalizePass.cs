@@ -26,7 +26,20 @@ namespace io.github.azukimochi
 
             internal static void Run(GameObject avatarObject, Session session, LightLimitChangerObjectCache cache)
             {
-                var obj = session.Settings.gameObject;
+                var obj = session.Settings?.gameObject;
+                if (!session.IsValid())
+                {
+                    if (obj == null)
+                        return;
+
+                    var mami = obj.GetComponent<ModularAvatarMenuInstaller>();
+                    if (mami != null)
+                    {
+                        GameObject.DestroyImmediate(mami);
+                    }
+                    return;
+                }
+
                 var mergeAnimator_wd = obj.AddComponent<ModularAvatarMergeAnimator>();
                 var mergeAnimator = obj.AddComponent<ModularAvatarMergeAnimator>();
                 var maParameters = obj.GetOrAddComponent<ModularAvatarParameters>();

@@ -18,6 +18,13 @@ namespace io.github.azukimochi
 
                 CollectMeshRenderers(context.AvatarRootObject, session.Parameters.TargetShaders, list);
                 CollectMeshRenderersInAnimation(context.AvatarRootObject, session.Parameters.TargetShaders, list);
+
+                if (list.Count == 0)
+                {
+                    IError error = new ErrorMessage("NDMF.info.non_generated", ErrorSeverity.NonFatal);
+                    ErrorReport.ReportError(error);
+                    session.IsFailed = true;
+                }
             }
 
             private static void CollectMeshRenderers(GameObject avatarObject, in TargetShaders targetShaders, HashSet<Renderer> list)

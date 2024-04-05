@@ -230,7 +230,32 @@ Settings will be loaded in another project only after Unity is restarted.",
                     "OK"
                 }
             },
-            
+            ///////////////////////////////////////////////////////
+            // Links
+            {
+                "link.document.changelog", new []
+                {
+                    "Light Limit Changer OfficialSite | Changelog",
+                    "Light Limit Changer OfficialSite | 更新履歴",
+                    "Light Limit Changer OfficialSite | Changelog"
+                }
+            },
+            {
+                "link.document.recommend", new []
+                {
+                    "Light Limit Changer OfficialSite | Recommend Settings",
+                    "Light Limit Changer OfficialSite | おすすめ設定",
+                    "Light Limit Changer OfficialSite | Recommend Settings"
+                }
+            },
+            {
+                "link.document.description", new []
+                {
+                    "Light Limit Changer OfficialSite | Description",
+                    "Light Limit Changer OfficialSite | 設定概要",
+                    "Light Limit Changer OfficialSite | Description"
+                }
+            },
             
             ///////////////////////////////////////////////////////
             // NDMF
@@ -260,7 +285,19 @@ Poiyomi Shaderの最新版へのアップデートをお願いします",
                     @"檢測到 Poiyomi Shader 7.3 版本。
 請使用最新版的 Poiyomi Shader。"
                 }
+            },
+            {
+                "NDMF.info.non_generated", new []
+                {
+                    @"The menu was not generated because there was no animation target.
+Please check your settings if this is not what you intended.",
+                    @"アニメーションの生成対象が存在しなかったため、メニューを生成しませんでした。
+これが意図したものでない場合には、設定を確認してください。",
+                    @"The menu was not generated because there was no animation target.
+Please check your settings if this is not what you intended."
+                }
             }
+            
         };
 
         public static string S(string text, int? language = null)
