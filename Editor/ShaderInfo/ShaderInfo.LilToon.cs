@@ -188,8 +188,10 @@ namespace io.github.azukimochi
                 {
                     container.Default.SetParameterAnimation(parameters, _MainTexHSVG, DefaultParameters.MainTexHSVG);
 
-                    container.Control.SetParameterAnimation(parameters, _MainTexHSVG, DefaultParameters.MainTexHSVG, ~ShaderInfoUtility.IncludeField.Y);
+                    container.Control.SetParameterAnimation(parameters, $"{_MainTexHSVG}.x", 1, 1);
                     container.Control.SetParameterAnimation(parameters, $"{_MainTexHSVG}.y", 0, 2);
+                    container.Control.SetParameterAnimation(parameters, $"{_MainTexHSVG}.z", 1, 1);
+                    container.Control.SetParameterAnimation(parameters, $"{_MainTexHSVG}.w", 1, 1);
                 }
                 if (container.ControlType.HasFlag(LightLimitControlType.Monochrome))
                 {
