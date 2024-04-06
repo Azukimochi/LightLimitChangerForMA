@@ -237,7 +237,7 @@ Settings will be loaded in another project only after Unity is restarted.",
                 {
                     "Light Limit Changer OfficialSite | Changelog",
                     "Light Limit Changer OfficialSite | 更新履歴",
-                    "Light Limit Changer OfficialSite | Changelog"
+                    "Light Limit Changer OfficialSite | 更新日誌"
                 }
             },
             {
@@ -245,7 +245,7 @@ Settings will be loaded in another project only after Unity is restarted.",
                 {
                     "Light Limit Changer OfficialSite | Recommend Settings",
                     "Light Limit Changer OfficialSite | おすすめ設定",
-                    "Light Limit Changer OfficialSite | Recommend Settings"
+                    "Light Limit Changer OfficialSite | 推薦設定"
                 }
             },
             {
@@ -253,7 +253,7 @@ Settings will be loaded in another project only after Unity is restarted.",
                 {
                     "Light Limit Changer OfficialSite | Description",
                     "Light Limit Changer OfficialSite | 設定概要",
-                    "Light Limit Changer OfficialSite | Description"
+                    "Light Limit Changer OfficialSite | 概述"
                 }
             },
             
@@ -270,7 +270,8 @@ If material colors appear abnormal, please disable these controls and file a bug
 
 この機能は実行時に非破壊でマテリアル・テクスチャを変更するため、潜在的なバグやテクスチャメモリが増加する可能性があります。
 マテリアルの色がおかしくなった場合にはこの機能を使用せず、作者に報告をお願いします。",
-                @"已啟用色溫或飽和度控制功能
+                @"已啟用色溫或飽和度控制功能。
+
 此功能在運行時會以非破壞性方式修改材質和貼圖，這可能會導致潛在的錯誤和增加貼圖記憶體消耗。
 如果材質顏色顯示異常，請不要使用這些功能並向作者報告。"
                 }
@@ -293,8 +294,8 @@ Poiyomi Shaderの最新版へのアップデートをお願いします",
 Please check your settings if this is not what you intended.",
                     @"アニメーションの生成対象が存在しなかったため、メニューを生成しませんでした。
 これが意図したものでない場合には、設定を確認してください。",
-                    @"The menu was not generated because there was no animation target.
-Please check your settings if this is not what you intended."
+                    @"選單未生成，因為沒有要動畫的目標。
+如果你不是有意的，請檢查你的設定。"
                 }
             }
             
