@@ -96,7 +96,7 @@ namespace io.github.azukimochi
             {
                 Graphics.Blit(source, rt, Material);
 
-                var request = AsyncGPUReadback.Request(rt);
+                var request = AsyncGPUReadback.Request(rt, 0, TextureFormat.RGBA32);
                 request.WaitForCompletion();
                 dest.SetPixelData(request.GetData<Color>(), 0);
                 dest.Apply(true);
