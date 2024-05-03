@@ -65,8 +65,6 @@ namespace io.github.azukimochi
             protected override void Execute(BuildContext context)
             {
                 var session = GetSession(context);
-                if (!session.IsValid() && typeof(TPass) != typeof(FinalizePass))
-                    return;
                 _session = session;
                 var cache = _cache = GetObjectCache(context);
 

@@ -27,8 +27,13 @@ namespace io.github.azukimochi
             internal static void Run(GameObject avatarObject, Session session, LightLimitChangerObjectCache cache)
             {
                 var obj = session.Settings?.gameObject;
+                
+                var maParameters = obj.GetOrAddComponent<ModularAvatarParameters>();
+
                 if (!session.IsValid())
                 {
+                    addMAParamaters(session, maParameters);
+                    
                     if (obj == null)
                         return;
 
@@ -42,7 +47,6 @@ namespace io.github.azukimochi
 
                 var mergeAnimator_wd = obj.AddComponent<ModularAvatarMergeAnimator>();
                 var mergeAnimator = obj.AddComponent<ModularAvatarMergeAnimator>();
-                var maParameters = obj.GetOrAddComponent<ModularAvatarParameters>();
                 var menuInstaller = obj.GetOrAddComponent<ModularAvatarMenuInstaller>();
 
 
@@ -123,7 +127,19 @@ namespace io.github.azukimochi
                     parameter.saved = session.Parameters.IsValueSave;
                 }
                 */
+                
+                addMAParamaters(session, maParameters, animator, animatorWD);
 
+                menuInstaller.menuToAppend = CreateMenu(session, cache);
+
+                foreach (var component in avatarObject.GetComponentsInChildren<LightLimitChangerSettings>(true))
+                {
+                    component.Destroy();
+                }
+            }
+
+            private static void addMAParamaters(Session session, ModularAvatarParameters maParameters, AnimatorController animator = null,AnimatorController animatorWD = null)
+            {
                 foreach(var parameter in session.AvatarParameters)
                 {
                     var param = parameter;
@@ -137,19 +153,16 @@ namespace io.github.azukimochi
                         type = AnimatorControllerParameterType.Float,
                         defaultFloat = param.defaultValue,
                     };
-
-                    animator.AddParameter(animatorParam);
-                    animatorWD.AddParameter(animatorParam);
+                    
+                    if(animator != null)
+                        animator.AddParameter(animatorParam);
+                    if(animatorWD != null)
+                        animatorWD.AddParameter(animatorParam);
                 }
                 maParameters.parameters.Add(new ParameterConfig() { nameOrPrefix = "1", defaultValue = 1, localOnly = true, syncType = ParameterSyncType.NotSynced });
-                animatorWD.AddParameter(new AnimatorControllerParameter() { name = "1", defaultFloat = 1, type = AnimatorControllerParameterType.Float });
+                if(animatorWD != null)
+                    animatorWD.AddParameter(new AnimatorControllerParameter() { name = "1", defaultFloat = 1, type = AnimatorControllerParameterType.Float });
 
-                menuInstaller.menuToAppend = CreateMenu(session, cache);
-
-                foreach (var component in avatarObject.GetComponentsInChildren<LightLimitChangerSettings>(true))
-                {
-                    component.Destroy();
-                }
             }
 
 
