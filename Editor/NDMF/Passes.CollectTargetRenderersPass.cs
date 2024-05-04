@@ -23,7 +23,7 @@ namespace io.github.azukimochi
                 {
                     IError error = new ErrorMessage("NDMF.info.non_generated", ErrorSeverity.NonFatal);
                     ErrorReport.ReportError(error);
-                    session.IsFailed = true;
+                    session.IsNoTargetRenderer = true;
                 }
             }
 

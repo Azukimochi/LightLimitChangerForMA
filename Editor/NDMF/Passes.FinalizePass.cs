@@ -28,14 +28,14 @@ namespace io.github.azukimochi
             {
                 var obj = session.Settings?.gameObject;
                 
+                if (obj == null)
+                    return;
+                
                 var maParameters = obj.GetOrAddComponent<ModularAvatarParameters>();
 
-                if (!session.IsValid())
+                if (!session.IsValid() || session.IsNoTargetRenderer)
                 {
                     addMAParamaters(session, maParameters);
-                    
-                    if (obj == null)
-                        return;
 
                     var mami = obj.GetComponent<ModularAvatarMenuInstaller>();
                     if (mami != null)
