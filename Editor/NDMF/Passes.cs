@@ -65,6 +65,8 @@ namespace io.github.azukimochi
             protected override void Execute(BuildContext context)
             {
                 var session = GetSession(context);
+                if ((!session.IsValid() || session.IsNoTargetRenderer) && (typeof(TPass) != typeof(FinalizePass) && typeof(TPass) != typeof(GenerateAnimationsPass)))
+                    return;
                 _session = session;
                 var cache = _cache = GetObjectCache(context);
 
@@ -84,13 +86,13 @@ namespace io.github.azukimochi
             public HashSet<Renderer> TargetRenderers;
             public DirectBlendTree DirectBlendTree;
             public List<ParameterConfig> AvatarParameters;
-            public bool IsFailed;
+            public bool IsNoTargetRenderer;
 
             public HashSet<Object> Excludes;
 
             private bool _initialized;
 
-            public bool IsValid() => Settings != null && !IsFailed;
+            public bool IsValid() => Settings != null;
 
             public void InitializeSession(BuildContext context)
             {
