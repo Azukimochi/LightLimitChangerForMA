@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using nadena.dev.ndmf.util;
 using UnityEditor;
 using UnityEngine;
@@ -147,11 +148,11 @@ namespace io.github.azukimochi
 
         public static IEnumerable<Material> GetAnimatedMaterials(this RuntimeAnimatorController runtimeAnimatorController)
         {
-            foreach (var anim in runtimeAnimatorController.animationClips)
+            foreach (var anim in runtimeAnimatorController.animationClips.Distinct())
             {
                 foreach (var bind in AnimationUtility.GetObjectReferenceCurveBindings(anim))
                 {
-                    if (bind.type == typeof(MeshRenderer) || bind.type == typeof(SkinnedMeshRenderer))
+                    if (typeof(Renderer).IsAssignableFrom(bind.type))
                     {
                         foreach (var curve in AnimationUtility.GetObjectReferenceCurve(anim, bind))
                         {

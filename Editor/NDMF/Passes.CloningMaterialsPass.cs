@@ -13,8 +13,11 @@ namespace io.github.azukimochi
             {
                 var components = context.AvatarRootObject.GetComponentsInChildren<Component>(true);
                 var mapper = new AnimatorControllerMapper(cache);
+                var rootAnimator = context.AvatarRootObject.GetComponent<Animator>();
                 foreach (var component in components)
                 {
+                    if (component == rootAnimator)
+                        continue;
                     var so = new SerializedObject(component);
                     bool enterChildren = true;
                     var p = so.GetIterator();
