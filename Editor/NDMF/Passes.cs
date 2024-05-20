@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using gomoru.su;
 using nadena.dev.modular_avatar.core;
@@ -23,12 +23,12 @@ namespace io.github.azukimochi
                 .Run(Finalize);
         }
 
-        public readonly static CollectTargetRenderersPass CollectTargetRenderers = new CollectTargetRenderersPass();
-        public readonly static CloningMaterialsPass CloningMaterials = new CloningMaterialsPass();
-        public readonly static NormalizeMaterialsPass NormalizeMaterials = new NormalizeMaterialsPass();
-        public readonly static GenerateAdditionalControlPass GenerateAdditionalControl = new GenerateAdditionalControlPass();
-        public readonly static GenerateAnimationsPass GenerateAnimations = new GenerateAnimationsPass();
-        public readonly static FinalizePass Finalize = new FinalizePass();
+        public readonly static CollectTargetRenderersPass CollectTargetRenderers = CollectTargetRenderersPass.Instance;
+        public readonly static CloningMaterialsPass CloningMaterials = CloningMaterialsPass.Instance;
+        public readonly static NormalizeMaterialsPass NormalizeMaterials = NormalizeMaterialsPass.Instance;
+        public readonly static GenerateAdditionalControlPass GenerateAdditionalControl = GenerateAdditionalControlPass.Instance;
+        public readonly static GenerateAnimationsPass GenerateAnimations = GenerateAnimationsPass.Instance;
+        public readonly static FinalizePass Finalize = FinalizePass.Instance;
 
         internal const string ParameterName_Toggle = "LightLimitEnable";
         internal const string ParameterName_Value = "LightLimitValue";
