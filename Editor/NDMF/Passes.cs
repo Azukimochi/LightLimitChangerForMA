@@ -23,12 +23,12 @@ namespace io.github.azukimochi
                 .Run(Finalize);
         }
 
-        public readonly static CollectTargetRenderersPass CollectTargetRenderers = new CollectTargetRenderersPass();
-        public readonly static CloningMaterialsPass CloningMaterials = new CloningMaterialsPass();
-        public readonly static NormalizeMaterialsPass NormalizeMaterials = new NormalizeMaterialsPass();
-        public readonly static GenerateAdditionalControlPass GenerateAdditionalControl = new GenerateAdditionalControlPass();
-        public readonly static GenerateAnimationsPass GenerateAnimations = new GenerateAnimationsPass();
-        public readonly static FinalizePass Finalize = new FinalizePass();
+        public readonly static CollectTargetRenderersPass CollectTargetRenderers = CollectTargetRenderersPass.Instance;
+        public readonly static CloningMaterialsPass CloningMaterials = CloningMaterialsPass.Instance;
+        public readonly static NormalizeMaterialsPass NormalizeMaterials = NormalizeMaterialsPass.Instance;
+        public readonly static GenerateAdditionalControlPass GenerateAdditionalControl = GenerateAdditionalControlPass.Instance;
+        public readonly static GenerateAnimationsPass GenerateAnimations = GenerateAnimationsPass.Instance;
+        public readonly static FinalizePass Finalize = FinalizePass.Instance;
 
         internal const string ParameterName_Toggle = "LightLimitEnable";
         internal const string ParameterName_Value = "LightLimitValue";
@@ -62,10 +62,12 @@ namespace io.github.azukimochi
             private LightLimitChangerObjectCache _cache;
             private Session _session;
 
+            protected virtual bool IsForceRun { get; } = false;
+
             protected override void Execute(BuildContext context)
             {
                 var session = GetSession(context);
-                if ((!session.IsValid() || session.IsNoTargetRenderer) && (typeof(TPass) != typeof(FinalizePass) && typeof(TPass) != typeof(GenerateAnimationsPass)))
+                if (session.Settings == null || (!IsForceRun && session.Cancel))
                     return;
                 _session = session;
                 var cache = _cache = GetObjectCache(context);
@@ -86,13 +88,12 @@ namespace io.github.azukimochi
             public HashSet<Renderer> TargetRenderers;
             public DirectBlendTree DirectBlendTree;
             public List<ParameterConfig> AvatarParameters;
-            public bool IsNoTargetRenderer;
+
+            public bool Cancel { get; set; } = false;
 
             public HashSet<Object> Excludes;
 
             private bool _initialized;
-
-            public bool IsValid() => Settings != null;
 
             public void InitializeSession(BuildContext context)
             {
@@ -154,6 +155,16 @@ namespace io.github.azukimochi
                 TargetControl = targetControl;
 
                 TargetRenderers = new HashSet<Renderer>();
+
+                AddParameter(new ParameterConfig() { nameOrPrefix = ParameterName_Toggle, defaultValue = parameters.IsDefaultUse ? 1 : 0, syncType = ParameterSyncType.Bool });
+
+                foreach (ref readonly var container in Controls.AsSpan())
+                {
+                    if (TargetControl.HasFlag(container.ControlType))
+                    {
+                        AddParameter(new ParameterConfig() { nameOrPrefix = container.ParameterName, defaultValue = container.DefaultValue, syncType = ParameterSyncType.Float });
+                    }
+                }
 
                 _initialized = true;
             }
