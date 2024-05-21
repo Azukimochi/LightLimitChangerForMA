@@ -10,34 +10,31 @@ namespace io.github.azukimochi
     public static class LightLimitChanger
     {
         public const string Title = "Light Limit Changer For MA";
-        private const string ContextMenuPath = "GameObject/ModularAvatar/Light Limit Changer";
+        private const string ContextMenuPath = "GameObject/Light Limit Changer/Setup";
         private const int ContextMenuPriority = 130;
 
         [MenuItem(ContextMenuPath, true, ContextMenuPriority)]
-        public static bool ValidateApplytoAvatar() => Selection.gameObjects.Any(ValidateCore);
+        public static bool ValidateApplytoAvatar(MenuCommand command) => Selection.gameObjects.Any(x => x.TryGetComponent<VRCAvatarDescriptor>(out _));
 
         [MenuItem(ContextMenuPath, false, ContextMenuPriority)]
-        public static void ApplytoAvatar()
+        public static void ApplytoAvatar(MenuCommand command)
         {
-            List<GameObject> objectToCreated = new List<GameObject>();
-            foreach (var x in Selection.gameObjects)
+            var target = command.context as GameObject;
+            if (target == null || !target.TryGetComponent<VRCAvatarDescriptor>(out _))
             {
-                if (!ValidateCore(x))
-                    continue;
-
-                var prefab = GeneratePrefab(x.transform);
-
-                objectToCreated.Add(prefab);
-            }
-            if (objectToCreated.Count == 0)
                 return;
+            }
 
-            EditorGUIUtility.PingObject(objectToCreated[0]);
-            Selection.objects = objectToCreated.ToArray();
+            if (target.TryGetComponentInChildren<LightLimitChangerSettings>(out _))
+            {
+                EditorUtility.DisplayDialog("Light Limit Changer for MA Setup", string.Format(Localization.S("Window.info.error.already_setup"), target.name), "OK");
+                return;
+            }
+
+            var prefab = GeneratePrefab(target.transform);
+            EditorGUIUtility.PingObject(prefab);
+            Selection.objects = Selection.gameObjects.Where(x => x.TryGetComponent<LightLimitChangerSettings>(out _)).Append(prefab).ToArray();
         }
-
-        // 選択されているものがアバター本体かつ、LLCが含まれていないときに実行可能
-        private static bool ValidateCore(GameObject obj) => obj != null && obj.GetComponent<VRCAvatarDescriptor>() != null && obj.GetComponentInChildren<LightLimitChangerSettings>() == null;
 
         [MenuItem("CONTEXT/LightLimitChangerSettings/Manual Bake (For Advanced User)")]
         public static void ManualBake(MenuCommand command)
