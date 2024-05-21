@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using nadena.dev.ndmf;
 using UnityEngine;
 
 namespace io.github.azukimochi
@@ -118,7 +119,9 @@ namespace io.github.azukimochi
                 // Run Bake
                 if (bakeFlag)
                 {
-                    material.SetTexture(PropertyIDs.MainTex, cache.Register(textureBaker.Bake()));
+                    var baked = cache.Register(textureBaker.Bake());
+                    ObjectRegistry.RegisterReplacedObject(tex, baked);
+                    material.SetTexture(PropertyIDs.MainTex, baked);
                 }
 
                 return bakeFlag;
@@ -148,7 +151,9 @@ namespace io.github.azukimochi
 
                 if (bakeFlag)
                 {
-                    material.SetTexture(propertyIds.Texture, cache.Register(textureBaker.Bake()));
+                    var baked = cache.Register(textureBaker.Bake());
+                    ObjectRegistry.RegisterReplacedObject(tex, baked);
+                    material.SetTexture(propertyIds.Texture, baked);
                 }
 
                 return bakeFlag;
