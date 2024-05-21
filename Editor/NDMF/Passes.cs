@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using gomoru.su;
 using nadena.dev.modular_avatar.core;
@@ -62,10 +62,12 @@ namespace io.github.azukimochi
             private LightLimitChangerObjectCache _cache;
             private Session _session;
 
+            protected virtual bool IsForceRun { get; } = false;
+
             protected override void Execute(BuildContext context)
             {
                 var session = GetSession(context);
-                if ((!session.IsValid() || session.IsNoTargetRenderer) && (typeof(TPass) != typeof(FinalizePass) && typeof(TPass) != typeof(GenerateAnimationsPass)))
+                if (session.Settings == null || (!IsForceRun && session.Cancel))
                     return;
                 _session = session;
                 var cache = _cache = GetObjectCache(context);
@@ -86,13 +88,12 @@ namespace io.github.azukimochi
             public HashSet<Renderer> TargetRenderers;
             public DirectBlendTree DirectBlendTree;
             public List<ParameterConfig> AvatarParameters;
-            public bool IsNoTargetRenderer;
+
+            public bool Cancel { get; set; } = false;
 
             public HashSet<Object> Excludes;
 
             private bool _initialized;
-
-            public bool IsValid() => Settings != null;
 
             public void InitializeSession(BuildContext context)
             {

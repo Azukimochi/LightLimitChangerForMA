@@ -19,6 +19,8 @@ namespace io.github.azukimochi
             private Session _session;
             private LightLimitChangerObjectCache _cache;
 
+            protected override bool IsForceRun => true;
+
             protected override void Execute(BuildContext context, Session session, LightLimitChangerObjectCache cache)
             {
                 Run(context.AvatarRootObject, session, cache);
@@ -33,7 +35,7 @@ namespace io.github.azukimochi
                 
                 var maParameters = obj.GetOrAddComponent<ModularAvatarParameters>();
 
-                if (!session.IsValid() || session.IsNoTargetRenderer)
+                if (session.Cancel)
                 {
                     addMAParamaters(session, maParameters);
 
