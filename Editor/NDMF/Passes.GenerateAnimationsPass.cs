@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using gomoru.su;
 using nadena.dev.modular_avatar.core;
 using nadena.dev.ndmf;
@@ -58,8 +58,6 @@ namespace io.github.azukimochi
                 toggleTree.Parameters = new[] { ParameterName_Toggle };
                 var animationTree = toggleTree.AddDirectBlendTree(DirectBlendTree.Target.ON, "Animation");
 
-                session.AddParameter(new ParameterConfig() { nameOrPrefix = ParameterName_Toggle, defaultValue = parameters.IsDefaultUse ? 1 : 0, syncType = ParameterSyncType.Bool });
-
                 foreach (ref readonly var container in animationContainers)
                 {
                     if (session.TargetControl.HasFlag(container.ControlType))
@@ -68,8 +66,6 @@ namespace io.github.azukimochi
                         var puppet = animationTree.AddRadialPuppet(container.Name);
                         puppet.ParameterName = container.ParameterName;
                         puppet.Animation = container.Control;
-
-                        session.AddParameter(new ParameterConfig() { nameOrPrefix = container.ParameterName, defaultValue = container.DefaultValue, syncType = ParameterSyncType.Float });
                     }
                 }
             }

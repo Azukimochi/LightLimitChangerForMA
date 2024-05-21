@@ -3,6 +3,7 @@
 
 using System;
 using io.github.azukimochi;
+using nadena.dev.ndmf;
 using UnityEditor;
 using UnityEditor.Animations;
 using UnityEngine;
@@ -74,7 +75,7 @@ namespace Anatawa12.AvatarOptimizer
                 newClip.frameRate = clip.frameRate;
                 newClip.localBounds = clip.localBounds;
                 AnimationUtility.SetAnimationClipSettings(newClip, AnimationUtility.GetAnimationClipSettings(clip));
-
+                ObjectRegistry.RegisterReplacedObject(clip, newClip);
                 return newClip;
             }
             else if (o is RuntimeAnimatorController controller)
@@ -193,6 +194,7 @@ namespace Anatawa12.AvatarOptimizer
                 so.ApplyModifiedPropertiesWithoutUndo();
             }
 
+            ObjectRegistry.RegisterReplacedObject(original, obj);
             return (T)obj;
         }
 

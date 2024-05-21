@@ -215,6 +215,15 @@ Settings will be loaded in another project only after Unity is restarted.",
                 }
             },
             {
+                "Window.info.error.already_setup", new []
+                {
+                    //[0] = Avatar Name
+                    "Light Limit Changer has already been installed in the avatar \"{0}\"",
+                    "アバター「{0}」にはすでにLight Limit Changerが導入されています",
+                    "Light Limit Changer has already been installed in the avatar \"{0}\""
+                }
+            },
+            {
                 "Window.info.cancel", new []
                 {
                     "Cancel",
