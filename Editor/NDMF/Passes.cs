@@ -155,6 +155,16 @@ namespace io.github.azukimochi
 
                 TargetRenderers = new HashSet<Renderer>();
 
+                AddParameter(new ParameterConfig() { nameOrPrefix = ParameterName_Toggle, defaultValue = parameters.IsDefaultUse ? 1 : 0, syncType = ParameterSyncType.Bool });
+
+                foreach (ref readonly var container in Controls.AsSpan())
+                {
+                    if (TargetControl.HasFlag(container.ControlType))
+                    {
+                        AddParameter(new ParameterConfig() { nameOrPrefix = container.ParameterName, defaultValue = container.DefaultValue, syncType = ParameterSyncType.Float });
+                    }
+                }
+
                 _initialized = true;
             }
 
