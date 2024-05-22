@@ -65,7 +65,8 @@ namespace io.github.azukimochi
                     if (bakeFlag)
                     {
                         var baked = cache.Register(textureBaker.Bake());
-                        ObjectRegistry.RegisterReplacedObject(tex, baked);
+                        if (tex != null)
+                            ObjectRegistry.RegisterReplacedObject(tex, baked);
                         material.SetTexture(PropertyIDs.MainTex, baked);
                     }
 
