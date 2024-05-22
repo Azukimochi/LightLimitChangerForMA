@@ -108,7 +108,6 @@ namespace io.github.azukimochi
                     if (ShaderInfo.TryGetShaderInfo(material, out var info) && Session.Parameters.TargetShaders.Contains(info.Name))
                     {
                         clonedMaterial = material.Clone();
-                        ObjectRegistry.RegisterReplacedObject(material, clonedMaterial);
                         Cache.Register(material, clonedMaterial);
                         return true;
                     }
