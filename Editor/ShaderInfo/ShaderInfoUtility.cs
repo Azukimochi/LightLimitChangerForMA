@@ -75,7 +75,7 @@ namespace io.github.azukimochi
             animationClip.SetCurve(parameters.TargetPath, parameters.TargetType, $"{MaterialAnimationKeyPrefix}{propertyName}.r", Utils.Animation.Linear(color.r * 0.6f, color.r, color.r));
             animationClip.SetCurve(parameters.TargetPath, parameters.TargetType, $"{MaterialAnimationKeyPrefix}{propertyName}.g", Utils.Animation.Linear(color.g * 0.95f, color.g, color.g * 0.8f));
             animationClip.SetCurve(parameters.TargetPath, parameters.TargetType, $"{MaterialAnimationKeyPrefix}{propertyName}.b", Utils.Animation.Linear(color.b, color.b, color.b * 0.6f));
-            animationClip.SetCurve(parameters.TargetPath, parameters.TargetType, $"{MaterialAnimationKeyPrefix}{propertyName}.a", Utils.Animation.Constant(color.a));
+            animationClip.SetCurve(parameters.TargetPath, parameters.TargetType, $"{MaterialAnimationKeyPrefix}{propertyName}.a", Utils.Animation.Linear(color.a, color.a, color.a));
 
             return animationClip;
         }
