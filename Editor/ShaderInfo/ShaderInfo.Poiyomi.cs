@@ -80,6 +80,8 @@ namespace io.github.azukimochi
                         if (bakeFlag)
                         {
                             var baked = cache.Register(textureBaker.Bake());
+                            if (tex != null)
+                                ObjectRegistry.RegisterReplacedObject(tex, baked);
                             material.TrySet(PropertyIDs.MainTex, baked);
                         }
 
@@ -109,6 +111,8 @@ namespace io.github.azukimochi
                         if (bakeFlag)
                         {
                             var baked = cache.Register(textureBaker.Bake());
+                            if (tex != null)
+                                ObjectRegistry.RegisterReplacedObject(tex, baked);
                             material.TrySet(PropertyIDs.DissolveToTexture, baked);
                         }
 
