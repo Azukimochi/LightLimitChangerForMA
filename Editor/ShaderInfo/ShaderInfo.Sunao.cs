@@ -1,5 +1,4 @@
 ﻿using System;
-using nadena.dev.ndmf;
 using UnityEngine;
 
 namespace io.github.azukimochi
@@ -65,8 +64,6 @@ namespace io.github.azukimochi
                     if (bakeFlag)
                     {
                         var baked = cache.Register(textureBaker.Bake());
-                        if (tex != null)
-                            ObjectRegistry.RegisterReplacedObject(tex, baked);
                         material.SetTexture(PropertyIDs.MainTex, baked);
                     }
 

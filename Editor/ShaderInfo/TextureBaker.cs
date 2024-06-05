@@ -1,4 +1,5 @@
-﻿using UnityEditor;
+﻿using nadena.dev.ndmf;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -89,6 +90,8 @@ namespace io.github.azukimochi
             }
 
             var dest = new Texture2D(width, height, TextureFormat.RGBA32, true);
+            if (source != null)
+                ObjectRegistry.RegisterReplacedObject(source, dest);
             dest.name = source?.name ?? Color.ToString();
             var rt = RenderTexture.GetTemporary(width, height);
             var temp = RenderTexture.active;
