@@ -37,6 +37,7 @@ namespace Anatawa12.AvatarOptimizer
             if (o is AnimationClip clip)
             {
                 var newClip = new AnimationClip();
+                ObjectRegistry.RegisterReplacedObject(clip, newClip);
                 newClip.name = "remapped " + clip.name;
 
                 // copy m_UseHighQualityCurve with SerializedObject since m_UseHighQualityCurve doesn't have public API
@@ -75,7 +76,6 @@ namespace Anatawa12.AvatarOptimizer
                 newClip.frameRate = clip.frameRate;
                 newClip.localBounds = clip.localBounds;
                 AnimationUtility.SetAnimationClipSettings(newClip, AnimationUtility.GetAnimationClipSettings(clip));
-                ObjectRegistry.RegisterReplacedObject(clip, newClip);
                 return newClip;
             }
             else if (o is RuntimeAnimatorController controller)
@@ -182,6 +182,7 @@ namespace Anatawa12.AvatarOptimizer
                 obj = (T)ctor.Invoke(Array.Empty<object>());
                 EditorUtility.CopySerialized(original, obj);
             }
+            ObjectRegistry.RegisterReplacedObject(original, obj);
 
             _cache[original] = obj;
             _cache[obj] = obj;
@@ -194,7 +195,6 @@ namespace Anatawa12.AvatarOptimizer
                 so.ApplyModifiedPropertiesWithoutUndo();
             }
 
-            ObjectRegistry.RegisterReplacedObject(original, obj);
             return (T)obj;
         }
 
