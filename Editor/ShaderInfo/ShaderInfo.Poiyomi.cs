@@ -35,6 +35,7 @@ namespace io.github.azukimochi
                 public static readonly int EnableDissolve = Shader.PropertyToID(_EnableDissolve);
                 public static readonly int DissolveTextureColor = Shader.PropertyToID(_DissolveTextureColor);
                 public static readonly int DissolveToTexture = Shader.PropertyToID(_DissolveToTexture);
+                public static readonly int MainColorAdjustTexture = Shader.PropertyToID("_MainColorAdjustTexture");
             }
 
             private static class DefaultParameters
@@ -72,10 +73,19 @@ namespace io.github.azukimochi
                         var saturation = material.GetOrDefault(PropertyIDs.Saturation, DefaultParameters.Saturation);
                         if (saturation != DefaultParameters.Saturation)
                         {
-                            textureBaker.HSVG = new Vector4(0, saturation, 1, 1);
+                            textureBaker.Saturation = saturation;
                             material.TrySet(PropertyIDs.Saturation, DefaultParameters.Saturation);
                             bakeFlag = true;
                         }
+
+                        // 焼き込むべきかどうかいまいちわかんなかったので保留
+                        /*var adjustTexture = material.GetOrDefault<Texture>(PropertyIDs.MainColorAdjustTexture, null);
+                        if (adjustTexture != null)
+                        {
+                            textureBaker.ColorAdjustTexture = adjustTexture;
+                            material.TrySet<Texture>(PropertyIDs.MainColorAdjustTexture, null);
+                            bakeFlag = true;
+                        }*/
 
                         if (bakeFlag)
                         {
