@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using nadena.dev.ndmf;
 using UnityEngine;
 
 namespace io.github.azukimochi
@@ -56,7 +55,7 @@ namespace io.github.azukimochi
 
             public override bool TryNormalizeMaterial(Material material, LightLimitChangerObjectCache cache)
             {
-                var textureBaker = TextureBaker.GetInstance<DefaultTextureBaker>(cache);
+                var textureBaker = TextureBaker.GetInstance<LilToonTextureBaker>(cache);
 
                 // MainTexture
                 bool bakeProcessed = false;
@@ -68,7 +67,7 @@ namespace io.github.azukimochi
                 return bakeProcessed;
             }
 
-            private bool BakeMainTex(Material material, LightLimitChangerObjectCache cache, DefaultTextureBaker textureBaker)
+            private bool BakeMainTex(Material material, LightLimitChangerObjectCache cache, LilToonTextureBaker textureBaker)
             {
                 bool bakeFlag = false;
                 bool isColorAdjusted = false;
@@ -126,7 +125,7 @@ namespace io.github.azukimochi
                 return bakeFlag;
             }
 
-            private bool Bake2ndOr3rdTex(Material material, LightLimitChangerObjectCache cache, DefaultTextureBaker textureBaker, (int Texture, int Color) propertyIds, Color defaultColor)
+            private bool Bake2ndOr3rdTex(Material material, LightLimitChangerObjectCache cache, LilToonTextureBaker textureBaker, (int Texture, int Color) propertyIds, Color defaultColor)
             {
                 if (!material.HasProperty(propertyIds.Texture))
                     return false;
