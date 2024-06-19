@@ -306,8 +306,90 @@ Please check your settings if this is not what you intended.",
                     @"選單未生成，因為沒有要動畫的目標。
 如果你不是有意的，請檢查你的設定。"
                 }
-            }
+            },
             
+            /////////////////////////////////////////////////
+            // ExpressionMenu
+            {
+                "ExpressionMenu.light", new []
+                {
+                    "Light",
+                    "明るさ",
+                    "Light"
+                }
+            },
+            {
+                "ExpressionMenu.light_min", new []
+                {
+                    "Min Light",
+                    "明るさの下限",
+                    "Min Light"
+                }
+            },
+            {
+                "ExpressionMenu.light_max", new []
+                {
+                    "Max Light",
+                    "明るさの上限",
+                    "Max Light"
+                }
+            },
+            {
+                "ExpressionMenu.color_temp", new []
+                {
+                    "Color Temp",
+                    "色温度",
+                    "Color Temp"
+                }
+            },
+            {
+                "ExpressionMenu.saturation", new []
+                {
+                    "Saturation",
+                    "彩度",
+                    "Saturation"
+                }
+            },
+            {
+                "ExpressionMenu.unlit", new []
+                {
+                    "Unlit",
+                    "Unlit",
+                    "Unlit"
+                }
+            },
+            {
+                "ExpressionMenu.monochrome", new []
+                {
+                    "Monochrome",
+                    "モノクロ化",
+                    "Monochrome"
+                }
+            },
+            {
+                "ExpressionMenu.Enable", new []
+                {
+                    "Enable",
+                    "有効",
+                    "Enable"
+                }
+            },
+            {
+                "ExpressionMenu.reset", new []
+                {
+                    "Reset",
+                    "リセット",
+                    "Reset"
+                }
+            },
+            {
+                "ExpressionMenu.Control", new []
+                {
+                    "Control",
+                    "コントロール",
+                    "Control"
+                }
+            }
         };
 
         public static string S(string text, int? language = null)

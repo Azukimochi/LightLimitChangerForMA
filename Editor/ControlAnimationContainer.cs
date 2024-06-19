@@ -8,6 +8,7 @@ namespace io.github.azukimochi
         public readonly string Name;
 
         public readonly string ParameterName;
+        public readonly string AnimationName;
         public readonly float DefaultValue;
 
         public readonly AnimationClip Default;
@@ -15,10 +16,11 @@ namespace io.github.azukimochi
 
         public readonly Texture2D Icon;
 
-        public ControlAnimationContainer(LightLimitControlType controlType, string name, string parameterName, float defaultValue, Texture2D icon, AnimationClip @default, AnimationClip control)
+        public ControlAnimationContainer(LightLimitControlType controlType, string name, string animationName, string parameterName, float defaultValue, Texture2D icon, AnimationClip @default, AnimationClip control)
         {
             ControlType = controlType;
             Name = name;
+            AnimationName = animationName;
             ParameterName = parameterName;
             DefaultValue = defaultValue;
             Default = @default;
@@ -26,8 +28,8 @@ namespace io.github.azukimochi
             Icon = icon;
         }
 
-        public static ControlAnimationContainer Create(LightLimitControlType controlType, string animationName, string parameterName, float defaultValue, Texture2D icon = null, AnimationClip defaultAnimation = null)
-            => new ControlAnimationContainer(controlType, animationName, parameterName, defaultValue, icon, defaultAnimation ?? new AnimationClip() { name = $"{animationName} Default" }, new AnimationClip() { name = $"{animationName} Control" });
+        public static ControlAnimationContainer Create(LightLimitControlType controlType, string name, string animationName, string parameterName, float defaultValue, Texture2D icon = null, AnimationClip defaultAnimation = null)
+            => new ControlAnimationContainer(controlType, name, animationName, parameterName, defaultValue, icon, defaultAnimation ?? new AnimationClip() { name = $"{animationName} Default" }, new AnimationClip() { name = $"{animationName} Control" });
 
         public void AddTo(LightLimitChangerObjectCache cache)
         {
