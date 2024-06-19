@@ -63,7 +63,7 @@ namespace io.github.azukimochi
                     if (session.TargetControl.HasFlag(container.ControlType))
                     {
                         container.AddTo(cache);
-                        var puppet = animationTree.AddRadialPuppet(container.Name);
+                        var puppet = animationTree.AddRadialPuppet(container.AnimationName);
                         puppet.ParameterName = container.ParameterName;
                         puppet.Animation = container.Control;
                     }
