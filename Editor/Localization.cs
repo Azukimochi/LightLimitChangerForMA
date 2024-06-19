@@ -220,7 +220,7 @@ Settings will be loaded in another project only after Unity is restarted.",
                     //[0] = Avatar Name
                     "Light Limit Changer has already been installed in the avatar \"{0}\"",
                     "アバター「{0}」にはすでにLight Limit Changerが導入されています",
-                    "Light Limit Changer has already been installed in the avatar \"{0}\""
+                    "Avatar「{0}」已安裝 Light Limit Changer"
                 }
             },
             {
