@@ -220,7 +220,7 @@ Settings will be loaded in another project only after Unity is restarted.",
                     //[0] = Avatar Name
                     "Light Limit Changer has already been installed in the avatar \"{0}\"",
                     "アバター「{0}」にはすでにLight Limit Changerが導入されています",
-                    "Light Limit Changer has already been installed in the avatar \"{0}\""
+                    "Avatar「{0}」已安裝 Light Limit Changer"
                 }
             },
             {
@@ -315,7 +315,7 @@ Please check your settings if this is not what you intended.",
                 {
                     "Light",
                     "明るさ",
-                    "Light"
+                    "亮度"
                 }
             },
             {
@@ -323,7 +323,7 @@ Please check your settings if this is not what you intended.",
                 {
                     "Min Light",
                     "明るさの下限",
-                    "Min Light"
+                    "亮度下限"
                 }
             },
             {
@@ -331,7 +331,7 @@ Please check your settings if this is not what you intended.",
                 {
                     "Max Light",
                     "明るさの上限",
-                    "Max Light"
+                    "亮度上限"
                 }
             },
             {
@@ -339,7 +339,7 @@ Please check your settings if this is not what you intended.",
                 {
                     "Color Temp",
                     "色温度",
-                    "Color Temp"
+                    "色溫"
                 }
             },
             {
@@ -347,7 +347,7 @@ Please check your settings if this is not what you intended.",
                 {
                     "Saturation",
                     "彩度",
-                    "Saturation"
+                    "飽和度"
                 }
             },
             {
@@ -363,7 +363,7 @@ Please check your settings if this is not what you intended.",
                 {
                     "Monochrome",
                     "モノクロ化",
-                    "Monochrome"
+                    "單色化"
                 }
             },
             {
@@ -371,7 +371,7 @@ Please check your settings if this is not what you intended.",
                 {
                     "Enable",
                     "有効",
-                    "Enable"
+                    "啟用"
                 }
             },
             {
@@ -379,7 +379,7 @@ Please check your settings if this is not what you intended.",
                 {
                     "Reset",
                     "リセット",
-                    "Reset"
+                    "重置"
                 }
             },
             {
@@ -387,7 +387,7 @@ Please check your settings if this is not what you intended.",
                 {
                     "Control",
                     "コントロール",
-                    "Control"
+                    "控制"
                 }
             }
         };
