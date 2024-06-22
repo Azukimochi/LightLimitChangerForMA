@@ -21,6 +21,7 @@ namespace io.github.azukimochi
         private SerializedProperty AllowSaturationControl;
         private SerializedProperty AllowMonochromeControl;
         private SerializedProperty AllowUnlitControl;
+        private SerializedProperty AllowEmissionControl;
         private SerializedProperty InitialTempControlValue;
         private SerializedProperty InitialSaturationControlValue;
         private SerializedProperty InitialMonochromeControlValue;
@@ -55,6 +56,7 @@ namespace io.github.azukimochi
             AllowSaturationControl = parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.AllowSaturationControl));
             AllowMonochromeControl = parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.AllowMonochromeControl));
             AllowUnlitControl = parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.AllowUnlitControl));
+            AllowEmissionControl = parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.AllowEmissionControl));
             InitialTempControlValue = parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.InitialTempControlValue));
             InitialSaturationControlValue = parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.InitialSaturationControlValue));
             InitialMonochromeControlValue = parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.InitialMonochromeControlValue));
@@ -148,7 +150,7 @@ namespace io.github.azukimochi
             {
                 using (new EditorGUILayout.VerticalScope())
                 {
-                    EditorGUILayout.Space(5);
+                    EditorGUILayout.Space(25);
                     EditorGUILayout.PropertyField(AllowColorTempControl,
                         Localization.G("label.allow_color_tmp", "tip.allow_color_tmp"));
                     EditorGUILayout.PropertyField(AllowSaturationControl,
@@ -157,6 +159,13 @@ namespace io.github.azukimochi
                         Localization.G("label.allow_monochrome", "tip.allow_monochrome"));
                     EditorGUILayout.PropertyField(AllowUnlitControl,
                         Localization.G("label.allow_unlit", "tip.allow_unlit"));
+                    EditorGUILayout.PropertyField(AllowEmissionControl,
+                        Localization.G("label.allow_emission", "tip.allow_emission"));
+                    EditorGUILayout.Space(5);
+                    EditorGUILayout.PropertyField(AddResetButton, Localization.G("label.allow_reset", "tip.allow_reset"));
+                    EditorGUILayout.PropertyField(IsGroupingAdditionalControls, Localization.G("label.grouping_additional_controls"));
+
+
                 }
 
                 using (new EditorGUILayout.VerticalScope(GUI.skin.box))
@@ -197,11 +206,6 @@ namespace io.github.azukimochi
                     }
                 }
             }
-
-            EditorGUILayout.PropertyField(AddResetButton, Localization.G("label.allow_reset", "tip.allow_reset"));
-            EditorGUILayout.Space(5);
-            EditorGUILayout.PropertyField(IsGroupingAdditionalControls, Localization.G("label.grouping_additional_controls"));
-
 
             EditorGUILayout.Space(10);
             using (var group = new Utils.FoldoutHeaderGroupScope(ref _isOptionFoldoutOpen, Localization.G("category.select_option")))

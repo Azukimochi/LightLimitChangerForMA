@@ -33,6 +33,7 @@ namespace io.github.azukimochi
         public bool AllowSaturationControl = false;
         public bool AllowMonochromeControl = false;
         public bool AllowUnlitControl = false;
+        public bool AllowEmissionControl = false;
         public bool AddResetButton = false;
         
         [Range(0,1)]
