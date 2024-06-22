@@ -38,6 +38,7 @@ namespace io.github.azukimochi
             { "label.allow_saturation", new[] { "Enable Saturation Control", "彩度調整を有効にする", "啟用飽和度控制" } },
             { "label.allow_monochrome", new []{ "Enable Monochrome Control", "ライトのモノクロ化調整を有効にする", "啟用單色化控制"}},
             { "label.allow_unlit", new[] { "Enable Unlit Control", "Unlit調整を有効にする", "啟用 Unlit 控制" } },
+            { "label.allow_emission", new []{ "Enable Emission Control", "エミッションの調整を有効にする", "Enable Emission Control"}},
             { "label.allow_reset", new[] { "Add Reset Button", "リセットボタンを追加する", "新增重置按鈕" } },
             { "label.allow_override_poiyomi", new[] { "Enable Override Poiyomi AnimatedFlag", "PoiyomiのAnimatedフラグを上書きする", "啟用覆蓋 Poiyomi AnimatedFlag" } },
             { "label.allow_editor_only", new[] { "Exclude EditorOnly", "EditorOnlyを除外する", "排除 EditorOnly" } },
@@ -112,6 +113,14 @@ namespace io.github.azukimochi
                     "Enables Unlit adjustment functionality (Liltoon/Sunao Only)",
                     "Unlit の調整機能を有効化することができます(Liltoon/Sunao Only)",
                     "啟用 Unlit 調整功能（僅 Liltoon/Sunao）"
+                }
+            },
+            {
+                "tip.allow_emission", new[]
+                {
+                    "Enables Emission adjustment functionality (lilToon Only)",
+                    "エミッションの調整機能を有効化することができます (lilToon Only)",
+                    "Enables Emission adjustment functionality (lilToon Only)"
                 }
             },
             {
@@ -220,7 +229,7 @@ Settings will be loaded in another project only after Unity is restarted.",
                     //[0] = Avatar Name
                     "Light Limit Changer has already been installed in the avatar \"{0}\"",
                     "アバター「{0}」にはすでにLight Limit Changerが導入されています",
-                    "Light Limit Changer has already been installed in the avatar \"{0}\""
+                    "Avatar「{0}」已安裝 Light Limit Changer"
                 }
             },
             {
@@ -306,8 +315,98 @@ Please check your settings if this is not what you intended.",
                     @"選單未生成，因為沒有要動畫的目標。
 如果你不是有意的，請檢查你的設定。"
                 }
-            }
+            },
             
+            /////////////////////////////////////////////////
+            // ExpressionMenu
+            {
+                "ExpressionMenu.light", new []
+                {
+                    "Light",
+                    "明るさ",
+                    "亮度"
+                }
+            },
+            {
+                "ExpressionMenu.light_min", new []
+                {
+                    "Min Light",
+                    "明るさの下限",
+                    "亮度下限"
+                }
+            },
+            {
+                "ExpressionMenu.light_max", new []
+                {
+                    "Max Light",
+                    "明るさの上限",
+                    "亮度上限"
+                }
+            },
+            {
+                "ExpressionMenu.color_temp", new []
+                {
+                    "Color Temp",
+                    "色温度",
+                    "色溫"
+                }
+            },
+            {
+                "ExpressionMenu.saturation", new []
+                {
+                    "Saturation",
+                    "彩度",
+                    "飽和度"
+                }
+            },
+            {
+                "ExpressionMenu.unlit", new []
+                {
+                    "Unlit",
+                    "Unlit",
+                    "Unlit"
+                }
+            },
+            {
+                "ExpressionMenu.monochrome", new []
+                {
+                    "Monochrome",
+                    "モノクロ化",
+                    "單色化"
+                }
+            },
+            {
+                "ExpressionMenu.emission", new []
+                {
+                    "Emission",
+                    "エミッション",
+                    "Emission"
+                }
+            },
+            {
+                "ExpressionMenu.Enable", new []
+                {
+                    "Enable",
+                    "有効",
+                    "啟用"
+                }
+            },
+            {
+                "ExpressionMenu.reset", new []
+                {
+                    "Reset",
+                    "リセット",
+                    "重置"
+                }
+            },
+            {
+                "ExpressionMenu.Control", new []
+                {
+                    "Control",
+                    "コントロール",
+                    "控制"
+                }
+            }
         };
 
         public static string S(string text, int? language = null)

@@ -177,7 +177,7 @@ namespace io.github.azukimochi
                 {
                     new VRCExpressionsMenu.Control
                     {
-                        name = "Enable",
+                        name = Localization.S("ExpressionMenu.Enable"),
                         type = VRCExpressionsMenu.Control.ControlType.Toggle,
                         icon = Icons.Enable,
                         parameter = new VRCExpressionsMenu.Control.Parameter
@@ -205,7 +205,7 @@ namespace io.github.azukimochi
 
                             mainMenu.controls.Add(new VRCExpressionsMenu.Control
                             {
-                                name = "Controls",
+                                name = Localization.S("ExpressionMenu.Control"),
                                 type = VRCExpressionsMenu.Control.ControlType.SubMenu,
                                 icon = Icons.Settings,
                                 subMenu = additionalMenu,
@@ -234,7 +234,7 @@ namespace io.github.azukimochi
                 {
                     mainMenu.controls.Add(new VRCExpressionsMenu.Control()
                     {
-                        name = "Reset",
+                        name = Localization.S("ExpressionMenu.reset"),
                         type = VRCExpressionsMenu.Control.ControlType.Button,
                         icon = Icons.Reset,
                         parameter = new VRCExpressionsMenu.Control.Parameter() { name = ParameterName_Reset }

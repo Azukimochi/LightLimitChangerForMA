@@ -11,7 +11,7 @@ namespace io.github.azukimochi
     {
         public const string Title = "Light Limit Changer For MA";
         private const string ContextMenuPath = "GameObject/Light Limit Changer/Setup";
-        private const int ContextMenuPriority = 130;
+        private const int ContextMenuPriority = 49;
 
         [MenuItem(ContextMenuPath, true, ContextMenuPriority)]
         public static bool ValidateApplytoAvatar(MenuCommand command) => Selection.gameObjects.Any(x => x.TryGetComponent<VRCAvatarDescriptor>(out _));

@@ -37,6 +37,7 @@ namespace io.github.azukimochi
         internal const string ParameterName_Saturation = "LightLimitSaturation";
         internal const string ParameterName_Unlit = "LightLimitUnlit";
         internal const string ParameterName_ColorTemp = "LightLimitColorTemp";
+        internal const string ParameterName_Emission = "LightLimitEmission";
         internal const string ParameterName_Reset = "LightLimitReset";
         internal const string ParameterName_Monochrome = "LightLimitMonochrome";
 
@@ -117,36 +118,42 @@ namespace io.github.azukimochi
 
                 if (!parameters.IsSeparateLightControl)
                 {
-                    controls.Add(ControlAnimationContainer.Create(LightLimitControlType.Light, "Light", ParameterName_Value, parameters.DefaultLightValue, Icons.Light, defaultAnimation));
+                    controls.Add(ControlAnimationContainer.Create(LightLimitControlType.Light, Localization.S("ExpressionMenu.light"), "Light", ParameterName_Value, parameters.DefaultLightValue, Icons.Light, defaultAnimation));
                 }
                 else
                 {
-                    controls.Add(ControlAnimationContainer.Create(LightLimitControlType.LightMin, "Min Light", ParameterName_Min, parameters.DefaultMinLightValue, Icons.Light_Min, defaultAnimation));
-                    controls.Add(ControlAnimationContainer.Create(LightLimitControlType.LightMax, "Max Light", ParameterName_Max, parameters.DefaultMaxLightValue, Icons.Light_Max, defaultAnimation));
+                    controls.Add(ControlAnimationContainer.Create(LightLimitControlType.LightMin, Localization.S("ExpressionMenu.light_min"), "Min Light", ParameterName_Min, parameters.DefaultMinLightValue, Icons.Light_Min, defaultAnimation));
+                    controls.Add(ControlAnimationContainer.Create(LightLimitControlType.LightMax, Localization.S("ExpressionMenu.light_max"), "Max Light", ParameterName_Max, parameters.DefaultMaxLightValue, Icons.Light_Max, defaultAnimation));
                 }
 
                 if (parameters.AllowColorTempControl)
                 {
                     targetControl |= LightLimitControlType.ColorTemperature;
-                    controls.Add(ControlAnimationContainer.Create(LightLimitControlType.ColorTemperature, "ColorTemp", ParameterName_ColorTemp, parameters.InitialTempControlValue, Icons.Temp, defaultAnimation));
+                    controls.Add(ControlAnimationContainer.Create(LightLimitControlType.ColorTemperature, Localization.S("ExpressionMenu.color_temp"), "ColorTemp", ParameterName_ColorTemp, parameters.InitialTempControlValue, Icons.Temp, defaultAnimation));
                 }
 
                 if (parameters.AllowSaturationControl)
                 {
                     targetControl |= LightLimitControlType.Saturation;
-                    controls.Add(ControlAnimationContainer.Create(LightLimitControlType.Saturation, "Saturation", ParameterName_Saturation, parameters.InitialSaturationControlValue, Icons.Color, defaultAnimation));
+                    controls.Add(ControlAnimationContainer.Create(LightLimitControlType.Saturation, Localization.S("ExpressionMenu.saturation"), "Saturation", ParameterName_Saturation, parameters.InitialSaturationControlValue, Icons.Color, defaultAnimation));
                 }
 
                 if (parameters.AllowUnlitControl)
                 {
                     targetControl |= LightLimitControlType.Unlit;
-                    controls.Add(ControlAnimationContainer.Create(LightLimitControlType.Unlit, "Unlit", ParameterName_Unlit, parameters.InitialUnlitControlValue, Icons.Unlit, defaultAnimation));
+                    controls.Add(ControlAnimationContainer.Create(LightLimitControlType.Unlit, Localization.S("ExpressionMenu.unlit"),  "Unlit", ParameterName_Unlit, parameters.InitialUnlitControlValue, Icons.Unlit, defaultAnimation));
                 }
 
                 if (parameters.AllowMonochromeControl)
                 {
                     targetControl |= LightLimitControlType.Monochrome;
-                    controls.Add(ControlAnimationContainer.Create(LightLimitControlType.Monochrome, "Monochrome", ParameterName_Monochrome, parameters.InitialMonochromeControlValue, Icons.Monochrome, defaultAnimation));
+                    controls.Add(ControlAnimationContainer.Create(LightLimitControlType.Monochrome, Localization.S("ExpressionMenu.monochrome"), "Monochrome", ParameterName_Monochrome, parameters.InitialMonochromeControlValue, Icons.Monochrome, defaultAnimation));
+                }
+
+                if (parameters.AllowEmissionControl)
+                {
+                    targetControl |= LightLimitControlType.Emission;
+                    controls.Add(ControlAnimationContainer.Create(LightLimitControlType.Emission, Localization.S("ExpressionMenu.emission"), "Emission", ParameterName_Emission, 1.0f, Icons.Emission, defaultAnimation));
                 }
 
 

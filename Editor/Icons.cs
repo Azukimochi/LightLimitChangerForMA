@@ -13,6 +13,8 @@ namespace io.github.azukimochi
         public static Texture2D Temp => FromGUID("94f3542912b540b47a37f7c914c92924");
         public static Texture2D Color => FromGUID("e641931350faa6c4f82ba056f31a1ef6");
         public static Texture2D Unlit => FromGUID("b0b1a25395988c64f887088f1c6748cf");
+        
+        public static Texture2D Emission => FromGUID("0103132a80e5f4e46a9745843bf5e49a");
         public static Texture2D Reset => FromGUID("46b69c6755e703048845eef57e51a329");
         public static Texture2D Settings => FromGUID("75cdf4ab5baf72a4f8b6463d3720bd35");
 
