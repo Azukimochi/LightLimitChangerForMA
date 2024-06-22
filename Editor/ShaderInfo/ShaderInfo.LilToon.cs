@@ -24,6 +24,8 @@ namespace io.github.azukimochi
             public const string _MainGradationStrength = "_MainGradationStrength";
             public const string _MainColorAdjustMask = "_MainColorAdjustMask";
             public const string _MonochromeLighting = "_MonochromeLighting";
+            public const string _EmissionBlend = "_EmissionBlend";
+            public const string _Emission2ndBlend = "_Emission2ndBlend";
 
             private static class PropertyIDs
             {
@@ -207,6 +209,15 @@ namespace io.github.azukimochi
                     container.Control.SetParameterAnimation(parameters, _AsUnlit, 0, 1);
                 }
 
+                if (container.ControlType.HasFlag(LightLimitControlType.Emission))
+                {
+                    container.Default.SetParameterAnimation(parameters, _EmissionBlend, 1);
+                    container.Default.SetParameterAnimation(parameters, _Emission2ndBlend, 1);
+                    
+                    container.Control.SetParameterAnimation(parameters, _EmissionBlend, 0, 1);
+                    container.Control.SetParameterAnimation(parameters, _Emission2ndBlend, 0, 1);
+                }
+
                 if (container.ControlType.HasFlag(LightLimitControlType.ColorTemperature))
                 {
                     container.Default.SetParameterAnimation(parameters, _Color, DefaultParameters.Color);
@@ -217,6 +228,7 @@ namespace io.github.azukimochi
                     container.Control.SetColorTempertureAnimation(parameters, _Color2nd);
                     container.Control.SetColorTempertureAnimation(parameters, _Color3rd);
                 }
+
             }
 
             public override bool TryGetLightMinMaxValue(Material material, out float min, out float max)
