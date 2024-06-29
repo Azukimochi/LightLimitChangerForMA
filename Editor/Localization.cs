@@ -73,6 +73,20 @@ namespace io.github.azukimochi
                     "說明書"
                 }
             },
+            { "label.support_shaders", new []
+                {
+                    "Supported Shaders L: liltoon P: Poiyomi S: Sunao",
+                    "対応シェーダー L: liltoon P: Poiyomi S: Sunao",
+                    "兼容 Shader L: liltoon P: Poiyomi S: Sunao"
+                }
+            },
+            { "label.shader_supported", new []
+                {
+                    "Compatible with {0}.",
+                    "{0}に対応しています。",
+                    "与 {0} 兼容。"
+                }
+            },
 
             ///////////////////////////////////////////////////////
             // 情報　info
@@ -110,17 +124,17 @@ namespace io.github.azukimochi
             {
                 "tip.allow_unlit", new[]
                 {
-                    "Enables Unlit adjustment functionality (Liltoon/Sunao Only)",
-                    "Unlit の調整機能を有効化することができます(Liltoon/Sunao Only)",
-                    "啟用 Unlit 調整功能（僅 Liltoon/Sunao）"
+                    "Enables Unlit adjustment functionality",
+                    "Unlit の調整機能を有効化することができます",
+                    "啟用 Unlit 調整功能"
                 }
             },
             {
                 "tip.allow_emission", new[]
                 {
-                    "Enables Emission adjustment functionality (lilToon Only)",
-                    "エミッションの調整機能を有効化することができます (lilToon Only)",
-                    "啟用自發光調整功能（僅 Liltoon）"
+                    "Enables Emission adjustment functionality",
+                    "エミッションの調整機能を有効化することができます",
+                    "啟用自發光調整功能"
                 }
             },
             {

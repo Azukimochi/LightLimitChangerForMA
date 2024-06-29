@@ -1,4 +1,5 @@
-﻿using nadena.dev.ndmf.util;
+﻿using System;
+using nadena.dev.ndmf.util;
 using UnityEditor;
 using UnityEngine;
 
@@ -145,26 +146,36 @@ namespace io.github.azukimochi
             
             EditorGUILayout.Space(10);
             EditorGUILayout.LabelField(Localization.S("label.category.additional_settings"), boldLabel);
-            
             using (new EditorGUILayout.HorizontalScope())
             {
                 using (new EditorGUILayout.VerticalScope())
                 {
-                    EditorGUILayout.Space(25);
-                    EditorGUILayout.PropertyField(AllowColorTempControl,
-                        Localization.G("label.allow_color_tmp", "tip.allow_color_tmp"));
-                    EditorGUILayout.PropertyField(AllowSaturationControl,
-                        Localization.G("label.allow_saturation", "tip.allow_saturation"));
-                    EditorGUILayout.PropertyField(AllowMonochromeControl,
-                        Localization.G("label.allow_monochrome", "tip.allow_monochrome"));
-                    EditorGUILayout.PropertyField(AllowUnlitControl,
-                        Localization.G("label.allow_unlit", "tip.allow_unlit"));
-                    EditorGUILayout.PropertyField(AllowEmissionControl,
-                        Localization.G("label.allow_emission", "tip.allow_emission"));
+                    EditorGUILayout.Space(4);
+                    EditorGUILayout.LabelField(Localization.G("label.support_shaders"), EditorStyles.boldLabel);
+
+                    PropertyFieldWithShaderLabel(AllowColorTempControl,
+                        Localization.G("label.allow_color_tmp", "tip.allow_color_tmp"),
+                        ShaderType.LilToon | ShaderType.Poiyomi | ShaderType.Sunao);
+
+                    PropertyFieldWithShaderLabel(AllowSaturationControl,
+                        Localization.G("label.allow_saturation", "tip.allow_saturation"),
+                        ShaderType.LilToon | ShaderType.Poiyomi | ShaderType.Sunao);
+
+                    PropertyFieldWithShaderLabel(AllowMonochromeControl,
+                        Localization.G("label.allow_monochrome", "tip.allow_monochrome"),
+                        ShaderType.LilToon | ShaderType.Poiyomi | ShaderType.Sunao);
+
+                    PropertyFieldWithShaderLabel(AllowUnlitControl,
+                        Localization.G("label.allow_unlit", "tip.allow_unlit"),
+                        ShaderType.LilToon | ShaderType.Sunao);
+
+                    PropertyFieldWithShaderLabel(AllowEmissionControl,
+                        Localization.G("label.allow_emission", "tip.allow_emission"),
+                        ShaderType.LilToon);
+
                     EditorGUILayout.Space(5);
                     EditorGUILayout.PropertyField(AddResetButton, Localization.G("label.allow_reset", "tip.allow_reset"));
                     EditorGUILayout.PropertyField(IsGroupingAdditionalControls, Localization.G("label.grouping_additional_controls"));
-
 
                 }
 
@@ -229,6 +240,72 @@ namespace io.github.azukimochi
                 EditorGUILayout.Separator();
                 Localization.ShowLocalizationUI();
             }
+        }
+
+        private static readonly Lazy<GUIStyle> supportedLabelStyle_LilToon = new Lazy<GUIStyle>(() => ColoredStyleFactory(EditorStyles.miniLabel, new Color(0, 128, 128)));
+        private static readonly Lazy<GUIStyle> supportedLabelStyle_Poiyomi = new Lazy<GUIStyle>(() => ColoredStyleFactory(EditorStyles.miniLabel, new Color(128, 128, 0)));
+        private static readonly Lazy<GUIStyle> supportedLabelStyle_Sunao = new Lazy<GUIStyle>(() => ColoredStyleFactory(EditorStyles.miniLabel,  new Color(0, 128, 0)));
+
+        private static GUIStyle ColoredStyleFactory(GUIStyle original, Color color)
+        {
+            var style = new GUIStyle(original);
+            style.normal.textColor = color;
+            return style;
+        }
+
+        private void PropertyFieldWithShaderLabel(SerializedProperty property, GUIContent label, ShaderType shaderType)
+        {
+            var mask = (target as LightLimitChangerSettings)?.Parameters?.TargetShaders.ToBitMask();
+            bool disabled = ((uint)shaderType & mask) == 0;
+
+            EditorGUI.BeginDisabledGroup(disabled);
+
+            var rect = EditorGUILayout.GetControlRect();
+            EditorGUI.BeginProperty(rect, label, property);
+
+            var shaderLabelRect = rect;
+            var propertyRect = rect;
+
+            shaderLabelRect.width = 16f;
+
+            propertyRect.width -= 32;
+            propertyRect.x += 32;
+
+            if (shaderType.HasFlag(ShaderType.LilToon))
+            {
+                EditorGUI.LabelField(shaderLabelRect, new GUIContent("L", string.Format(Localization.S("label.shader_supported"), "lilToon")), supportedLabelStyle_LilToon.Value);
+            }
+            shaderLabelRect.x += 8;
+            if (shaderType.HasFlag(ShaderType.Sunao))
+            {
+                EditorGUI.LabelField(shaderLabelRect, new GUIContent("S", string.Format(Localization.S("label.shader_supported"), "Sunao Shader")), supportedLabelStyle_Sunao.Value);
+            }
+            shaderLabelRect.x += 8;
+            if (shaderType.HasFlag(ShaderType.Poiyomi))
+            {
+                EditorGUI.LabelField(shaderLabelRect, new GUIContent("P", string.Format(Localization.S("label.shader_supported"), "Poiyomi Toon")), supportedLabelStyle_Poiyomi.Value);
+            }
+
+            var labelRect = propertyRect;
+            labelRect.width = EditorGUIUtility.labelWidth - 32;
+            EditorGUI.LabelField(labelRect, label);
+
+            propertyRect.width -= labelRect.width;
+            propertyRect.x += labelRect.width + 2; // ← チェックボックスずれるので気合で合わせてる
+
+            EditorGUI.PropertyField(propertyRect, property, GUIContent.none);
+            EditorGUI.EndProperty();
+
+            EditorGUI.EndDisabledGroup();
+        }
+
+        [Flags]
+        private enum ShaderType
+        {
+            None = 0,
+            LilToon = 1,
+            Sunao = 2,
+            Poiyomi = 4,
         }
     }
 }
