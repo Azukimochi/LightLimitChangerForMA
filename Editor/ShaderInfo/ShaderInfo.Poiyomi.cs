@@ -48,11 +48,25 @@ namespace io.github.azukimochi
 
             private const string Animated_Suffix = "Animated";
             private const string Flag_IsAnimated = "1";
+            private static readonly Material[] singleMaterialArray = new Material[1];
 
             public override bool TryNormalizeMaterial(Material material, LightLimitChangerObjectCache cache)
             {
                 var textureBaker = TextureBaker.GetInstance<PoiyomiTextureBaker>(cache);
                 bool result = false;
+
+#if POIYOMI
+
+                // ロックされてるかどうか確認
+                if (Thry.ShaderOptimizer.IsMaterialLocked(material))
+                {
+                    // されてるなら解除してしまう（どのみちアップロード時には自動でロックされるはずなので）
+                    singleMaterialArray[0] = material;
+                    if (!Thry.ShaderOptimizer.SetLockedForAllMaterials(singleMaterialArray, 0))
+                        return false;
+                }
+
+#endif
 
                 {
                     bool bakeFlag = false;
