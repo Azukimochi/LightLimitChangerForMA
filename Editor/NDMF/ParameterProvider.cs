@@ -46,6 +46,9 @@ namespace io.github.azukimochi
 
             if (parameters.AllowUnlitControl)
                 yield return Parameter<float>(Passes.ParameterName_Unlit);
+
+            if (parameters.AllowEmissionControl)
+                yield return Parameter<float>(Passes.ParameterName_Emission);
         }
 
         private ProvidedParameter Parameter<T>(string name, bool sync = true, ParameterNamespace @namespace = ParameterNamespace.Animator) 
