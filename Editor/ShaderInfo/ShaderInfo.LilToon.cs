@@ -178,13 +178,13 @@ namespace io.github.azukimochi
             {
                 if (container.ControlType.HasFlag(LightLimitControlType.LightMin))
                 {
-                    container.Default.SetParameterAnimation(parameters, _LightMinLimit, parameters.MinLightValue);
+                    container.Default.SetParameterAnimation(parameters, _LightMinLimit, parameters.DefaultMinLightValue);
                     container.Control.SetParameterAnimation(parameters, _LightMinLimit, parameters.MinLightValue, parameters.MaxLightValue);
                 }
 
                 if (container.ControlType.HasFlag(LightLimitControlType.LightMax))
                 {
-                    container.Default.SetParameterAnimation(parameters, _LightMaxLimit, parameters.MaxLightValue);
+                    container.Default.SetParameterAnimation(parameters, _LightMaxLimit, parameters.DefaultMaxLightValue);
                     container.Control.SetParameterAnimation(parameters, _LightMaxLimit, parameters.MinLightValue, parameters.MaxLightValue);
                 }
 

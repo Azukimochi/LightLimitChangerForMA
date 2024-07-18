@@ -35,19 +35,34 @@ namespace io.github.azukimochi
                         if (!parameters.TargetShaders.Contains(x.Name))
                             continue;
 
+                        var min = parameters.MinLightValue;
+                        var max = parameters.MaxLightValue;
+
+                        float defaultMinLight, defaultMaxLight;
+                        if (parameters.OverwriteDefaultLightMinMax && 
+                            renderer.sharedMaterial is Material mat &&
+                            x.IsTargetShader(mat?.shader) && 
+                            x.TryGetLightMinMaxValue(mat, out defaultMinLight, out defaultMaxLight))
+                        {
+                            // OK!
+                        }
+                        else
+                        {
+                            if (parameters.IsSeparateLightControl)
+                            {
+                                defaultMinLight = parameters.DefaultMinLightValue;
+                                defaultMaxLight = parameters.DefaultMaxLightValue;
+                            }
+                            else
+                            {
+                                defaultMinLight = defaultMaxLight = parameters.DefaultLightValue;
+                            }
+                        }
+
+                        var param = new ControlAnimationParameters(relativePath, type, min, max, defaultMinLight, defaultMaxLight);
                         foreach (ref readonly var container in animationContainers)
                         {
-                            if (!(!parameters.OverwriteDefaultLightMinMax &&
-                                  (renderer.sharedMaterials?.Length ?? 0) > 0 &&
-                                  renderer.sharedMaterials[0] is Material mat &&
-                                  x.IsTargetShader(mat?.shader) &&
-                                  x.TryGetLightMinMaxValue(mat, out var min, out var max)))
-                            {
-                                min = parameters.MinLightValue;
-                                max = parameters.MaxLightValue;
-                            }
-
-                            x.SetControlAnimation(container, new ControlAnimationParameters(relativePath, type, min, max));
+                            x.SetControlAnimation(container, param);
                         }
                     }
                 }
