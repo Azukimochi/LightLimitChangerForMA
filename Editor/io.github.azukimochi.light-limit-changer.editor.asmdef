@@ -1,12 +1,14 @@
 {
     "name": "io.github.azukimochi.light-limit-changer.editor",
+    "rootNamespace": "",
     "references": [
         "nadena.dev.modular-avatar.core",
         "io.github.azukimochi.light-limit-changer",
         "nadena.dev.modular-avatar.core.editor",
         "nadena.dev.ndmf",
         "nadena.dev.ndmf.runtime",
-        "nadena.dev.ndmf.vrchat"
+        "nadena.dev.ndmf.vrchat",
+        "ThryAssemblyDefinition"
     ],
     "includePlatforms": [
         "Editor"
@@ -25,6 +27,12 @@
     ],
     "autoReferenced": false,
     "defineConstraints": [],
-    "versionDefines": [],
+    "versionDefines": [
+        {
+            "name": "com.poiyomi.toon",
+            "expression": "",
+            "define": "POIYOMI"
+        }
+    ],
     "noEngineReferences": false
 }
