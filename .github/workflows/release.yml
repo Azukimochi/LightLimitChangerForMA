@@ -13,34 +13,22 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    
       - name: Checkout
         uses: actions/checkout@v4
     
-      - name: get version
-        id: version
-        uses: zoexx/github-action-json-file-properties@d02f28167f05bf70cd75352b11c25a4e8c39bf38
-        with: 
-            file_path: "package.json"
-            prop_path: "version"
-    
-      - name: Set Environment Variables
-        run: |
-          echo "zipFile=${{ env.packageName }}-${{ steps.version.outputs.prop }}".zip >> $GITHUB_ENV
-          echo "unityPackage=${{ env.packageName }}-${{ steps.version.outputs.prop }}.unitypackage" >> $GITHUB_ENV
-        
-      - name: Create Zip
-        uses: TheDoctor0/zip-release@b57d897cb5d60cb78b51a507f63fa184cfe35554
+      - name: Packaging
+        id: packager
+        uses: "docker://ghcr.io/rerigferl/vpm-packager:latest"
         with:
-          type: "zip"
-          filename: "${{env.zipFile}}" # make the zip file two directories up, since we start two directories in above
-          exclusions: "*.git*"
-
+          args: "-z -u"
+          
       - name: Make Release
-        uses: softprops/action-gh-release@c062e08bd532815e2082a85e87e3ef29c3e6d191
+        if: ${{ steps.packager.outputs.package-version != '0.0.0' }}
+        uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ steps.version.outputs.value }}
-          prerelease: ${{ contains(steps.version.outputs.value, '-') }}
+          tag_name: ${{ steps.packager.outputs.package-version }}
+          prerelease: ${{ contains(steps.packager.outputs.package-version, '-') }}
           files: |
-            ${{ env.zipFile }}
-            package.json
+            ${{steps.packager.outputs.zip-path}}
+            ${{steps.packager.outputs.unitypackage-path}}
+            ${{steps.packager.outputs.manifest-path}}
