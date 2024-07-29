@@ -15,13 +15,13 @@ jobs:
     steps:
     
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
     
       - name: get version
         id: version
-        uses: notiz-dev/github-action-json-property@7c8cf5cc36eb85d8d287a8086a39dac59628eb31
+        uses: zoexx/github-action-json-file-properties@d02f28167f05bf70cd75352b11c25a4e8c39bf38
         with: 
-            path: "package.json"
+            file_path: "package.json"
             prop_path: "version"
     
       - name: Set Environment Variables
@@ -30,16 +30,17 @@ jobs:
           echo "unityPackage=${{ env.packageName }}-${{ steps.version.outputs.prop }}.unitypackage" >> $GITHUB_ENV
         
       - name: Create Zip
-        uses: thedoctor0/zip-release@09336613be18a8208dfa66bd57efafd9e2685657
+        uses: TheDoctor0/zip-release@b57d897cb5d60cb78b51a507f63fa184cfe35554
         with:
           type: "zip"
           filename: "${{env.zipFile}}" # make the zip file two directories up, since we start two directories in above
-          exclusions: ".git*"
+          exclusions: "*.git*"
 
       - name: Make Release
-        uses: softprops/action-gh-release@1e07f4398721186383de40550babbdf2b84acfc5
+        uses: softprops/action-gh-release@c062e08bd532815e2082a85e87e3ef29c3e6d191
         with:
-          tag_name: ${{ steps.version.outputs.prop }}
+          tag_name: ${{ steps.version.outputs.value }}
+          prerelease: ${{ contains(steps.version.outputs.value, '-') }}
           files: |
             ${{ env.zipFile }}
             package.json

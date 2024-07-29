@@ -12,6 +12,7 @@ namespace io.github.azukimochi
 
             public const string _LightingMinLightBrightness = "_LightingMinLightBrightness";
             public const string _LightingCap = "_LightingCap";
+            public const string _LightingAdditiveLimit = "_LightingAdditiveLimit";
             public const string _MainColorAdjustToggle = "_MainColorAdjustToggle";
             public const string _Saturation = "_Saturation";
             public const string _MonochromeLighting = "_LightingMonochromatic";
@@ -28,6 +29,7 @@ namespace io.github.azukimochi
             {
                 public static readonly int LightingMinLightBrightness = Shader.PropertyToID(_LightingMinLightBrightness);
                 public static readonly int LightingCap = Shader.PropertyToID(_LightingCap);
+                public static readonly int LightingAdditiveLimit = Shader.PropertyToID(_LightingAdditiveLimit);
                 public static readonly int MainColorAdjustToggle = Shader.PropertyToID(_MainColorAdjustToggle);
                 public static readonly int Saturation = Shader.PropertyToID(_Saturation);
                 public static readonly int Color = Shader.PropertyToID(_Color);
@@ -168,7 +170,9 @@ namespace io.github.azukimochi
                 if (container.ControlType.HasFlag(LightLimitControlType.LightMax))
                 {
                     container.Default.SetParameterAnimation(parameters, _LightingCap, parameters.DefaultMaxLightValue);
+                    container.Default.SetParameterAnimation(parameters, _LightingAdditiveLimit, parameters.DefaultMaxLightValue);
                     container.Control.SetParameterAnimation(parameters, _LightingCap, parameters.MinLightValue, parameters.MaxLightValue);
+                    container.Control.SetParameterAnimation(parameters, _LightingAdditiveLimit, parameters.MinLightValue, parameters.MaxLightValue);
                 }
 
                 if (container.ControlType.HasFlag(LightLimitControlType.Saturation))
@@ -195,6 +199,7 @@ namespace io.github.azukimochi
             public override void AdditionalControl(Material material, in LightLimitChangerParameters parameters)
             {
                 material.SetOverrideTag($"{_LightingCap}{Animated_Suffix}", Flag_IsAnimated);
+                material.SetOverrideTag($"{_LightingAdditiveLimit}{Animated_Suffix}", Flag_IsAnimated);
                 material.SetOverrideTag($"{_LightingMinLightBrightness}{Animated_Suffix}", Flag_IsAnimated);
                 if (parameters.AllowSaturationControl || parameters.AllowColorTempControl)
                 {
