@@ -39,24 +39,18 @@ namespace io.github.azukimochi
                         var max = parameters.MaxLightValue;
 
                         float defaultMinLight, defaultMaxLight;
-                        if (parameters.OverwriteDefaultLightMinMax && 
+                        if (!parameters.OverwriteDefaultLightMinMax && 
                             renderer.sharedMaterial is Material mat &&
                             x.IsTargetShader(mat?.shader) && 
                             x.TryGetLightMinMaxValue(mat, out defaultMinLight, out defaultMaxLight))
                         {
-                            // OK!
+                            // OverwriteDefaultLightMinMax disabled.
+                            // Now we get defaultMinLight and defaultMaxLight from first material slot.
                         }
                         else
                         {
-                            if (parameters.IsSeparateLightControl)
-                            {
-                                defaultMinLight = parameters.DefaultMinLightValue;
-                                defaultMaxLight = parameters.DefaultMaxLightValue;
-                            }
-                            else
-                            {
-                                defaultMinLight = defaultMaxLight = parameters.DefaultLightValue;
-                            }
+                            defaultMinLight = parameters.MinLightValue;
+                            defaultMaxLight = parameters.MaxLightValue;
                         }
 
                         var param = new ControlAnimationParameters(relativePath, type, min, max, defaultMinLight, defaultMaxLight);
