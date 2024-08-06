@@ -3,7 +3,13 @@
 [Serializable]
 public sealed class Parameter<T>
 {
+    public Parameter() { }
+
+    public Parameter(T value) : this() => Value = value;
+
     public T Value;
+
+    public Vector2 Range = Vector2.zero;
 
     /// <summary>
     /// 有効／無効
