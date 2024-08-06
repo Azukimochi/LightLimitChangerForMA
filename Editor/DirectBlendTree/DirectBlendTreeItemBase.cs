@@ -1,6 +1,5 @@
 ﻿using UnityEditor;
 using UnityEditor.Animations;
-using Object = UnityEngine.Object;
 
 namespace gomoru.su
 {
