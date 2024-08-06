@@ -1,4 +1,4 @@
-﻿namespace io.github.azukimochi;
+namespace io.github.azukimochi;
 
 [Serializable]
 public sealed class LightingSettings : ISettings
@@ -16,11 +16,13 @@ public sealed class LightingSettings : ISettings
     /// <summary>
     /// 明るさの下限の範囲
     /// </summary>
+    [MinMaxSlider(0, 1)]
     public Vector2 MinLightRange = new(0, 1);
 
     /// <summary>
     /// 明るさの上限の範囲
     /// </summary>
+    [MinMaxSlider(0, 10)]
     public Vector2 MaxLightRange = new(0, 1);
 
     /// <summary>

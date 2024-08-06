@@ -1,4 +1,4 @@
-namespace io.github.azukimochi;
+﻿namespace io.github.azukimochi;
 
 [AttributeUsage(AttributeTargets.Field)]
 internal sealed class ShaderFeatureAttribute : PropertyAttribute
@@ -6,4 +6,14 @@ internal sealed class ShaderFeatureAttribute : PropertyAttribute
     public ShaderFeatureAttribute(SupportedShaders shaders) => Shaders = shaders;
 
     public SupportedShaders Shaders { get; }
+}
+
+[AttributeUsage(AttributeTargets.Field)]
+internal sealed class MinMaxSliderAttribute : PropertyAttribute
+{
+    public MinMaxSliderAttribute(float min, float max) => (Min, Max) = (min, max);
+
+    public float Min { get; }
+
+    public float Max { get; }
 }
