@@ -16,6 +16,7 @@ namespace io.github.azukimochi
             public const string _MainColorAdjustToggle = "_MainColorAdjustToggle";
             public const string _Saturation = "_Saturation";
             public const string _MonochromeLighting = "_LightingMonochromatic";
+            public const string _MonoChromeAdditiveLighting = "_LightingAdditiveMonochromatic";
             public const string _Color = "_Color";
             public const string _MainTex = "_MainTex";
 
@@ -193,6 +194,8 @@ namespace io.github.azukimochi
                 {
                     container.Default.SetParameterAnimation(parameters, _MonochromeLighting, 0);
                     container.Control.SetParameterAnimation(parameters, _MonochromeLighting, 0, 1);
+                    container.Default.SetParameterAnimation(parameters, _MonoChromeAdditiveLighting, 0);
+                    container.Control.SetParameterAnimation(parameters, _MonoChromeAdditiveLighting, 0, 1);
                 }
             }
 
@@ -223,6 +226,7 @@ namespace io.github.azukimochi
                 if (parameters.AllowMonochromeControl)
                 {
                     material.SetOverrideTag($"{_MonochromeLighting}{Animated_Suffix}", Flag_IsAnimated);
+                    material.SetOverrideTag($"{_MonoChromeAdditiveLighting}{Animated_Suffix}", Flag_IsAnimated);
                 }
             }
 
