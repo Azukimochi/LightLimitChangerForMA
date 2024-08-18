@@ -49,8 +49,9 @@ namespace io.github.azukimochi
                         }
                         else
                         {
-                            defaultMinLight = parameters.MinLightValue;
-                            defaultMaxLight = parameters.MaxLightValue;
+                            // Fix for defaultMinLight and defaultMaxLight.
+                            defaultMinLight = parameters.MinLightValue * parameters.DefaultMinLightValue;
+                            defaultMaxLight = parameters.MaxLightValue * parameters.DefaultMaxLightValue;
                         }
 
                         var param = new ControlAnimationParameters(relativePath, type, min, max, defaultMinLight, defaultMaxLight);
