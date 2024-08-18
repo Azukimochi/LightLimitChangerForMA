@@ -22,8 +22,8 @@
         "VRCSDKBase-Editor.dll",
         "VRC.Utility.dll",
         "VRCCore-Editor.dll",
-        "System.Memory.dll",
-        "System.Collections.Immutable.dll"
+        "System.Collections.Immutable.dll",
+        "System.Runtime.CompilerServices.Unsafe.dll"
     ],
     "autoReferenced": false,
     "defineConstraints": [],
