@@ -14,8 +14,8 @@ namespace gomoru.su
             AssetDatabase.AddObjectToAsset(blendTree, assetContainer);
             blendTree.blendParameter = ParameterName;
             blendTree.name = Name;
-            OFF.Apply(destination, assetContainer);
-            ON.Apply(destination, assetContainer);
+            OFF.Apply(blendTree, assetContainer);
+            ON.Apply(blendTree, assetContainer);
 
             destination.AddChild(blendTree);
         }

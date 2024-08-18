@@ -1,7 +1,7 @@
 using System.Collections.Generic;
-using UnityEngine;
 using UnityEditor;
 using UnityEditor.Animations;
+using System;
 
 namespace gomoru.su
 {
@@ -21,7 +21,7 @@ namespace gomoru.su
 
         public void Add(IDirectBlendTreeItem item) => _items.Add(item);
 
-        public BlendTree ToBlendTree(Object assetContainer)
+        public BlendTree ToBlendTree(UnityEngine.Object assetContainer)
         {
             var blendTree = new BlendTree();
             blendTree.name = Name;
@@ -33,14 +33,21 @@ namespace gomoru.su
                 item.Apply(blendTree, assetContainer);
             }
 
-            var children = blendTree.children;
-            for(int i = 0; i < children.Length; i++)
-            {
-                children[i].directBlendParameter = ParameterName;
-            }
-            blendTree.children = children;
+            ApplyDirectBlendParameter(blendTree, ParameterName);
 
             return blendTree;
+        }
+
+        private static void ApplyDirectBlendParameter(BlendTree blendTree, string parameterName)
+        {
+            var children = blendTree.children;
+            foreach (ref var x in children.AsSpan())
+            {
+                x.directBlendParameter = parameterName;
+                if (x.motion is BlendTree b)
+                    ApplyDirectBlendParameter(b, parameterName);
+            }
+            blendTree.children = children;
         }
 
         public AnimatorControllerLayer ToAnimatorControllerLayer(Object assetContainer)
@@ -50,7 +57,7 @@ namespace gomoru.su
             var stateMachine = layer.stateMachine = new AnimatorStateMachine();
             AssetDatabase.AddObjectToAsset(stateMachine, assetContainer);
 
-            var state = stateMachine.AddState($"{(Name ?? "Direct Blend Tree")} (WD ON)");
+            var state = stateMachine.AddState($"{(Name ?? "Direct Blend Tree")} (WD On)");
             state.writeDefaultValues = true;
             state.motion = ToBlendTree(assetContainer);
 
