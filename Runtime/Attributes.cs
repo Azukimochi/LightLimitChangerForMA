@@ -17,3 +17,10 @@ internal sealed class MinMaxSliderAttribute : PropertyAttribute
 
     public float Max { get; }
 }
+
+internal sealed class RangeParameterAttribute : Attribute
+{
+    public RangeParameterAttribute(string parameterName) => ParameterName = parameterName;
+
+    public string ParameterName { get; }
+}

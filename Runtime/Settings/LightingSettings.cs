@@ -6,11 +6,13 @@ public sealed class LightingSettings : ISettings
     /// <summary>
     /// 明るさの下限
     /// </summary>
+    [RangeParameter(nameof(MinLightRange))]
     public Parameter<float> MinLight = new(0.05f) { Range = new(0, 1) };
 
     /// <summary>
     /// 明るさの上限
     /// </summary>
+    [RangeParameter(nameof(MaxLightRange))]
     public Parameter<float> MaxLight = new(1f) { Range = new(0, 10) };
 
     /// <summary>
