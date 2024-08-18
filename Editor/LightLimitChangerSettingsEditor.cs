@@ -32,6 +32,10 @@ namespace io.github.azukimochi
         private SerializedProperty Excludes;
         private SerializedProperty WriteDefaults;
 
+        private const string GlobalSettingsIDKey = "io.github.azukimochi.LightLimitChanger.GlobalSettings.ID.Global";
+        private const string GlobalSettingsLocalIDKey = "io.github.azukimochi.LightLimitChanger.GlobalSettings.ID.Local";
+        private const string GlobalSettingsValueKey = "io.github.azukimochi.LightLimitChanger.GlobalSettings.Value";
+
         private static bool _isOptionFoldoutOpen = true;
         private static bool _isCepareteInitValFoldoutOpen = false;
 
@@ -216,6 +220,23 @@ namespace io.github.azukimochi
                     EditorGUILayout.PropertyField(TargetShaders, Localization.G("label.target_shader", "tip.target_shader"));
                     WriteDefaults.intValue = EditorGUILayout.Popup(Utils.Label("Write Defaults"), WriteDefaults.intValue, new[] { Localization.S("label.match_avatar"), "OFF", "ON" });
                     EditorGUILayout.PropertyField(Excludes, Localization.G("label.excludes"));
+
+                    // Add "Get Global Settings" button.
+                    EditorGUILayout.BeginHorizontal();
+                    EditorGUILayout.LabelField(Localization.S("label.load_global_settings"), GUILayout.Width(200));
+                    if (GUILayout.Button(Localization.S("label.load_global_settings"), GUILayout.ExpandWidth(true)))
+                    {
+
+                        if (EditorUtility.DisplayDialog(Localization.S("Window.info.global_settings.load"), Localization.S("Window.info.global_settings.load_message"), Localization.S("Window.info.choice.apply_load"), Localization.S("Window.info.cancel")))
+                        {
+                            var globalID = EditorPrefs.GetString(GlobalSettingsIDKey);
+                            var value = JsonUtility.FromJson<LightLimitChangerParameters>(EditorPrefs.GetString(GlobalSettingsValueKey));
+                            LightLimitChangerPrefab.SavePrefabSetting(value);
+                            PlayerPrefs.SetString(GlobalSettingsLocalIDKey, globalID);
+                        }
+                    }
+                    GUILayout.FlexibleSpace();
+                    EditorGUILayout.EndHorizontal();
                 }
             }
 

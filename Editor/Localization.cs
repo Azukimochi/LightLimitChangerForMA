@@ -374,6 +374,15 @@ namespace io.github.azukimochi
                     "文档"
                 }
             },
+            {
+                "label.load_global_settings", new []
+                {
+                    "Load Global Settings",
+                    "グローバル設定を読み込む",
+                    "加載全域設置",
+                    "加载全局设置"
+                }
+            },
 
             ///////////////////////////////////////////////////////
             // 情報　info
@@ -398,7 +407,7 @@ namespace io.github.azukimochi
             {
                 "info.re_generate", new []
                 {
-                    "Regenerate", 
+                    "Regenerate",
                     "再生成",
                     "再生成",
                     "重新生成"
@@ -467,12 +476,21 @@ namespace io.github.azukimochi
                     "已取消"
                 }
             },
+            {
+                "Window.info.global_settings.load_message", new []
+                {
+                    "Load the global settings and replace the current settings.\nAre you sure?",
+                    "グローバル設置を読み込んで、今の設定と置き換えます。\nよろしいですか？",
+                    "加載全域設置並替換當前設置。\n確定嗎？",
+                    "加载全局设置并替换当前设置。\n确定吗？"
+                }
+            },
             
             ///////////////////////////////////////////////////////
             // ヒント tip
             {
                 "tip.select_avatar", new []
-                { 
+                {
                     "Select the avatar to generate animations for",
                     "アニメーションを生成するアバターをセットしてください",
                     "選擇要為其生成動畫的 Avatar",
@@ -481,7 +499,7 @@ namespace io.github.azukimochi
             },
             {
                 "tip.use_default", new []
-                { 
+                {
                     "Use the light animation in the initial state",
                     "初期状態でライトのアニメーションを使用します",
                     "在預設狀態下使用亮度動畫",
@@ -490,7 +508,7 @@ namespace io.github.azukimochi
             },
             {
                 "tip.save_value", new []
-                { 
+                {
                     "Keep brightness changes in the avatar",
                     "明るさの変更をアバターに保持したままにします",
                     "保持 Avatar 的亮度變化",
@@ -508,7 +526,7 @@ namespace io.github.azukimochi
             },
             {
                 "tip.light_max", new []
-                { 
+                {
                     "Brightness upper limit setting",
                     "明るさの上限設定です",
                     "亮度的上限設定",
@@ -517,7 +535,7 @@ namespace io.github.azukimochi
             },
             {
                 "tip.light_min", new []
-                { 
+                {
                     "Brightness lower limit setting",
                     "明るさの下限設定です",
                     "亮度的下限設定",
@@ -526,7 +544,7 @@ namespace io.github.azukimochi
             },
             {
                 "tip.light_default", new []
-                { 
+                {
                     "Initial brightness setting",
                     "初期の明るさ設定",
                     "預設的亮度設定",
@@ -535,7 +553,7 @@ namespace io.github.azukimochi
             },
             {
                 "tip.target_shader", new []
-                { 
+                {
                     "Selects which shader(s) to control",
                     "制御するシェーダーを選択できます",
                     "選擇要控制哪個或哪些著色器",
@@ -544,7 +562,7 @@ namespace io.github.azukimochi
             },
             {
                 "tip.allow_color_tmp", new []
-                { 
+                {
                     "Enables color temperature adjustment functionality",
                     "色温度の調節機能を有効化することができます",
                     "啟用色溫調整功能",
@@ -553,7 +571,7 @@ namespace io.github.azukimochi
             },
             {
                 "tip.allow_saturation", new []
-                { 
+                {
                     "Enables saturation adjustment functionality",
                     "彩度の調整機能を有効化することができます",
                     "啟用飽和度調整功能",
@@ -562,7 +580,7 @@ namespace io.github.azukimochi
             },
             {
                 "tip.allow_monochrome", new []
-                { 
+                {
                     "Enables monochrome adjustment functionality",
                     "ライトのモノクロ化の調整機能を有効化することができます",
                     "啟用單色化調整功能",
