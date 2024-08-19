@@ -9,7 +9,7 @@ internal sealed class ParameterDrawer : PropertyDrawer
 
     public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
     {
-        return EditorGUIUtility.singleLineHeight * (property.isExpanded ? 2 : 1);
+        return EditorGUIUtility.singleLineHeight * (property.isExpanded && LightLimitChangerComponentEditor.SelectedTab != LightLimitChangerComponentEditor.Tab.BasicSettings ? 2 : 1) ;
     }
 
     public static void Draw(Rect position, SerializedProperty property, GUIContent label)
@@ -21,16 +21,31 @@ internal sealed class ParameterDrawer : PropertyDrawer
         var range = rangeProp.vector2Value;
         position.height = EditorGUIUtility.singleLineHeight;
 
-        EditorGUI.BeginChangeCheck();
-        var enable = EditorGUI.ToggleLeft(position, scope.Label, enableProp.boolValue);
-        if (EditorGUI.EndChangeCheck())
+        var p = position;
+        p.width = EditorGUIUtility.labelWidth;
+        bool enable;
+
+        if (LightLimitChangerComponentEditor.SelectedTab == LightLimitChangerComponentEditor.Tab.BasicSettings)
         {
+            enable = EditorGUI.ToggleLeft(p, scope.Label, enableProp.boolValue);
             enableProp.boolValue = enable;
         }
+        else
+        {
+            EditorGUI.LabelField(p, scope.Label);
+            enable = enableProp.boolValue;
+        }
 
-        property.isExpanded = EditorGUI.Foldout(position with { width = EditorGUIUtility.labelWidth }, property.isExpanded, GUIContent.none, true);
-
-        var p = position;
+        //if (LightLimitChangerComponentEditor.SelectedTab != LightLimitChangerComponentEditor.Tab.BasicSettings)
+        //{
+        //    property.isExpanded = EditorGUI.Foldout(position with { width = EditorGUIUtility.labelWidth }, property.isExpanded, GUIContent.none, true);
+        //}
+        p = position;
+        p.x += EditorGUIUtility.labelWidth - EditorGUI.indentLevel * 15;
+        p.width -= EditorGUIUtility.labelWidth - EditorGUI.indentLevel * 15;
+        
+        
+        p = position;
         p.x += EditorGUIUtility.labelWidth - EditorGUI.indentLevel * 15;
         p.width -= EditorGUIUtility.labelWidth - EditorGUI.indentLevel * 15;
 
@@ -50,11 +65,11 @@ internal sealed class ParameterDrawer : PropertyDrawer
         }
         EditorGUI.EndDisabledGroup();
 
-        if (!property.isExpanded)
+        if (!property.isExpanded || LightLimitChangerComponentEditor.SelectedTab == LightLimitChangerComponentEditor.Tab.BasicSettings)
             return;
         EditorGUI.indentLevel++;
         position.y += EditorGUIUtility.singleLineHeight;
-        position.x += EditorGUIUtility.labelWidth;
+        position.x += EditorGUIUtility.labelWidth + 30;
         position.width -= EditorGUIUtility.labelWidth;
 
         p = position with { width = position.width / 3 };

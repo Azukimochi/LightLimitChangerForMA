@@ -8,5 +8,5 @@ public sealed class EmissionControlSettings : ISettings
     /// </summary>
     public bool UseEmissionControl = false;
 
-    public Parameter<float> Strength = 1;
+    public Parameter<float> Strength = new(1) { Range = new(0, 1) };
 }

@@ -19,8 +19,8 @@ internal sealed class MinMaxSliderAttributeDrawer : PropertyDrawer
         position.width += EditorGUI.indentLevel * 15f;
 
 
-        float floatFieldWidth = Mathf.Max(position.width * 0.1f, 80);
-        float padding = -20f;
+        float floatFieldWidth = Mathf.Max(position.width * 0.1f, 50);
+        float padding = 10f;
 
         var left = position with { width = floatFieldWidth };
         var mid = position with { width = position.width - (floatFieldWidth * 2 + padding * 2), x = position.x + left.width + padding };
