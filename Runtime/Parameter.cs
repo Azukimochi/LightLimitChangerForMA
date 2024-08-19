@@ -26,10 +26,12 @@ public sealed class Parameter<T> : Parameter
 {
     public Parameter() { }
 
-    public Parameter(T value) : this() => Value = value;
+    public Parameter(T value) : this() => (InitialValue, OverrideValue) = (value, value);
 
-    public T Value;
+    public T InitialValue;
+    public T OverrideValue;
 
-    public static implicit operator Parameter<T>(T value) => new() { Value = value };
-    public static explicit operator T(Parameter<T> parameter) => parameter.Value;
+    public static implicit operator Parameter<T>(T value) => new(value);
+
+    public void Deconstruct(out T initialValue, out T overrideValue) => (initialValue, overrideValue) = (InitialValue, OverrideValue);
 }

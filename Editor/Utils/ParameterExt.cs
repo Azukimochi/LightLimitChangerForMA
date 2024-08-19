@@ -10,7 +10,14 @@ internal static class ParameterExt
             Saved = parameter.Saved,
             Range = parameter.Range,
             Synced = parameter.Synced,
-            Value = parameter.Value switch
+            InitialValue = parameter.InitialValue switch
+            {
+                float x => x,
+                int x => x,
+                bool x => x ? 1 : 0,
+                _ => default,
+            },
+            OverrideValue = parameter.OverrideValue switch
             {
                 float x => x,
                 int x => x,
