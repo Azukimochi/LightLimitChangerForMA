@@ -2,11 +2,11 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-namespace io.github.noridev
+namespace io.github.azukimochi
 {
     internal static class Localization
     {
-        private const string PreferenceKey = "io.github.noridev.light-limit-changer.lang";
+        private const string PreferenceKey = "io.github.azukimochi.light-limit-changer.lang";
         private static int _SelectedLanguage = EditorPrefs.GetInt(PreferenceKey, 1);
         private static readonly GUIContent[] _SupportedLanguages = new GUIContent[]
         {
