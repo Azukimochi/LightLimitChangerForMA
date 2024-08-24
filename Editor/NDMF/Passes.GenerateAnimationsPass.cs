@@ -38,11 +38,12 @@ namespace io.github.azukimochi
                         var min = parameters.MinLightValue;
                         var max = parameters.MaxLightValue;
 
-                        float defaultMinLight, defaultMaxLight;
-                        if (!parameters.OverwriteDefaultLightMinMax && 
+                        float defaultMinLight, defaultMaxLight, defaultMonochromeLighting, defaultMonochromeAdditiveLighting;
+                        if (!parameters.OverwriteDefaultLightMinMax &&
                             renderer.sharedMaterial is Material mat &&
-                            x.IsTargetShader(mat?.shader) && 
-                            x.TryGetLightMinMaxValue(mat, out defaultMinLight, out defaultMaxLight))
+                            x.IsTargetShader(mat?.shader) &&
+                            x.TryGetLightMinMaxValue(mat, out defaultMinLight, out defaultMaxLight) &&
+                            x.TryGetMonochromeValue(mat, out defaultMonochromeLighting, out defaultMonochromeAdditiveLighting))
                         {
                             // OverwriteDefaultLightMinMax disabled.
                             // Now we get defaultMinLight and defaultMaxLight from first material slot.
@@ -52,12 +53,15 @@ namespace io.github.azukimochi
                             // Fix for defaultMinLight and defaultMaxLight.
                             defaultMinLight = parameters.MinLightValue * parameters.DefaultMinLightValue;
                             defaultMaxLight = parameters.MaxLightValue * parameters.DefaultMaxLightValue;
+
+                            defaultMonochromeLighting = parameters.InitialMonochromeControlValue;
+                            defaultMonochromeAdditiveLighting = parameters.MonochromeAdditiveLightingValue;
                         }
 
-                        var param = new ControlAnimationParameters(relativePath, type, min, max, defaultMinLight, defaultMaxLight);
+                        var param = new ControlAnimationParameters(relativePath, type, min, max, defaultMinLight, defaultMaxLight, defaultMonochromeLighting, defaultMonochromeAdditiveLighting);
                         foreach (ref readonly var container in animationContainers)
                         {
-                            x.SetControlAnimation(container, param);
+                            x.SetControlAnimation(container, param, parameters);
                         }
                     }
                 }

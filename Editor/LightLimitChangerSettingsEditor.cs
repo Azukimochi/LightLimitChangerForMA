@@ -29,8 +29,10 @@ namespace io.github.azukimochi
         private SerializedProperty AddResetButton;
         private SerializedProperty IsGroupingAdditionalControls;
         private SerializedProperty IsSeparateLightControl;
+        private SerializedProperty IsSeparateMonochromeControl;
         private SerializedProperty Excludes;
         private SerializedProperty WriteDefaults;
+        private SerializedProperty MonochromeAdditiveLightingValue;
 
         private static bool _isOptionFoldoutOpen = true;
         private static bool _isCepareteInitValFoldoutOpen = false;
@@ -63,9 +65,11 @@ namespace io.github.azukimochi
             InitialUnlitControlValue = parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.InitialUnlitControlValue));
             AddResetButton = parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.AddResetButton));
             IsSeparateLightControl = parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.IsSeparateLightControl));
+            IsSeparateMonochromeControl = parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.IsSeparateMonochromeControl));
             IsGroupingAdditionalControls = parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.IsGroupingAdditionalControls));
             Excludes = serializedObject.FindProperty(nameof(LightLimitChangerSettings.Excludes));
             WriteDefaults = serializedObject.FindProperty(nameof(LightLimitChangerSettings.WriteDefaults));
+            MonochromeAdditiveLightingValue = parameters.FindPropertyRelative(nameof(LightLimitChangerParameters.MonochromeAdditiveLightingValue));
         }
 
         public override void OnInspectorGUI()
@@ -157,6 +161,10 @@ namespace io.github.azukimochi
                         Localization.G("label.allow_saturation", "tip.allow_saturation"));
                     EditorGUILayout.PropertyField(AllowMonochromeControl,
                         Localization.G("label.allow_monochrome", "tip.allow_monochrome"));
+                    EditorGUI.BeginDisabledGroup(AllowMonochromeControl.boolValue == false);
+                    EditorGUILayout.PropertyField(IsSeparateMonochromeControl,
+                        Localization.G("label.separate_monochrome_control"));
+                     EditorGUI.EndDisabledGroup();
                     EditorGUILayout.PropertyField(AllowUnlitControl,
                         Localization.G("label.allow_unlit", "tip.allow_unlit"));
                     EditorGUILayout.PropertyField(AllowEmissionControl,
@@ -194,6 +202,15 @@ namespace io.github.azukimochi
                         EditorGUILayout.LabelField(Localization.G("label.monochrome"), GUILayout.MaxWidth(70.0f), GUILayout.ExpandWidth(false));
                         EditorGUI.BeginDisabledGroup(AllowMonochromeControl.boolValue == false);
                         EditorGUILayout.PropertyField(InitialMonochromeControlValue, Localization.G(""));
+                        EditorGUI.EndDisabledGroup();
+                    }
+
+                    using (new EditorGUILayout.HorizontalScope())
+                    {
+                        EditorGUILayout.Space(10);
+                        EditorGUI.BeginDisabledGroup(AllowMonochromeControl.boolValue == false || IsSeparateMonochromeControl.boolValue == false);
+                        EditorGUILayout.LabelField(Localization.G("label.monochrome_additive"), GUILayout.MaxWidth(70.0f), GUILayout.ExpandWidth(false));
+                        EditorGUILayout.PropertyField(MonochromeAdditiveLightingValue, Localization.G(""));
                         EditorGUI.EndDisabledGroup();
                     }
                     using (new EditorGUILayout.HorizontalScope())

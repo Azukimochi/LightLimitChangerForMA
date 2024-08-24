@@ -40,6 +40,7 @@ namespace io.github.azukimochi
         internal const string ParameterName_Emission = "LightLimitEmission";
         internal const string ParameterName_Reset = "LightLimitReset";
         internal const string ParameterName_Monochrome = "LightLimitMonochrome";
+        internal const string ParameterName_MonochromeAdditive = "LightLimitMonochromeAdditive";
 
         private static Session GetSession(BuildContext context)
         {
@@ -148,6 +149,12 @@ namespace io.github.azukimochi
                 {
                     targetControl |= LightLimitControlType.Monochrome;
                     controls.Add(ControlAnimationContainer.Create(LightLimitControlType.Monochrome, Localization.S("ExpressionMenu.monochrome"), "Monochrome", ParameterName_Monochrome, parameters.InitialMonochromeControlValue, Icons.Monochrome, defaultAnimation));
+
+                    if (parameters.IsSeparateMonochromeControl)
+                    {
+                        targetControl |= LightLimitControlType.MonochromeAdditive;
+                        controls.Add(ControlAnimationContainer.Create(LightLimitControlType.MonochromeAdditive, Localization.S("ExpressionMenu.monochrome_additive"), "Monochrome Additive", ParameterName_MonochromeAdditive, parameters.MonochromeAdditiveLightingValue, Icons.Monochrome, defaultAnimation));
+                    }
                 }
 
                 if (parameters.AllowEmissionControl)

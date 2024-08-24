@@ -277,6 +277,15 @@ namespace io.github.azukimochi
                 }
             },
             {
+                "label.separate_monochrome_control", new []
+                 {
+                    "Set Monochrome Individually",
+                    "モノクロを別々に設定する",
+                    "",
+                    ""
+                 }
+            },
+            {
                 "label.match_avatar", new []
                 {
                     "Match Avatar",
@@ -338,6 +347,15 @@ namespace io.github.azukimochi
                     "單色化",
                     "单色化"
                 }
+            },
+            {
+                "label.monochrome_additive", new []
+                {
+                    "Monochrome Additive",
+                    "モノクロの加算",
+                    "",
+                    ""
+                 }
             },
             {
                 "label.unlit", new []
@@ -886,6 +904,15 @@ Please check your settings if this is not what you intended.",
                     "モノクロ化",
                     "單色化",
                     "单色化"
+                }
+            },
+            {
+                "ExpressionMenu.monochrome_additive", new []
+                {
+                    "Monochrome Additive",
+                    "モノクロの加算",
+                    "",
+                    ""
                 }
             },
             {
