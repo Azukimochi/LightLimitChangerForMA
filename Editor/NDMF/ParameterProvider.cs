@@ -42,7 +42,14 @@ namespace io.github.azukimochi
                 yield return Parameter<float>(Passes.ParameterName_Saturation);
 
             if (parameters.AllowMonochromeControl)
+            {
                 yield return Parameter<float>(Passes.ParameterName_Monochrome);
+
+                if (parameters.IsSeparateMonochromeControl)
+                {
+                    yield return Parameter<float>(Passes.ParameterName_MonochromeAdditive);
+                }
+            }
 
             if (parameters.AllowUnlitControl)
                 yield return Parameter<float>(Passes.ParameterName_Unlit);

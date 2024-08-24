@@ -11,8 +11,10 @@ namespace io.github.azukimochi
         public readonly float MaxLightValue;
         public readonly float DefaultMinLightValue;
         public readonly float DefaultMaxLightValue;
+        public readonly float DefaultMonochromeLightingValue;
+        public readonly float DefaultMonochromeAdditiveLightingValue;
 
-        public ControlAnimationParameters(string targetPath, Type targetType, float minLightValue, float maxLightValue, float defaultMinLightValue, float defaultMaxLightValue)
+        public ControlAnimationParameters(string targetPath, Type targetType, float minLightValue, float maxLightValue, float defaultMinLightValue, float defaultMaxLightValue, float defaultMonochromeLightingValue, float defaultMonochromeAdditiveLightingValue)
         {
             TargetPath = targetPath;
             TargetType = targetType;
@@ -20,6 +22,8 @@ namespace io.github.azukimochi
             MaxLightValue = maxLightValue;
             DefaultMinLightValue = defaultMinLightValue;
             DefaultMaxLightValue = defaultMaxLightValue;
+            DefaultMonochromeLightingValue = defaultMonochromeLightingValue;
+            DefaultMonochromeAdditiveLightingValue = defaultMonochromeAdditiveLightingValue;
         }
     }
 }

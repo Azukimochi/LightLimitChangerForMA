@@ -96,7 +96,7 @@ namespace io.github.azukimochi
 
         public abstract bool IsTargetShader(Shader shader);
 
-        public abstract void SetControlAnimation(in ControlAnimationContainer container, in ControlAnimationParameters parameters);
+        public abstract void SetControlAnimation(in ControlAnimationContainer container, in ControlAnimationParameters parameters, in LightLimitChangerParameters llc_parameters);
 
         public virtual void AdditionalControl(Material material, in LightLimitChangerParameters parameters) { }
 
@@ -104,6 +104,13 @@ namespace io.github.azukimochi
         {
             min = 0;
             max = 0;
+            return false;
+        }
+
+        public virtual bool TryGetMonochromeValue(Material material, out float monochrome, out float monochromeAdditive)
+        {
+            monochrome = 0;
+            monochromeAdditive = 1;
             return false;
         }
     }

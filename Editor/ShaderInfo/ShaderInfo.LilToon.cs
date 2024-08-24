@@ -42,6 +42,7 @@ namespace io.github.azukimochi
                 public static readonly int MainGradationTex = Shader.PropertyToID(_MainGradationTex);
                 public static readonly int MainGradationStrength = Shader.PropertyToID(_MainGradationStrength);
                 public static readonly int MainColorAdjustMask = Shader.PropertyToID(_MainColorAdjustMask);
+                public static readonly int MonochromeLighting = Shader.PropertyToID(_MonochromeLighting);
             }
 
             private static class DefaultParameters
@@ -53,6 +54,7 @@ namespace io.github.azukimochi
                 public static readonly Color Color3rd = Color.white;
                 public static readonly Vector4 MainTexHSVG = new Vector4(0, 1, 1, 1);
                 public static readonly float MainGradationStrength = 0;
+                public static readonly float MonochromeLighting = 0;
             }
 
             public override bool TryNormalizeMaterial(Material material, LightLimitChangerObjectCache cache)
@@ -174,7 +176,7 @@ namespace io.github.azukimochi
 
             private static int[] _propertyIDsArrayCache;
 
-            public override void SetControlAnimation(in ControlAnimationContainer container, in ControlAnimationParameters parameters)
+            public override void SetControlAnimation(in ControlAnimationContainer container, in ControlAnimationParameters parameters, in LightLimitChangerParameters llc_parameters)
             {
                 if (container.ControlType.HasFlag(LightLimitControlType.LightMin))
                 {
@@ -199,7 +201,7 @@ namespace io.github.azukimochi
                 }
                 if (container.ControlType.HasFlag(LightLimitControlType.Monochrome))
                 {
-                    container.Default.SetParameterAnimation(parameters, _MonochromeLighting, 0);
+                    container.Default.SetParameterAnimation(parameters, _MonochromeLighting, parameters.DefaultMonochromeLightingValue);
                     container.Control.SetParameterAnimation(parameters, _MonochromeLighting, 0, 1);
                 }
 
@@ -235,6 +237,13 @@ namespace io.github.azukimochi
             {
                 min = material.GetOrDefault(PropertyIDs.LightMinLimit, DefaultParameters.LightMinLimit);
                 max = material.GetOrDefault(PropertyIDs.LightMaxLimit, DefaultParameters.LightMaxLimit);
+                return true;
+            }
+
+            public override bool TryGetMonochromeValue(Material material, out float monochrome, out float monochromeAdditive)
+            {
+                monochrome = material.GetOrDefault(PropertyIDs.MonochromeLighting, DefaultParameters.MonochromeLighting);
+                monochromeAdditive = 1;
                 return true;
             }
         }
