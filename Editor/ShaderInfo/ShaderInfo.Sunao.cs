@@ -80,7 +80,7 @@ namespace io.github.azukimochi
                 return shader.name.Contains(nameof(Sunao), StringComparison.OrdinalIgnoreCase);
             }
 
-            public override void SetControlAnimation(in ControlAnimationContainer container, in ControlAnimationParameters parameters)
+            public override void SetControlAnimation(in ControlAnimationContainer container, in ControlAnimationParameters parameters, in LightLimitChangerParameters llc_parameters)
             {
                 if (container.ControlType.HasFlag(LightLimitControlType.LightMin))
                 {

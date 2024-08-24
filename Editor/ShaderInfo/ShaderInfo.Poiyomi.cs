@@ -164,7 +164,7 @@ namespace io.github.azukimochi
                        ! shader.name.Contains("7.3", StringComparison.OrdinalIgnoreCase);
             }
 
-            public override void SetControlAnimation(in ControlAnimationContainer container, in ControlAnimationParameters parameters)
+            public override void SetControlAnimation(in ControlAnimationContainer container, in ControlAnimationParameters parameters, in LightLimitChangerParameters llc_parameters)
             {
                 if (container.ControlType.HasFlag(LightLimitControlType.LightMin))
                 {
@@ -198,6 +198,15 @@ namespace io.github.azukimochi
                 {
                     container.Default.SetParameterAnimation(parameters, _MonochromeLighting, parameters.DefaultMonochromeLightingValue);
                     container.Control.SetParameterAnimation(parameters, _MonochromeLighting, 0, 1);
+
+                    if (!llc_parameters.IsSeparateMonochromeControl)
+                    {
+                        container.Default.SetParameterAnimation(parameters, _MonoChromeAdditiveLighting, parameters.DefaultMonochromeAdditiveLightingValue);
+                        container.Control.SetParameterAnimation(parameters, _MonoChromeAdditiveLighting, 0, 1);
+                    }
+                }
+                if (container.ControlType.HasFlag(LightLimitControlType.MonochromeAdditive))
+                {
                     container.Default.SetParameterAnimation(parameters, _MonoChromeAdditiveLighting, parameters.DefaultMonochromeAdditiveLightingValue);
                     container.Control.SetParameterAnimation(parameters, _MonoChromeAdditiveLighting, 0, 1);
                 }

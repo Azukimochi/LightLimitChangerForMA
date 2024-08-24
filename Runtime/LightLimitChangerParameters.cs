@@ -46,6 +46,9 @@ namespace io.github.azukimochi
         public float InitialMonochromeControlValue = 0.0f;
 
         [Range(0,1)]
+        public float MonochromeAdditiveLightingValue = 0.0f;
+
+        [Range(0,1)]
         public float DefaultMonochromeLightingValue = 0.0f;
 
         [Range(0,1)]
@@ -55,6 +58,7 @@ namespace io.github.azukimochi
         public float InitialUnlitControlValue = 0.0f;
         
         public bool IsSeparateLightControl = false;
+        public bool IsSeparateMonochromeControl = false;
 
         public bool IsGroupingAdditionalControls = false;
     }

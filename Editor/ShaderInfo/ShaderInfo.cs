@@ -96,7 +96,7 @@ namespace io.github.azukimochi
 
         public abstract bool IsTargetShader(Shader shader);
 
-        public abstract void SetControlAnimation(in ControlAnimationContainer container, in ControlAnimationParameters parameters);
+        public abstract void SetControlAnimation(in ControlAnimationContainer container, in ControlAnimationParameters parameters, in LightLimitChangerParameters llc_parameters);
 
         public virtual void AdditionalControl(Material material, in LightLimitChangerParameters parameters) { }
 

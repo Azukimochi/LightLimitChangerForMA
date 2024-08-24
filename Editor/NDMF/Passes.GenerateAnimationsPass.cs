@@ -39,9 +39,9 @@ namespace io.github.azukimochi
                         var max = parameters.MaxLightValue;
 
                         float defaultMinLight, defaultMaxLight, defaultMonochromeLighting, defaultMonochromeAdditiveLighting;
-                        if (!parameters.OverwriteDefaultLightMinMax && 
+                        if (!parameters.OverwriteDefaultLightMinMax &&
                             renderer.sharedMaterial is Material mat &&
-                            x.IsTargetShader(mat?.shader) && 
+                            x.IsTargetShader(mat?.shader) &&
                             x.TryGetLightMinMaxValue(mat, out defaultMinLight, out defaultMaxLight) &&
                             x.TryGetMonochromeValue(mat, out defaultMonochromeLighting, out defaultMonochromeAdditiveLighting))
                         {
@@ -54,14 +54,14 @@ namespace io.github.azukimochi
                             defaultMinLight = parameters.MinLightValue * parameters.DefaultMinLightValue;
                             defaultMaxLight = parameters.MaxLightValue * parameters.DefaultMaxLightValue;
 
-                            defaultMonochromeLighting = parameters.DefaultMonochromeLightingValue;
-                            defaultMonochromeAdditiveLighting = parameters.DefaultMonochromeAdditiveLightingValue;
+                            defaultMonochromeLighting = parameters.InitialMonochromeControlValue;
+                            defaultMonochromeAdditiveLighting = parameters.MonochromeAdditiveLightingValue;
                         }
 
                         var param = new ControlAnimationParameters(relativePath, type, min, max, defaultMinLight, defaultMaxLight, defaultMonochromeLighting, defaultMonochromeAdditiveLighting);
                         foreach (ref readonly var container in animationContainers)
                         {
-                            x.SetControlAnimation(container, param);
+                            x.SetControlAnimation(container, param, parameters);
                         }
                     }
                 }

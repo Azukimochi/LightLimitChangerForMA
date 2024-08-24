@@ -3,7 +3,7 @@
 namespace io.github.azukimochi
 {
     [Flags]
-    public enum LightLimitControlType
+    public enum LightLimitControlType : long
     {
         Light = LightMin | LightMax, // 1 << 0,
         Saturation = 1 << 1,
@@ -12,8 +12,9 @@ namespace io.github.azukimochi
         LightMin = 1 << 4,
         LightMax = 1 << 5,
         Monochrome = 1 << 6,
-        Emission = 1 << 7,
+        MonochromeAdditive = 1 << 7,
+        Emission = 1 << 8,
 
-        AdditionalControls = Saturation | Unlit | ColorTemperature | Monochrome | Emission,
+        AdditionalControls = Saturation | Unlit | ColorTemperature | Monochrome | MonochromeAdditive | Emission,
     }
 }
