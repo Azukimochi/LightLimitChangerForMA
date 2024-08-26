@@ -212,7 +212,7 @@ namespace io.github.azukimochi
                     "ライトのモノクロ化調整を有効にする",
                     "啟用單色化控制",
                     "启用单色化控制",
-                    "조명 흑백화(Monochrome) 조정 활성화"
+                    "흑백화(Monochrome) 조정 활성화"
                 }
             },
             {
