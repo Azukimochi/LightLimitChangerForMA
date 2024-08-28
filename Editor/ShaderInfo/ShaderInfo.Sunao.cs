@@ -31,6 +31,7 @@ namespace io.github.azukimochi
                 public static readonly int MainTex = Shader.PropertyToID(_MainTex);
                 public static readonly int SubTex = Shader.PropertyToID(_SubTex);
                 public static readonly int SubColor = Shader.PropertyToID(_SubColor);
+                public static readonly int MonochromeLit = Shader.PropertyToID(_MonochromeLit);
             }
 
             private static class DefaultParameters
@@ -38,6 +39,7 @@ namespace io.github.azukimochi
                 public static readonly float MinimumLight = 0;
                 public static readonly float DirectionalLight = 1;
                 public static readonly Color Color = Color.white;
+                public static readonly float MonochromeLit = 0;
             }
 
             public override bool TryNormalizeMaterial(Material material, LightLimitChangerObjectCache cache)
@@ -101,7 +103,7 @@ namespace io.github.azukimochi
 
                 if (container.ControlType.HasFlag(LightLimitControlType.Monochrome))
                 {
-                    container.Default.SetParameterAnimation(parameters, _MonochromeLit, 0);
+                    container.Default.SetParameterAnimation(parameters, _MonochromeLit, parameters.DefaultMonochromeLightingValue);
                     container.Control.SetParameterAnimation(parameters, _MonochromeLit, 0, 1);
                 }
 
@@ -122,6 +124,13 @@ namespace io.github.azukimochi
             {
                 min = material.GetOrDefault(PropertyIDs.MinimumLight, DefaultParameters.MinimumLight);
                 max = material.GetOrDefault(PropertyIDs.DirectionalLight, DefaultParameters.DirectionalLight);
+                return true;
+            }
+
+            public override bool TryGetMonochromeValue(Material material, out float monochrome, out float monochromeAdditive)
+            {
+                monochrome = material.GetOrDefault(PropertyIDs.MonochromeLit, DefaultParameters.MonochromeLit);
+                monochromeAdditive = 1;
                 return true;
             }
         }

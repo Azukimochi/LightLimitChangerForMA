@@ -106,5 +106,12 @@ namespace io.github.azukimochi
             max = 0;
             return false;
         }
+
+        public virtual bool TryGetMonochromeValue(Material material, out float monochrome, out float monochromeAdditive)
+        {
+            monochrome = 0;
+            monochromeAdditive = 1;
+            return false;
+        }
     }
 }
