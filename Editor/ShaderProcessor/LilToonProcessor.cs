@@ -1,11 +1,11 @@
-﻿namespace io.github.azukimochi;
+namespace io.github.azukimochi;
 
 internal sealed class LilToonProcessor : ShaderProcessor
 {
     public override string QualifiedName => BuiltinSupportedShaders.LilToon;
     public override string DisplayName => "LilToon";
 
-    public override void ConfigureGeneralAnimation(in ConfigureGeneralAnimationContext context)
+    public override void ConfigureGeneralAnimation(ConfigureGeneralAnimationContext context)
     {
         if (context.Type == GeneralControlType.MinLight)
         {

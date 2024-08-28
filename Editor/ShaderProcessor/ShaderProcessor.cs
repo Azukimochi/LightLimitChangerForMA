@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Globalization;
 using nadena.dev.modular_avatar.core;
 
@@ -35,12 +35,12 @@ internal abstract class ShaderProcessor
     /// <summary>
     /// アニメーションを設定する
     /// </summary>
-    public virtual void ConfigureGeneralAnimation(in ConfigureGeneralAnimationContext context) { }
+    public virtual void ConfigureGeneralAnimation(ConfigureGeneralAnimationContext context) { }
 
     /// <summary>
     /// シェーダー固有のアニメーションの設定
     /// </summary>
-    public virtual void ConfigureShaderSpecificAnimation(in ConfigureShaderSpecificAnimationContext context) { }
+    public virtual void ConfigureShaderSpecificAnimation(ConfigureShaderSpecificAnimationContext context) { }
 
     /// <summary>
     /// シェーダー固有のメニューを生成する
