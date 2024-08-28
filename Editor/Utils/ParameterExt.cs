@@ -8,7 +8,6 @@ internal static class ParameterExt
         {
             Enable = parameter.Enable,
             Saved = parameter.Saved,
-            Range = parameter.Range,
             Synced = parameter.Synced,
             InitialValue = parameter.InitialValue switch
             {

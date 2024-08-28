@@ -1,5 +1,4 @@
-﻿
-namespace io.github.azukimochi;
+﻿namespace io.github.azukimochi;
 
 [CustomPropertyDrawer(typeof(Parameter<>), true)]
 internal sealed class ParameterDrawer : PropertyDrawer
@@ -8,17 +7,17 @@ internal sealed class ParameterDrawer : PropertyDrawer
         => Draw(position, property, label);
 
     public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
-    {
-        return EditorGUIUtility.singleLineHeight * (property.isExpanded ? 2 : 1);
-    }
+        => GetPropertyHeight(property);
 
-    public static void Draw(Rect position, SerializedProperty property, GUIContent label)
+    public static float GetPropertyHeight(SerializedProperty property) 
+        => EditorGUIUtility.singleLineHeight * (property.isExpanded ? 2 : 1);
+
+    public static void Draw(Rect position, SerializedProperty property, GUIContent label, Vector2? range = null)
     {
         using var scope = new PropertyScope(position, label, property);
-        var valueProp = property.FindPropertyRelative("Value");
-        var rangeProp = property.FindPropertyRelative("Range");
+        var valueProp = property.FindPropertyRelative("InitialValue");
+        //var rangeProp = property.FindPropertyRelative("Range");
         var enableProp = property.FindPropertyRelative("Enable");
-        var range = rangeProp.vector2Value;
         position.height = EditorGUIUtility.singleLineHeight;
 
         EditorGUI.BeginChangeCheck();
@@ -35,10 +34,11 @@ internal sealed class ParameterDrawer : PropertyDrawer
         p.width -= EditorGUIUtility.labelWidth - EditorGUI.indentLevel * 15;
 
         EditorGUI.BeginDisabledGroup(!enable);
-        if (range != Vector2.zero)
+        if (range is { /* Not Null */ } r)
         {
             EditorGUI.BeginChangeCheck();
-            var value = EditorGUI.Slider(p, GUIContent.none, valueProp.floatValue, range.x, range.y);
+            var value = EditorGUI.Slider(p, GUIContent.none, valueProp.floatValue, r.x, r.y);
+            EditorGUI.Slider(p, GUIContent.none, property.FindPropertyRelative("OverrideValue").floatValue, r.x, r.y);
             if (EditorGUI.EndChangeCheck())
             {
                 valueProp.floatValue = value;

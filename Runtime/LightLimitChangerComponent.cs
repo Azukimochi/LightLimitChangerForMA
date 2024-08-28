@@ -35,6 +35,6 @@ namespace io.github.azukimochi
         /// <summary>
         /// 対象シェーダー
         /// </summary>
-        public SupportedShaders TargetShader = (SupportedShaders)(-1);
+        public TargetShaderContainer TargetShader = TargetShaderContainer.Everything;
     }
 }

@@ -7,13 +7,17 @@ public sealed class LightingSettings : ISettings
     /// 明るさの下限
     /// </summary>
     [RangeParameter(nameof(MinLightRange))]
-    public Parameter<float> MinLight = new(0.05f) { Range = new(0, 1) };
+    [GeneralControl(GeneralControlType.MinLight)]
+    [Range(0, 1)]
+    public Parameter<float> MinLight = 0.05f;
 
     /// <summary>
     /// 明るさの上限
     /// </summary>
     [RangeParameter(nameof(MaxLightRange))]
-    public Parameter<float> MaxLight = new(1f) { Range = new(0, 10) };
+    [GeneralControl(GeneralControlType.MaxLight)]
+    [Range(0, 10)]
+    public Parameter<float> MaxLight = 1;
 
     /// <summary>
     /// 明るさの下限の範囲
@@ -30,24 +34,30 @@ public sealed class LightingSettings : ISettings
     /// <summary>
     /// 光の色の無視具合
     /// </summary>
-    [ShaderFeature(SupportedShaders.LilToon)]
-    public Parameter<float> Monochrome = new(0) { Range = new(0, 1) };
+    [GeneralControl(GeneralControlType.Monochrome)]
+    [ShaderFeature(BuiltinSupportedShaders.LilToon)]
+    [Range(0, 1)]
+    public Parameter<float> Monochrome = 0;
 
     /// <summary>
     /// 光の無視具合
     /// </summary>
-    [ShaderFeature(SupportedShaders.LilToon)]
-    public Parameter<float> Unlit = new(0) { Range = new(0, 1) };
+    [GeneralControl(GeneralControlType.Unlit)]
+    [ShaderFeature(BuiltinSupportedShaders.LilToon)]
+    [Range(0, 10)]
+    public Parameter<float> Unlit = 0;
 
     /// <summary>
     /// 影色への環境光影響度
     /// </summary>
-    [ShaderFeature(SupportedShaders.LilToon)]
-    public Parameter<float> ShadowEnvStrength = new(0) { Range = new(0, 1) };
+    [ShaderFeature(BuiltinSupportedShaders.LilToon)]
+    [Range(0, 1)]
+    public Parameter<float> ShadowEnvStrength = 0;
 
     /// <summary>
     /// 頂点ライトの強度
     /// </summary>
-    [ShaderFeature(SupportedShaders.LilToon)]
-    public Parameter<float> VertexLightStrength = new(0) { Range = new(0, 1) };
+    [ShaderFeature(BuiltinSupportedShaders.LilToon)]
+    [Range(0, 1)]
+    public Parameter<float> VertexLightStrength = 0;
 }

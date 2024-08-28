@@ -3,8 +3,6 @@
 [Serializable]
 public abstract class Parameter 
 {
-    public Vector2 Range = Vector2.zero;
-
     /// <summary>
     /// 有効／無効
     /// </summary>
@@ -28,7 +26,14 @@ public sealed class Parameter<T> : Parameter
 
     public Parameter(T value) : this() => (InitialValue, OverrideValue) = (value, value);
 
+    /// <summary>
+    /// アニメーション用の初期値
+    /// </summary>
     public T InitialValue;
+
+    /// <summary>
+    /// 上書き用の値
+    /// </summary>
     public T OverrideValue;
 
     public static implicit operator Parameter<T>(T value) => new(value);
