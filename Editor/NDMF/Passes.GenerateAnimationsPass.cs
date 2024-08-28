@@ -50,12 +50,21 @@ namespace io.github.azukimochi
                         }
                         else
                         {
-                            // Fix for defaultMinLight and defaultMaxLight.
-                            defaultMinLight = parameters.MinLightValue * parameters.DefaultMinLightValue;
-                            defaultMaxLight = parameters.MaxLightValue * parameters.DefaultMaxLightValue;
-
                             defaultMonochromeLighting = parameters.DefaultMonochromeLightingValue;
                             defaultMonochromeAdditiveLighting = parameters.DefaultMonochromeAdditiveLightingValue;
+
+                            if (parameters.IsSeparateLightControl)
+                            {
+                                defaultMinLight = (parameters.MaxLightValue - parameters.MinLightValue) * 
+                                    parameters.DefaultMinLightValue + parameters.MinLightValue;
+                                defaultMaxLight = (parameters.MaxLightValue - parameters.MinLightValue) * 
+                                    parameters.DefaultMaxLightValue + parameters.MinLightValue;
+                            }
+                            else
+                            {
+                                defaultMinLight = parameters.MinLightValue;
+                                defaultMaxLight = parameters.MaxLightValue;
+                            }
                         }
 
                         var param = new ControlAnimationParameters(relativePath, type, min, max, defaultMinLight, defaultMaxLight, defaultMonochromeLighting, defaultMonochromeAdditiveLighting);
