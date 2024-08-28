@@ -39,6 +39,8 @@ namespace io.github.azukimochi
                 public static readonly int DissolveTextureColor = Shader.PropertyToID(_DissolveTextureColor);
                 public static readonly int DissolveToTexture = Shader.PropertyToID(_DissolveToTexture);
                 public static readonly int MainColorAdjustTexture = Shader.PropertyToID("_MainColorAdjustTexture");
+                public static readonly int MonochromeLighting = Shader.PropertyToID(_MonochromeLighting);
+                public static readonly int MonoChromeAdditiveLighting = Shader.PropertyToID(_MonoChromeAdditiveLighting);
             }
 
             private static class DefaultParameters
@@ -47,6 +49,8 @@ namespace io.github.azukimochi
                 public static readonly float LightingCap = 1;
                 public static readonly float Saturation = 0;
                 public static readonly Color Color = Color.white;
+                public static readonly float MonochromeLighting = 0;
+                public static readonly float MonoChromeAdditiveLighting = 0;
             }
 
             private const string Animated_Suffix = "Animated";
@@ -192,9 +196,9 @@ namespace io.github.azukimochi
                 }
                 if (container.ControlType.HasFlag(LightLimitControlType.Monochrome))
                 {
-                    container.Default.SetParameterAnimation(parameters, _MonochromeLighting, 0);
+                    container.Default.SetParameterAnimation(parameters, _MonochromeLighting, parameters.DefaultMonochromeLightingValue);
                     container.Control.SetParameterAnimation(parameters, _MonochromeLighting, 0, 1);
-                    container.Default.SetParameterAnimation(parameters, _MonoChromeAdditiveLighting, 0);
+                    container.Default.SetParameterAnimation(parameters, _MonoChromeAdditiveLighting, parameters.DefaultMonochromeAdditiveLightingValue);
                     container.Control.SetParameterAnimation(parameters, _MonoChromeAdditiveLighting, 0, 1);
                 }
             }
@@ -234,6 +238,13 @@ namespace io.github.azukimochi
             {
                 min = material.GetOrDefault(PropertyIDs.LightingMinLightBrightness, DefaultParameters.LightingMinLightBrightness);
                 max = material.GetOrDefault(PropertyIDs.LightingCap, DefaultParameters.LightingCap);
+                return true;
+            }
+
+            public override bool TryGetMonochromeValue(Material material, out float monochrome, out float monochromeAdditive)
+            {
+                monochrome = material.GetOrDefault(PropertyIDs.MonochromeLighting, DefaultParameters.MonochromeLighting);
+                monochromeAdditive = material.GetOrDefault(PropertyIDs.MonoChromeAdditiveLighting, DefaultParameters.MonoChromeAdditiveLighting);
                 return true;
             }
         }
