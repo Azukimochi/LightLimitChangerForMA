@@ -1,8 +1,10 @@
 ﻿namespace io.github.azukimochi;
 
 [Serializable]
-public sealed class LilToonSettings : ISettings 
+public sealed class LilToonSettings : ISettings
 {
+    string ISettings.ParameterPrefix => "LilToon";
+
     /// <summary>
     /// 影色への環境光影響度
     /// </summary>

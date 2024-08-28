@@ -3,6 +3,8 @@
 [Serializable]
 public sealed class LightingSettings : ISettings
 {
+    string ISettings.ParameterPrefix => "Light";
+
     /// <summary>
     /// 明るさの下限
     /// </summary>

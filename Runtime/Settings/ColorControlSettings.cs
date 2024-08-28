@@ -3,6 +3,8 @@
 [Serializable]
 public sealed class ColorControlSettings : ISettings
 {
+    string ISettings.ParameterPrefix => "ColorControl";
+
     /// <summary>
     /// カラー制御を有効にする
     /// </summary>

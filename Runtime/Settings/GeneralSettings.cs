@@ -3,6 +3,8 @@
 [Serializable]
 public sealed class GeneralSettings : ISettings
 {
+    string ISettings.ParameterPrefix => "";
+    
     /// <summary>
     /// アニメーションやメニューを生成する
     /// </summary>

@@ -3,6 +3,8 @@
 [Serializable]
 public sealed class EmissionControlSettings : ISettings
 {
+    string ISettings.ParameterPrefix => "Emission";
+
     /// <summary>
     /// エミッション制御を有効にする
     /// </summary>
