@@ -54,10 +54,10 @@ internal sealed class LightLimitChangerProcessor : IDisposable
 
         blendTree = new DirectBlendTree() { Name = LightLimitChanger.Title };
 
-        ConfigureAnimation(Component.General.Lighting, x => x.MinLight);
-        ConfigureAnimation(Component.General.Lighting, x => x.MaxLight);
-        ConfigureAnimation(Component.General.Lighting, x => x.Monochrome);
-        ConfigureAnimation(Component.General.Lighting, x => x.Unlit);
+        ConfigureAnimation(Component.General.LightingControl, x => x.MinLight);
+        ConfigureAnimation(Component.General.LightingControl, x => x.MaxLight);
+        ConfigureAnimation(Component.General.LightingControl, x => x.Monochrome);
+        ConfigureAnimation(Component.General.LightingControl, x => x.Unlit);
 
         var animatorController = new AnimatorController() { name = LightLimitChanger.Title };
         AssetDatabase.AddObjectToAsset(animatorController, AssetContainer);

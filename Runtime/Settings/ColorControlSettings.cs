@@ -19,4 +19,8 @@ public sealed class ColorControlSettings : ISettings
     [GeneralControl(GeneralControlType.ColorControlBrightness)]
     [Range(0, 2)]
     public Parameter<float> Brightness = 1;
+
+    [GeneralControl(GeneralControlType.ColorControlGamma)]
+    [Range(0.01f, 2)]
+    public Parameter<float> Gamma = 1;
 }

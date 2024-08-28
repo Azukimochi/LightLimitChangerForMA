@@ -12,6 +12,7 @@ public enum GeneralControlType
     ColorControlHue,
     ColorControlSaturation,
     ColorControlBrightness,
+    ColorControlGamma,
 
     // Emission
     EmissionStrength,

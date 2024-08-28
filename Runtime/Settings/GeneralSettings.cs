@@ -18,7 +18,7 @@ public sealed class GeneralSettings : ISettings
     /// </summary>
     public bool OverwriteMeshSettings = true;
 
-    public LightingSettings Lighting = new();
+    public LightingSettings LightingControl = new();
     public ColorControlSettings ColorControl = new();
     public EmissionControlSettings EmissionControl = new();
 }
