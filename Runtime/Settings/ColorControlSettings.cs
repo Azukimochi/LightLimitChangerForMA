@@ -1,4 +1,4 @@
-namespace io.github.azukimochi;
+﻿namespace io.github.azukimochi;
 
 [Serializable]
 public sealed class ColorControlSettings : ISettings

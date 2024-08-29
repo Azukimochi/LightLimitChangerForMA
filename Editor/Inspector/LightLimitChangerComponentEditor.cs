@@ -155,7 +155,7 @@ internal sealed class LightLimitChangerComponentEditor : Editor
     {
         public static Lazy<GUIContent[]> TabToggles = new Lazy<GUIContent[]>(() =>
         {
-            return System.Enum.GetNames(typeof(Tab)).Select(x => new GUIContent(x)).ToArray();
+            return Enum.GetNames(typeof(Tab)).Select(x => new GUIContent(x)).ToArray();
         }, false);
         
         public static Lazy<GUIStyle> Foldoutbackground = new Lazy<GUIStyle>(() =>

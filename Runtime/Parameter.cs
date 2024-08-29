@@ -24,19 +24,31 @@ public sealed class Parameter<T> : Parameter
 {
     public Parameter() { }
 
-    public Parameter(T value) : this() => (InitialValue, OverrideValue) = (value, value);
+    public Parameter(T value) : this() => (InitialValue, OverrideValue) = (ToFloatValue(value), ToFloatValue(value));
 
     /// <summary>
     /// アニメーション用の初期値
     /// </summary>
-    public T InitialValue;
+    public float InitialValue;
 
     /// <summary>
     /// 上書き用の値
     /// </summary>
-    public T OverrideValue;
+    public float OverrideValue;
+
+    private static float ToFloatValue(T value)
+    {
+        if (typeof(T) == typeof(float))
+            return (float)(object)value;
+
+        if (typeof(T) == typeof(int))
+            return (int)(object)value;
+
+        if (typeof(T) == typeof(bool))
+            return (bool)(object)value ? 1 : 0;
+
+        return float.NaN;
+    }
 
     public static implicit operator Parameter<T>(T value) => new(value);
-
-    public void Deconstruct(out T initialValue, out T overrideValue) => (initialValue, overrideValue) = (InitialValue, OverrideValue);
 }

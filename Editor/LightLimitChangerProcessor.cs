@@ -11,6 +11,7 @@ using UnityEditor.Animations;
 using UnityEngine;
 using VRC.Core;
 using VRC.SDK3.Avatars.Components;
+using VRC.SDK3.Avatars.ScriptableObjects;
 
 namespace io.github.azukimochi;
 
@@ -23,7 +24,9 @@ internal sealed class LightLimitChangerProcessor : IDisposable
     private readonly BuildContext context;
     private readonly Dictionary<Object, Object> cache = new();
     private readonly List<ShaderProcessor> processors = new();
+    private readonly HashSet<ParameterConfig> avatarParameters = new();
 
+    private ModularAvatarMenuItem menuRoot;
     private DirectBlendTree blendTree;
     private Renderer[] targetRenderers;
 
@@ -52,79 +55,145 @@ internal sealed class LightLimitChangerProcessor : IDisposable
             .Where(x => !excludes.Contains(x.gameObject))
             .ToArray();
 
+        var llcObject = Component.gameObject;
         blendTree = new DirectBlendTree() { Name = LightLimitChanger.Title };
-
-        ConfigureAnimation(Component.General.LightingControl, x => x.MinLight);
-        ConfigureAnimation(Component.General.LightingControl, x => x.MaxLight);
-        ConfigureAnimation(Component.General.LightingControl, x => x.Monochrome);
-        ConfigureAnimation(Component.General.LightingControl, x => x.Unlit);
 
         var animatorController = new AnimatorController() { name = LightLimitChanger.Title };
         AssetDatabase.AddObjectToAsset(animatorController, AssetContainer);
+        animatorController.AddParameter(new() { defaultFloat = 1, name = "1", type = AnimatorControllerParameterType.Float });
 
-        var llcObject = Component.gameObject;
         var mama = llcObject.GetOrAddComponent<ModularAvatarMergeAnimator>();
         mama.animator = animatorController;
         mama.matchAvatarWriteDefaults = Component.WriteDefaults == WriteDefaultsSetting.MatchAvatar;
         mama.layerType = VRCAvatarDescriptor.AnimLayerType.FX;
         mama.pathMode = MergeAnimatorPathMode.Absolute;
         mama.deleteAttachedAnimator = true;
+        
+        if (!llcObject.TryGetComponent<ModularAvatarMenuInstaller>(out var mami))
+        {
+            mami = llcObject.AddComponent<ModularAvatarMenuInstaller>();
+        }
+        
+        var mam = llcObject.AddComponent<ModularAvatarMenuItem>();
+        mam.Control.type = VRCExpressionsMenu.Control.ControlType.SubMenu;
+        mam.MenuSource = SubmenuSource.Children;
+        menuRoot = mam;
+
+        ConfigureSettings(Component.General.LightingControl);
+        ConfigureSettings(Component.General.ColorControl);
+        ConfigureSettings(Component.General.EmissionControl);
+
+        ConfigureSettings(Component.LilToon);
+        ConfigureSettings(Component.Poiyomi);
+
+        var mapa = llcObject.GetOrAddComponent<ModularAvatarParameters>();
+        mapa.parameters.AddRange(avatarParameters);
+
+
+        foreach (var parameter in mapa.parameters.AsSpan())
+        {
+            animatorController.AddParameter(new AnimatorControllerParameter()
+            {
+                name = parameter.nameOrPrefix,
+                defaultFloat = parameter.defaultValue,
+                defaultBool = parameter.defaultValue != 0,
+                defaultInt = (int)parameter.defaultValue,
+                type = parameter.syncType switch 
+                {
+                    ParameterSyncType.Int => AnimatorControllerParameterType.Int,
+                    ParameterSyncType.Bool => AnimatorControllerParameterType.Bool,
+                    ParameterSyncType.Float => AnimatorControllerParameterType.Float,
+                    _ => default,
+                },
+            });
+        }
 
         animatorController.AddLayer(blendTree.ToAnimatorControllerLayer(animatorController));
-
     }
 
-    private bool ConfigureAnimation<TSettings, T>(TSettings settings, Expression<Func<TSettings, Parameter<T>>> parameterSelector) where TSettings : ISettings
+    private void ConfigureSettings<TSettings>(TSettings settings) where TSettings : ISettings
     {
-        var targetField = (parameterSelector.Body as MemberExpression).Member as FieldInfo;
-        var parameter = targetField.GetValue(settings) as Parameter<T>;
-        Vector2 range = default;
-
-        if (targetField.GetCustomAttribute<RangeParameterAttribute>() is { } rangeAttr)
+        var fields = typeof(TSettings).GetFields(BindingFlags.Instance | BindingFlags.Public);
+        foreach(var field in fields)
         {
-            var val = typeof(TSettings).GetField(rangeAttr.ParameterName)?.GetValue(settings) ?? null;
-            if (val is Vector2 v)
-                range = v;
-        }
+            if (field.FieldType.BaseType != typeof(Parameter))
+                continue;
 
-        if (!parameter.Enable)
-            return false;
+            var t = field.FieldType.GenericTypeArguments[0];
+            var parameter = field.GetValue(settings) as Parameter<float>;
+            Vector2 range = Vector2.up;
 
-        var name = targetField.Name;
-
-        var tree = blendTree.AddMotionTime(name);
-        var anim = tree.Animation = new AnimationClip() { name = $"{LightLimitChanger.Title} {name}" };
-        AssetDatabase.AddObjectToAsset(anim, AssetContainer);
-
-        var generalType = targetField.GetCustomAttribute<GeneralControlAttribute>()?.Type ?? default;
-        var shaderFeatureAttr = targetField.GetCustomAttribute<ShaderFeatureAttribute>();
-
-        foreach (var processor in processors.AsSpan())
-        {
-            var context = new ConfigureGeneralAnimationContext()
+            if (field.GetCustomAttribute<RangeParameterAttribute>() is { } rangeParamAttr)
             {
-                Name = name,
-                Renderers = targetRenderers,
-                AnimationClip = anim,
-                Parameter = parameter.ToFloat(),
-                Range = range,
-                Type = generalType,
+                var val = typeof(TSettings).GetField(rangeParamAttr.ParameterName)?.GetValue(settings) ?? null;
+                if (val is Vector2 v)
+                    range = v;
+            }
+            else if (field.GetCustomAttribute<RangeAttribute>() is { } rangeAttr)
+            {
+                range = new(rangeAttr.Min, rangeAttr.Max);
+            }
+
+            if (!parameter.Enable)
+                continue;
+
+            var name = field.Name;
+
+            var group = blendTree.Items.FirstOrDefault(x => x is DirectBlendTree d && d.Name == settings.ParameterPrefix) as DirectBlendTree ?? blendTree.AddDirectBlendTree(settings.ParameterPrefix);
+            var tree = group.AddMotionTime(name);
+            var anim = tree.Animation = new AnimationClip() { name = $"{LightLimitChanger.Title} {name}" };
+            AssetDatabase.AddObjectToAsset(anim, AssetContainer);
+
+            var avatarParameter = new ParameterConfig()
+            {
+                nameOrPrefix = $"{settings.ParameterPrefix}{field.Name}",
+                defaultValue = NormalizeInRange(parameter.InitialValue, range.x, range.y),
+                syncType = 
+                    t == typeof(bool) ? ParameterSyncType.Bool : 
+                    t == typeof(int) ? ParameterSyncType.Int : 
+                    t == typeof(float) ? ParameterSyncType.Float : 
+                    ParameterSyncType.NotSynced,
+                saved = parameter.Saved,
+                localOnly = !parameter.Synced,
             };
+            tree.ParameterName = avatarParameter.nameOrPrefix;
+            avatarParameters.Add(avatarParameter);
 
-            if (shaderFeatureAttr is null)
-            {
-                processor.ConfigureGeneralAnimation(context);
-            }
-            else
-            {
-                var names = shaderFeatureAttr.QualifiedNames;
-                if (!names.Contains(processor.QualifiedName))
-                    continue;
+            var generalType = field.GetCustomAttribute<GeneralControlAttribute>()?.Type ?? default;
+            var shaderFeatureAttr = field.GetCustomAttribute<ShaderFeatureAttribute>();
 
-                processor.ConfigureShaderSpecificAnimation(Unsafe.As<ConfigureGeneralAnimationContext, ConfigureShaderSpecificAnimationContext>(ref context));
+            foreach (var processor in processors.AsSpan())
+            {
+                var context = new ConfigureGeneralAnimationContext()
+                {
+                    Name = name,
+                    Renderers = targetRenderers,
+                    AnimationClip = anim,
+                    AvatarParameter = avatarParameter,
+                    Range = range,
+                    Type = generalType,
+                };
+
+                if (shaderFeatureAttr is null)
+                {
+                    processor.ConfigureGeneralAnimation(context);
+                }
+                else
+                {
+                    var names = shaderFeatureAttr.QualifiedNames;
+                    if (!names.Contains(processor.QualifiedName))
+                        continue;
+
+                    processor.ConfigureShaderSpecificAnimation(context);
+                }
+                menuRoot.GetOrAdd($"{settings.DisplayName}/{name}", menu => (VRCExpressionsMenu.Control.ControlType.RadialPuppet, avatarParameter.nameOrPrefix));
             }
         }
-        return true;
+    }
+
+    private void ConfigureAnimation<TSettings>(FieldInfo parameter) where TSettings : ISettings
+    {
+
     }
 
     private void CloneMaterials()
@@ -156,7 +225,7 @@ internal sealed class LightLimitChangerProcessor : IDisposable
                         {
                             foreach(var processor in processors)
                             {
-
+                                processor.OnMaterialCloned(mat);
                             }
                         }
                         else if (obj is RuntimeAnimatorController runtimeAnimatorController)
@@ -214,8 +283,11 @@ internal sealed class LightLimitChangerProcessor : IDisposable
     public LightLimitChangerProcessor AddProcessor<T>() where T : ShaderProcessor, new()
     {
         var t = new T();
-        t.Initialize(this);
+        (t as IShaderProcessor).Initialize(this);
         processors.Add(t);
         return this;
     }
+
+    private static float NormalizeInRange(float value, float min, float max)
+        => (value - min) / (max - min);
 }

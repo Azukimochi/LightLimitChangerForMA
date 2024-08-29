@@ -1,23 +1,36 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Globalization;
 using nadena.dev.modular_avatar.core;
 
 namespace io.github.azukimochi;
 
-internal abstract class ShaderProcessor
+internal interface IShaderProcessor
 {
+    void Initialize(LightLimitChangerProcessor processor);
+}
+
+internal abstract class ShaderProcessor : IShaderProcessor
+{
+    protected const string MaterialAnimationKeyPrefix = "material.";
+
     protected LightLimitChangerProcessor Processor => processor;
     private LightLimitChangerProcessor processor;
 
-    public virtual void Initialize(LightLimitChangerProcessor processor) 
+    void IShaderProcessor.Initialize(LightLimitChangerProcessor processor) 
     { 
         this.processor = processor;
     }
 
+    /// <summary>
+    /// プロセッサーのID
+    /// </summary>
     public abstract string QualifiedName { get; }
 
+    /// <summary>
+    /// 表示名　いつか使うかも
+    /// </summary>
     public virtual string DisplayName => CultureInfo.InvariantCulture.TextInfo.ToTitleCase(QualifiedName);
-
+    
     /// <summary>
     /// 入力されたマテリアルが対象かどうかを判定する
     /// </summary>

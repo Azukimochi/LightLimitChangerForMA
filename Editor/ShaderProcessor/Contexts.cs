@@ -18,7 +18,7 @@ internal class ConfigureShaderSpecificAnimationContext
     public ParameterConfig AvatarParameter { get; init; }
     public AnimationClip AnimationClip { get; init; }
     public ReadOnlyMemory<Renderer> Renderers { get; init; }
-    public Vector2? Range { get; init; }
+    public Vector2 Range { get; init; }
 }
 
 internal sealed class ConfigureGeneralAnimationContext : ConfigureShaderSpecificAnimationContext

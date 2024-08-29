@@ -1,4 +1,5 @@
-﻿using nadena.dev.ndmf;
+﻿using System.Diagnostics;
+using nadena.dev.ndmf;
 using UnityEngine;
 
 [assembly: ExportsPlugin(typeof(io.github.azukimochi.LightLimitChanger))]
@@ -17,20 +18,46 @@ namespace io.github.azukimochi
 
         public override Color? ThemeColor => new Color(0.0f, 0.2f, 0.8f);
 
+
+
         protected override void Configure()
         {
-            InPhase(BuildPhase.Transforming).Run(DisplayName, Run);
+            InPhase(BuildPhase.Transforming)
+                .BeforePlugin(ModularAvatarQualifiedName)
+                .Run(DisplayName, Run);
         }
 
         private void Run(BuildContext context)
         {
             using var processor = new LightLimitChangerProcessor(context);
-            if (processor.Component.TargetShader.Contains(BuiltinSupportedShaders.LilToon))
+            ConfigureBuiltinProcessors(processor);
+
+            processor.Run();
+        }
+
+        private void ConfigureBuiltinProcessors(LightLimitChangerProcessor processor)
+        {
+            var targetShader = processor.Component.TargetShader;
+
+            if (targetShader.Contains(BuiltinSupportedShaders.LilToon))
             {
                 processor.AddProcessor<LilToonProcessor>();
             }
 
-            processor.Run();
+            if (targetShader.Contains(BuiltinSupportedShaders.Poiyomi))
+            {
+                processor.AddProcessor<PoiyomiProcessor>();
+            }
+
+            if (targetShader.Contains(BuiltinSupportedShaders.Sunao))
+            {
+                processor.AddProcessor<SunaoProcessor>();
+            }
+
+            if (targetShader.Contains(BuiltinSupportedShaders.UnlitWF))
+            {
+                processor.AddProcessor<UnlitWFProcessor>();
+            }
         }
     }
 }

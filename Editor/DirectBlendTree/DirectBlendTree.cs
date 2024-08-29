@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEditor.Animations;
 using System;
+using io.github.azukimochi;
 
 namespace gomoru.su
 {
@@ -12,6 +13,8 @@ namespace gomoru.su
         public string Name { get; set; }
 
         public string ParameterName { get; }
+
+        public IEnumerable<IDirectBlendTreeItem> Items => _items;
 
         public DirectBlendTree(string parameterName = "1")
         {

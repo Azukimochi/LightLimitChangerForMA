@@ -1,4 +1,4 @@
-namespace io.github.azukimochi;
+﻿namespace io.github.azukimochi;
 
 [Serializable]
 public sealed class LightingSettings : ISettings
@@ -39,7 +39,6 @@ public sealed class LightingSettings : ISettings
     /// 光の色の無視具合
     /// </summary>
     [GeneralControl(GeneralControlType.Monochrome)]
-    [ShaderFeature(BuiltinSupportedShaders.LilToon)]
     [Range(0, 1)]
     public Parameter<float> Monochrome = 0;
 
@@ -47,7 +46,6 @@ public sealed class LightingSettings : ISettings
     /// 光の無視具合
     /// </summary>
     [GeneralControl(GeneralControlType.Unlit)]
-    [ShaderFeature(BuiltinSupportedShaders.LilToon)]
     [Range(0, 10)]
     public Parameter<float> Unlit = 0;
 }
