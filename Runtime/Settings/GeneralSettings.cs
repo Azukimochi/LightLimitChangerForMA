@@ -1,10 +1,8 @@
 ﻿namespace io.github.azukimochi;
 
 [Serializable]
-public sealed class GeneralSettings : ISettings
+public sealed class GeneralSettings
 {
-    string ISettings.ParameterPrefix => "";
-    
     /// <summary>
     /// アニメーションやメニューを生成する
     /// </summary>

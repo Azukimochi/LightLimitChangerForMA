@@ -1,9 +1,11 @@
-﻿namespace io.github.azukimochi;
+namespace io.github.azukimochi;
 
 [Serializable]
 public sealed class LightingSettings : ISettings
 {
     string ISettings.ParameterPrefix => "Light";
+
+    string ISettings.DisplayName => "Lighting";
 
     /// <summary>
     /// 明るさの下限

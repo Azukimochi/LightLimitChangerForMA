@@ -5,6 +5,8 @@ public sealed class EmissionControlSettings : ISettings
 {
     string ISettings.ParameterPrefix => "Emission";
 
+    string ISettings.DisplayName => "Emission";
+
     /// <summary>
     /// エミッション制御を有効にする
     /// </summary>

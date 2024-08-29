@@ -1,14 +1,11 @@
-﻿namespace io.github.azukimochi;
+namespace io.github.azukimochi;
 
 [Serializable]
 public sealed class ColorControlSettings : ISettings
 {
-    string ISettings.ParameterPrefix => "ColorControl";
+    string ISettings.ParameterPrefix => "Color";
 
-    /// <summary>
-    /// カラー制御を有効にする
-    /// </summary>
-    public bool AllowColorControl = false;
+    string ISettings.DisplayName => "Color Control";
 
     [GeneralControl(GeneralControlType.ColorControlHue)]
     [Range(-1, 1)]

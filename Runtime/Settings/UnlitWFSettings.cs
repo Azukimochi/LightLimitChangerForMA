@@ -4,4 +4,6 @@
 public sealed class UnlitWFSettings : ISettings
 {
     string ISettings.ParameterPrefix => "UnlitWF";
+
+    string ISettings.DisplayName => "UnlitWF";
 }

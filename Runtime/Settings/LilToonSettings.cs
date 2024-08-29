@@ -5,6 +5,8 @@ public sealed class LilToonSettings : ISettings
 {
     string ISettings.ParameterPrefix => "LilToon";
 
+    string ISettings.DisplayName => "LilToon";
+
     /// <summary>
     /// 影色への環境光影響度
     /// </summary>
