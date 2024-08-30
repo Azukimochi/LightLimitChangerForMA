@@ -14,7 +14,6 @@ public sealed class LightingSettings : ISettings
     [RangeParameter(nameof(MinLightRange))]
     [GeneralControl(GeneralControlType.MinLight)]
     [MenuIcon(Icons.Light_Min)]
-    [Range(0, 1)]
     public Parameter<float> MinLight = 0.05f;
 
     /// <summary>
@@ -23,7 +22,6 @@ public sealed class LightingSettings : ISettings
     [RangeParameter(nameof(MaxLightRange))]
     [GeneralControl(GeneralControlType.MaxLight)]
     [MenuIcon(Icons.Light_Max)]
-    [Range(0, 10)]
     public Parameter<float> MaxLight = 1;
 
     /// <summary>

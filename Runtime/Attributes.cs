@@ -19,7 +19,7 @@ internal sealed class MinMaxSliderAttribute : PropertyAttribute
 }
 
 [AttributeUsage(AttributeTargets.Field)]
-internal sealed class RangeParameterAttribute : Attribute
+internal sealed class RangeParameterAttribute : PropertyAttribute
 {
     public RangeParameterAttribute(string parameterName) => ParameterName = parameterName;
 
