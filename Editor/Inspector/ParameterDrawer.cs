@@ -3,6 +3,9 @@
 [CustomPropertyDrawer(typeof(Parameter<>), true)]
 internal sealed class ParameterDrawer : PropertyDrawer
 {
+    private static readonly Lazy<Vector2> FoldoutStyleSize =
+        new(() => EditorStyles.foldout.CalcSize(GUIContent.none), false);
+
     public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         => Draw(position, property, label);
 
@@ -12,10 +15,16 @@ internal sealed class ParameterDrawer : PropertyDrawer
     public static float GetPropertyHeight(SerializedProperty property) 
         => EditorGUIUtility.singleLineHeight * (property.isExpanded && LightLimitChangerComponentEditor.SelectedTab != LightLimitChangerComponentEditor.Tab.BasicSettings ? 2 : 1) ;
 
-    public static void Draw(Rect position, SerializedProperty property, GUIContent label, Vector2? range = null)
+    public static void DrawLayout(SerializedProperty property, GUIContent label, Vector2? range = null, bool isOverrideValue = false)
+    {
+        var position = EditorGUILayout.GetControlRect(label != null, GetPropertyHeight(property));
+        Draw(position, property, label, range, isOverrideValue);
+    }
+
+    public static void Draw(Rect position, SerializedProperty property, GUIContent label, Vector2? range = null, bool isOverrideValue = false)
     {
         using var scope = new PropertyScope(position, label, property);
-        var valueProp = property.FindPropertyRelative("InitialValue");
+        var valueProp = property.FindPropertyRelative(isOverrideValue ? "OverrideValue" : "InitialValue");
         //var rangeProp = property.FindPropertyRelative("Range");
         var enableProp = property.FindPropertyRelative("Enable");
         position.height = EditorGUIUtility.singleLineHeight;
@@ -31,7 +40,8 @@ internal sealed class ParameterDrawer : PropertyDrawer
         }
         else
         {
-            EditorGUI.LabelField(p, scope.Label);
+            p.x += FoldoutStyleSize.Value.x;
+            property.isExpanded = EditorGUI.Foldout(p, property.isExpanded, scope.Label);
             enable = enableProp.boolValue;
         }
 
@@ -66,6 +76,7 @@ internal sealed class ParameterDrawer : PropertyDrawer
 
         if (!property.isExpanded || LightLimitChangerComponentEditor.SelectedTab == LightLimitChangerComponentEditor.Tab.BasicSettings)
             return;
+
         EditorGUI.indentLevel++;
         position.y += EditorGUIUtility.singleLineHeight;
         position.x += EditorGUIUtility.labelWidth + 30;

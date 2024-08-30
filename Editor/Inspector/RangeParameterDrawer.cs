@@ -15,11 +15,11 @@ internal sealed class RangeParameterDrawer : PropertyDrawer
         var idx = path.LastIndexOf(".");
         if (idx == -1)
             return;
-        string propertyPath = string.Create(idx + 1 + attr.ParameterName.Length, (Memory: path.AsMemory(0, idx), attr.ParameterName), (span, state) =>
+        idx += 1;
+        string propertyPath = string.Create(idx + attr.ParameterName.Length, (Memory: path.AsMemory(0, idx), attr.ParameterName), (span, state) =>
         {
             state.Memory.Span.CopyTo(span);
-            span[state.Memory.Length] = '.';
-            state.ParameterName.AsSpan().CopyTo(span.Slice(state.Memory.Length + 1));
+            state.ParameterName.AsSpan().CopyTo(span[state.Memory.Length..]);
         });
 
         var rangeParameter = property.serializedObject.FindProperty(propertyPath);
