@@ -1,6 +1,7 @@
 ﻿namespace io.github.azukimochi;
 
 [Serializable]
+[MenuIcon(Icons.Light)]
 public sealed class LightingSettings : ISettings
 {
     string ISettings.ParameterPrefix => "Light";
@@ -12,6 +13,7 @@ public sealed class LightingSettings : ISettings
     /// </summary>
     [RangeParameter(nameof(MinLightRange))]
     [GeneralControl(GeneralControlType.MinLight)]
+    [MenuIcon(Icons.Light_Min)]
     [Range(0, 1)]
     public Parameter<float> MinLight = 0.05f;
 
@@ -20,6 +22,7 @@ public sealed class LightingSettings : ISettings
     /// </summary>
     [RangeParameter(nameof(MaxLightRange))]
     [GeneralControl(GeneralControlType.MaxLight)]
+    [MenuIcon(Icons.Light_Max)]
     [Range(0, 10)]
     public Parameter<float> MaxLight = 1;
 
@@ -39,6 +42,7 @@ public sealed class LightingSettings : ISettings
     /// 光の色の無視具合
     /// </summary>
     [GeneralControl(GeneralControlType.Monochrome)]
+    [MenuIcon(Icons.Monochrome)]
     [Range(0, 1)]
     public Parameter<float> Monochrome = 0;
 
@@ -46,6 +50,7 @@ public sealed class LightingSettings : ISettings
     /// 光の無視具合
     /// </summary>
     [GeneralControl(GeneralControlType.Unlit)]
+    [MenuIcon(Icons.Unlit)]
     [Range(0, 10)]
     public Parameter<float> Unlit = 0;
 }

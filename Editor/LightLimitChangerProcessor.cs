@@ -89,7 +89,6 @@ internal sealed class LightLimitChangerProcessor : IDisposable
         var mapa = llcObject.GetOrAddComponent<ModularAvatarParameters>();
         mapa.parameters.AddRange(avatarParameters);
 
-
         foreach (var parameter in mapa.parameters.AsSpan())
         {
             animatorController.AddParameter(new AnimatorControllerParameter()
@@ -113,6 +112,12 @@ internal sealed class LightLimitChangerProcessor : IDisposable
 
     private void ConfigureSettings<TSettings>(TSettings settings) where TSettings : ISettings
     {
+        var menuGroup = menuRoot.GetOrAdd(settings.DisplayName);
+        if (typeof(TSettings).GetCustomAttribute<MenuIconAttribute>() is { } groupIconAttr)
+        {
+            menuGroup.Control.icon = AssetUtils.FromGUID<Texture2D>(groupIconAttr.Guid);
+        }
+
         var fields = typeof(TSettings).GetFields(BindingFlags.Instance | BindingFlags.Public);
         foreach(var field in fields)
         {
@@ -186,7 +191,11 @@ internal sealed class LightLimitChangerProcessor : IDisposable
 
                     processor.ConfigureShaderSpecificAnimation(context);
                 }
-                menuRoot.GetOrAdd($"{settings.DisplayName}/{name}", menu => (VRCExpressionsMenu.Control.ControlType.RadialPuppet, avatarParameter.nameOrPrefix));
+                var menuItem = menuGroup.GetOrAdd(name, menu => (VRCExpressionsMenu.Control.ControlType.RadialPuppet, avatarParameter.nameOrPrefix));
+                if (menuItem.Control.icon == null && field.GetCustomAttribute<MenuIconAttribute>() is { } iconAttr)
+                {
+                    menuItem.Control.icon = AssetUtils.FromGUID<Texture2D>(iconAttr.Guid);
+                }
             }
         }
     }

@@ -5,7 +5,7 @@ using MenuItem = nadena.dev.modular_avatar.core.ModularAvatarMenuItem;
 
 internal static class MenuItemExt
 {
-    public static MenuItem GetOrAdd(this MenuItem menu, string path, Func<MenuItem, (VRCExpressionsMenu.Control.ControlType ControlType, string ParameterName)> factory)
+    public static MenuItem GetOrAdd(this MenuItem menu, string path, Func<MenuItem, (VRCExpressionsMenu.Control.ControlType ControlType, string ParameterName)> factory = null)
     {
         var split = path.Split("/");
         bool flag = false;
@@ -30,7 +30,7 @@ internal static class MenuItemExt
             }
         }
 
-        if (!flag)
+        if (!flag || factory is null)
             return menu;
 
         var (type, param) = factory(menu);

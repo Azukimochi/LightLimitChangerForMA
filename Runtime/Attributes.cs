@@ -18,6 +18,7 @@ internal sealed class MinMaxSliderAttribute : PropertyAttribute
     public float Max { get; }
 }
 
+[AttributeUsage(AttributeTargets.Field)]
 internal sealed class RangeParameterAttribute : Attribute
 {
     public RangeParameterAttribute(string parameterName) => ParameterName = parameterName;
@@ -25,6 +26,7 @@ internal sealed class RangeParameterAttribute : Attribute
     public string ParameterName { get; }
 }
 
+[AttributeUsage(AttributeTargets.Field)]
 internal sealed class RangeAttribute : PropertyAttribute
 {
     public RangeAttribute(float min, float max) => (Min, Max) = (min, max);
@@ -34,9 +36,18 @@ internal sealed class RangeAttribute : PropertyAttribute
     public float Max { get; }
 }
 
+[AttributeUsage(AttributeTargets.Field)]
 internal sealed class GeneralControlAttribute : Attribute
 {
     public GeneralControlAttribute(GeneralControlType type) => Type = type;
 
     public GeneralControlType Type { get; }
+}
+
+[AttributeUsage(AttributeTargets.Class | AttributeTargets.Field)]
+internal sealed class MenuIconAttribute : Attribute
+{
+    public MenuIconAttribute(string guid) => Guid = guid;
+
+    public string Guid { get; }
 }
