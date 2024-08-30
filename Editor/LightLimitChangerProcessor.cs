@@ -108,6 +108,8 @@ internal sealed class LightLimitChangerProcessor : IDisposable
         }
 
         animatorController.AddLayer(blendTree.ToAnimatorControllerLayer(animatorController));
+
+        RemoveEmptySubMenus(menuRoot);
     }
 
     private void ConfigureSettings<TSettings>(TSettings settings) where TSettings : ISettings
@@ -200,9 +202,22 @@ internal sealed class LightLimitChangerProcessor : IDisposable
         }
     }
 
-    private void ConfigureAnimation<TSettings>(FieldInfo parameter) where TSettings : ISettings
+    private static void RemoveEmptySubMenus(MAMenuItem menu)
     {
+        if (menu.Control.type != VRCExpressionsMenu.Control.ControlType.SubMenu)
+            return;
 
+        var children = menu.transform.Cast<Transform>().Select(x => x.GetComponent<MAMenuItem>()).Where(x => x != null);
+        if (!children.Any())
+        {
+            Object.DestroyImmediate(menu);
+            return;
+        }
+
+        foreach(var child in  children)
+        {
+            RemoveEmptySubMenus(child);
+        }
     }
 
     private void CloneMaterials()
