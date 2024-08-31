@@ -36,7 +36,7 @@ internal sealed class LightLimitChangerComponentEditor : Editor
             GUILayout.FlexibleSpace();
         }
         EditorGUILayout.Space();
-        CategoryLabelStyle("General Settings");
+        CategoryLabel("General Settings");
         EditorGUILayout.Space();
         EditorGUILayout.PropertyField(serializedObject.FindProperty("General.AllowParameterController"));
         EditorGUILayout.PropertyField(serializedObject.FindProperty("General.OverwriteMaterialParameters"));
@@ -45,17 +45,31 @@ internal sealed class LightLimitChangerComponentEditor : Editor
 
         DoFoldoutedGroup(serializedObject.FindProperty("General.LightingControl"), "Lighting Settings", static property =>
         {
-            ControledParameterField(property.FindPropertyRelative("MaxLight"));
-
+            EditorGUILayout.PropertyField(property.FindPropertyRelative("MaxLight"));
             DescriptionHelpBox("明るさの上限値");
+
+            using (DisableScope.If(!property.FindPropertyRelative("MaxLight.Enable").boolValue))
+            {
+                EditorGUILayout.PropertyField(property.FindPropertyRelative("MaxLightRange"));
+                DescriptionHelpBox("明るさの上限の範囲");
+            }
+
+            EditorGUILayout.Space();
+
             EditorGUILayout.PropertyField(property.FindPropertyRelative("MinLight"));
             DescriptionHelpBox("明るさの下限値");
-            EditorGUILayout.PropertyField(property.FindPropertyRelative("MaxLightRange"));
-            DescriptionHelpBox("明るさの上限の範囲");
-            EditorGUILayout.PropertyField(property.FindPropertyRelative("MinLightRange"));
-            DescriptionHelpBox("明るさの下限の範囲");
+
+            using (DisableScope.If(!property.FindPropertyRelative("MinLight.Enable").boolValue))
+            {
+                EditorGUILayout.PropertyField(property.FindPropertyRelative("MinLightRange"));
+                DescriptionHelpBox("明るさの下限の範囲");
+            }
+
+            EditorGUILayout.Space();
+
             EditorGUILayout.PropertyField(property.FindPropertyRelative("Monochrome"));
             DescriptionHelpBox("環境強のモノクロ化の度合いの初期値");
+
             EditorGUILayout.PropertyField(property.FindPropertyRelative("Unlit"));
             DescriptionHelpBox("環境強の無視具合の初期値");
         });
@@ -74,7 +88,7 @@ internal sealed class LightLimitChangerComponentEditor : Editor
         });
 
 
-        CategoryLabelStyle("Shader Settings");
+        CategoryLabel("Shader Settings");
         EditorGUILayout.Space();
 
         DoFoldoutedGroup(serializedObject.FindProperty("LilToon"), "lilToon Settings", static property =>
@@ -141,48 +155,12 @@ internal sealed class LightLimitChangerComponentEditor : Editor
             EditorGUILayout.Space();
     }
 
-    private static class Styles
-    {
-        public static Lazy<GUIContent[]> TabToggles = new Lazy<GUIContent[]>(() =>
-        {
-            return Enum.GetNames(typeof(Tab)).Select(x => new GUIContent(x)).ToArray();
-        }, false);
-        
-        public static Lazy<GUIStyle> Foldoutbackground = new Lazy<GUIStyle>(() =>
-        {
-            var style = new GUIStyle("HelpBox");
-            style.margin = new RectOffset(15, 0, 0, 0);
-            return style;
-        }, false);
-        
-        public static readonly GUIStyle TabButtonStyle = "LargeButton";
+    private static void CategoryLabel(string title) => EditorGUILayout.LabelField(title, Styles.CategoryLabel.Value);
 
-        // GUI.ToolbarButtonSize.FitToContentsも設定できる
-        public static readonly GUI.ToolbarButtonSize TabButtonSize = GUI.ToolbarButtonSize.Fixed;
-
-        public static readonly Lazy<GUIStyle> Foldout = new(() => new GUIStyle("ShurikenModuleTitle")
-        {
-            font = EditorStyles.label.font,
-            border = new RectOffset(15, 7, 4, 4),
-            fixedHeight = 22,
-            contentOffset = new Vector2(20f, -2f),
-            fontSize = 12
-        }, isThreadSafe: false);
-    }
-    private static void CategoryLabelStyle(string title)
-    {
-        
-        GUIStyle label = new GUIStyle(EditorStyles.label);
-        label.fontStyle = FontStyle.Bold;
-        label.normal.textColor = Color.white;
-        label.fontSize = 14;
-        EditorGUILayout.LabelField(title, label);
-    }
-    
     private static bool Foldout(string title, bool display)
     {
         var style = Styles.Foldout.Value;
-        var rect = GUILayoutUtility.GetRect(16f, 22f, style);
+        var rect = GUILayoutUtility.GetRect(16f, 20f, style);
         GUI.Box(rect, title, style);
 
         var e = Event.current;
@@ -201,13 +179,52 @@ internal sealed class LightLimitChangerComponentEditor : Editor
     }
     private static void DescriptionHelpBox(string message)
     {
-        if (SelectedTab == Tab.DiescriptionMode)
-        {
-            EditorGUILayout.HelpBox(message, MessageType.Info);
-        }
+        if (SelectedTab != Tab.DiescriptionMode)
+            return;
+
+        EditorGUILayout.HelpBox(message, MessageType.Info);
+        EditorGUILayout.Space();
     }
     private static void ControledParameterField(SerializedProperty property)
     {
         EditorGUILayout.PropertyField(property);
+    }
+
+    private static class Styles
+    {
+        public static Lazy<GUIContent[]> TabToggles = new Lazy<GUIContent[]>(() =>
+        {
+            return Enum.GetNames(typeof(Tab)).Select(x => new GUIContent(x)).ToArray();
+        }, false);
+
+        public static Lazy<GUIStyle> Foldoutbackground = new Lazy<GUIStyle>(() =>
+        {
+            var style = new GUIStyle("HelpBox");
+            style.margin = new RectOffset(15, 0, 0, 0);
+            return style;
+        }, false);
+
+        public static readonly GUIStyle TabButtonStyle = "LargeButton";
+
+        // GUI.ToolbarButtonSize.FitToContentsも設定できる
+        public static readonly GUI.ToolbarButtonSize TabButtonSize = GUI.ToolbarButtonSize.Fixed;
+
+        public static readonly Lazy<GUIStyle> Foldout = new(() => new GUIStyle("ShurikenModuleTitle")
+        {
+            font = EditorStyles.label.font,
+            border = new RectOffset(15, 7, 4, 4),
+            fixedHeight = 22,
+            contentOffset = new Vector2(20f, -2f),
+            fontSize = 12
+        }, isThreadSafe: false);
+
+        public static readonly Lazy<GUIStyle> CategoryLabel = new(() =>
+        {
+            var style = new GUIStyle(EditorStyles.label);
+            style.fontStyle = FontStyle.Bold;
+            style.fontSize = 14;
+            style.normal.textColor = Color.white;
+            return style;
+        }, isThreadSafe: false);
     }
 }

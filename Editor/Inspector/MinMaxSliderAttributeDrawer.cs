@@ -27,7 +27,7 @@ internal sealed class MinMaxSliderAttributeDrawer : PropertyDrawer
         var right = position with { width = floatFieldWidth, x = position.x + left.width + mid.width + padding * 2 };
 
         EditorGUI.BeginChangeCheck();
-        var f = EditorGUI.FloatField(left, GUIContent.none, Mathf.Round(vector.x * 100) / 100f);
+        var f = EditorGUI.FloatField(left, GUIContent.none, vector.x);
         if (EditorGUI.EndChangeCheck())
         {
             vector.x = Mathf.Clamp(f, attr.Min, vector.y);
@@ -37,11 +37,14 @@ internal sealed class MinMaxSliderAttributeDrawer : PropertyDrawer
         EditorGUI.MinMaxSlider(mid, GUIContent.none, ref vector.x, ref vector.y, attr.Min, attr.Max);
         if (EditorGUI.EndChangeCheck())
         {
+            const float N = 0.025f;
+            vector.x = Mathf.Ceil(vector.x / N) * N;
+            vector.y = Mathf.Ceil(vector.y / N) * N;
             property.vector2Value = vector;
         }
 
         EditorGUI.BeginChangeCheck();
-        f = EditorGUI.FloatField(right, GUIContent.none, Mathf.Round(vector.y * 100) / 100f);
+        f = EditorGUI.FloatField(right, GUIContent.none, vector.y);
         if (EditorGUI.EndChangeCheck())
         {
             vector.y = Mathf.Clamp(f, vector.x, attr.Max);
