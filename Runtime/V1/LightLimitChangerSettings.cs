@@ -5,7 +5,7 @@ using VRC.SDKBase;
 namespace io.github.azukimochi
 {
     [DisallowMultipleComponent]
-    [AddComponentMenu("Modular Avatar/Light Limit Changer")]
+    [AddComponentMenu("/Light Limit Changer (V1)")]
     public sealed class LightLimitChangerSettings : MonoBehaviour, IEditorOnly, ISerializationCallbackReceiver
     {
         public LightLimitChangerParameters Parameters = new LightLimitChangerParameters();
