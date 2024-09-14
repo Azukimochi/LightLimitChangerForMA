@@ -904,6 +904,20 @@ If material colors appear abnormal, please disable these controls and file a bug
 머티리얼 색이 이상해진 경우에는 이 기능을 사용하지 말고, 제작자에게 버그 리포트를 부탁드립니다."
                 }
             },
+
+            {
+                // `{0}` is replaced by the number of items detected
+                "NDMF.info.mixedShader", new[]
+                {
+                @"Excluded or unsupported shaders are used within {0} objects.
+This may cause unrelated properties to be modified by the animation.",
+                @"{0}個のオブジェクト（レンダラー）内で除外されている、または対応していないシェーダーが使用されています。
+これにより、アニメーションによって関係のないプロパティが変更されてしまう可能性があります。", 
+                "zh-Hant",
+                "zh-Hans",
+                "ko-KR"
+                }
+            },
             {
                 "NDMF.info.poiyomi_old_version", new[]
                 {
