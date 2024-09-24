@@ -1,10 +1,13 @@
-﻿namespace io.github.azukimochi;
+﻿using System.Linq;
+using nadena.dev.ndmf.localization;
+
+namespace io.github.azukimochi;
 
 internal abstract partial class L10n
 {
     private const string PreferenceKey = "io.github.azukimochi.light-limit-changer.lang";
 
-    private static L10n[] Instances = { 
+    private static readonly L10n[] Instances = { 
         new En_US(), 
         new Ja_JP(),
         new Zh_Hant(),
@@ -14,6 +17,8 @@ internal abstract partial class L10n
     public static L10n Default => Instances[0];
 
     public static L10n Current => Instances[CurrentLanguageIndex];
+
+    public static Localizer NDMFLocalizer = new(Instances[0].Code, () => Instances.Select<L10n, (string, Func<string, string>)>(x => (x.Code, key => key /* TODO: あとでやる！*/)).ToList());
 
     public static int CurrentLanguageIndex
     {

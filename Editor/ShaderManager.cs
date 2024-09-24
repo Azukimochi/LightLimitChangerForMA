@@ -8,7 +8,7 @@ internal static class ShaderManager
 {
     // TODO （そのうち） : プラグインか何かで差し込めるようにしたい
 
-    private static string[] builtinShaderIDs =
+    private static readonly string[] builtinShaderIDs =
     {
         BuiltinSupportedShaders.LilToon,
         BuiltinSupportedShaders.Poiyomi,
@@ -16,7 +16,7 @@ internal static class ShaderManager
         BuiltinSupportedShaders.UnlitWF,
     };
 
-    private static string[] builtinShaderNames =
+    private static readonly string[] builtinShaderNames =
     {
         "LilToon",
         "Poiyomi",

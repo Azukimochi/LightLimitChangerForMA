@@ -17,14 +17,6 @@ public abstract class Parameter
     /// 値を同期する
     /// </summary>
     public bool Synced = true;
-}
-
-[Serializable]
-public sealed class Parameter<T> : Parameter
-{
-    public Parameter() { }
-
-    public Parameter(T value) : this() => (InitialValue, OverrideValue) = (ToFloatValue(value), ToFloatValue(value));
 
     /// <summary>
     /// アニメーション用の初期値
@@ -35,6 +27,14 @@ public sealed class Parameter<T> : Parameter
     /// 上書き用の値
     /// </summary>
     public float OverrideValue;
+}
+
+[Serializable]
+public sealed class Parameter<T> : Parameter
+{
+    public Parameter() { }
+
+    public Parameter(T value) : this() => (InitialValue, OverrideValue) = (ToFloatValue(value), ToFloatValue(value));
 
     private static float ToFloatValue(T value)
     {

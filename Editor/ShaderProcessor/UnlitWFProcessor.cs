@@ -1,4 +1,5 @@
-﻿namespace io.github.azukimochi;
+﻿
+namespace io.github.azukimochi;
 
 internal sealed class UnlitWFProcessor : ShaderProcessor
 {

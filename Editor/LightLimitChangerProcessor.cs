@@ -1,14 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using gomoru.su;
 using nadena.dev.modular_avatar.core;
 using nadena.dev.ndmf;
-using nadena.dev.ndmf.util;
 using UnityEditor.Animations;
-using UnityEngine;
 using VRC.Core;
 using VRC.SDK3.Avatars.Components;
 using VRC.SDK3.Avatars.ScriptableObjects;
@@ -54,6 +50,8 @@ internal sealed class LightLimitChangerProcessor : IDisposable
         targetRenderers = AvatarRootObject.GetComponentsInChildren<Renderer>()
             .Where(x => !excludes.Contains(x.gameObject))
             .ToArray();
+
+        CloneMaterials();
 
         var llcObject = Component.gameObject;
         blendTree = new DirectBlendTree() { Name = LightLimitChanger.Title };
@@ -107,7 +105,8 @@ internal sealed class LightLimitChangerProcessor : IDisposable
             });
         }
 
-        animatorController.AddLayer(blendTree.ToAnimatorControllerLayer(animatorController));
+        var layer = blendTree.ToAnimatorControllerLayer(animatorController);
+        animatorController.AddLayer(layer);
 
         RemoveEmptySubMenus(menuRoot);
     }
@@ -121,6 +120,7 @@ internal sealed class LightLimitChangerProcessor : IDisposable
         }
 
         var fields = typeof(TSettings).GetFields(BindingFlags.Instance | BindingFlags.Public);
+        using ValueDictionary<string, List<(FieldInfo FieldInfo, Parameter<float> Parameter)>> vectorGroup = new();
         foreach(var field in fields)
         {
             if (field.FieldType.BaseType != typeof(Parameter))
@@ -128,8 +128,18 @@ internal sealed class LightLimitChangerProcessor : IDisposable
 
             var t = field.FieldType.GenericTypeArguments[0];
             var parameter = field.GetValue(settings) as Parameter<float>;
-            Vector2 range = Vector2.up;
 
+            if (field.GetCustomAttribute<VectorFieldAttribute>() is { } vectorAttr)
+            {
+                ref var list = ref vectorGroup.GetOrAdd(vectorAttr.Group);
+                list ??= new();
+                list.Add((field, parameter));
+            }
+
+            if (!parameter.Enable)
+                continue;
+
+            Vector2 range = Vector2.up;
             if (field.GetCustomAttribute<RangeParameterAttribute>() is { } rangeParamAttr)
             {
                 var val = typeof(TSettings).GetField(rangeParamAttr.ParameterName)?.GetValue(settings) ?? null;
@@ -141,8 +151,8 @@ internal sealed class LightLimitChangerProcessor : IDisposable
                 range = new(rangeAttr.Min, rangeAttr.Max);
             }
 
-            if (!parameter.Enable)
-                continue;
+            var generalType = field.GetCustomAttribute<GeneralControlAttribute>()?.Type ?? default;
+            var shaderFeatureAttr = field.GetCustomAttribute<ShaderFeatureAttribute>();
 
             var name = field.Name;
 
@@ -154,7 +164,7 @@ internal sealed class LightLimitChangerProcessor : IDisposable
             var avatarParameter = new ParameterConfig()
             {
                 nameOrPrefix = $"{settings.ParameterPrefix}{field.Name}",
-                defaultValue = NormalizeInRange(parameter.InitialValue, range.x, range.y),
+                defaultValue = Utils.NormalizeInRange(parameter.InitialValue, range.x, range.y),
                 syncType = 
                     t == typeof(bool) ? ParameterSyncType.Bool : 
                     t == typeof(int) ? ParameterSyncType.Int : 
@@ -166,21 +176,18 @@ internal sealed class LightLimitChangerProcessor : IDisposable
             tree.ParameterName = avatarParameter.nameOrPrefix;
             avatarParameters.Add(avatarParameter);
 
-            var generalType = field.GetCustomAttribute<GeneralControlAttribute>()?.Type ?? default;
-            var shaderFeatureAttr = field.GetCustomAttribute<ShaderFeatureAttribute>();
+            var context = new ConfigureGeneralAnimationContext()
+            {
+                Name = name,
+                Renderers = targetRenderers,
+                AnimationClip = anim,
+                AvatarParameter = avatarParameter,
+                Type = generalType,
+            };
 
             foreach (var processor in processors.AsSpan())
             {
-                var context = new ConfigureGeneralAnimationContext()
-                {
-                    Name = name,
-                    Renderers = targetRenderers,
-                    AnimationClip = anim,
-                    AvatarParameter = avatarParameter,
-                    Range = range,
-                    Type = generalType,
-                };
-
+                context.Range = range; // Range is mutable.
                 if (shaderFeatureAttr is null)
                 {
                     processor.ConfigureGeneralAnimation(context);
@@ -193,6 +200,7 @@ internal sealed class LightLimitChangerProcessor : IDisposable
 
                     processor.ConfigureShaderSpecificAnimation(context);
                 }
+
                 var menuItem = menuGroup.GetOrAdd(name, menu => (VRCExpressionsMenu.Control.ControlType.RadialPuppet, avatarParameter.nameOrPrefix));
                 if (menuItem.Control.icon == null && field.GetCustomAttribute<MenuIconAttribute>() is { } iconAttr)
                 {
@@ -200,23 +208,45 @@ internal sealed class LightLimitChangerProcessor : IDisposable
                 }
             }
         }
-    }
 
-    private static void RemoveEmptySubMenus(MAMenuItem menu)
-    {
-        if (menu.Control.type != VRCExpressionsMenu.Control.ControlType.SubMenu)
-            return;
-
-        var children = menu.transform.Cast<Transform>().Select(x => x.GetComponent<MAMenuItem>()).Where(x => x != null);
-        if (!children.Any())
+        const string MissingVectorFieldGroupName = "Missing Fields";
+        foreach(var entry in vectorGroup.Entries)
         {
-            Object.DestroyImmediate(menu);
-            return;
-        }
+            if (entry.Value.Select(x => x.Parameter.Enable).Aggregate((x, y) => x == y))
+                continue;
 
-        foreach(var child in  children)
-        {
-            RemoveEmptySubMenus(child);
+            var name = entry.Key;
+            if (string.IsNullOrEmpty(name))
+            {
+                name = settings.DisplayName;
+            }
+
+            var group = blendTree.Items.FirstOrDefault(x => x is DirectBlendTree d && d.Name == settings.ParameterPrefix) as DirectBlendTree ?? blendTree.AddDirectBlendTree(settings.ParameterPrefix);
+            var group2 = group.Items.FirstOrDefault(x => x is DirectBlendTree d && d.Name == MissingVectorFieldGroupName) as DirectBlendTree ?? group.AddDirectBlendTree(MissingVectorFieldGroupName);
+            var anim = new AnimationClip() { name = $"{LightLimitChanger.Title} {name}" };
+            AssetDatabase.AddObjectToAsset(anim, AssetContainer);
+            var tree = group.AddMotion(anim);
+
+            foreach (var x in entry.Value.AsSpan())
+            {
+                var (field, parameter) = x;
+                if (parameter.Enable)
+                    continue;
+
+                var generalType = field.GetCustomAttribute<GeneralControlAttribute>()?.Type ?? default;
+                var context = new ConfigureEmptyAnimationContext()
+                {
+                    Name = field.Name,
+                    Renderers = targetRenderers,
+                    AnimationClip = anim,
+                    Type = generalType,
+                };
+                foreach (var processor in processors.AsSpan())
+                {
+                    context.Value = parameter.InitialValue;
+                    processor.ConfigreEmptyAnimation(context);
+                }
+            }
         }
     }
 
@@ -241,25 +271,34 @@ internal sealed class LightLimitChangerProcessor : IDisposable
                         var obj = p.objectReferenceValue;
                         if (obj == null) continue;
 
+                        Object replace;
+
                         if (cache.TryGetValue(obj, out var mapped))
                         {
-                            p.objectReferenceValue = mapped;
+                            replace = mapped;
                         }
                         else if (obj is Material mat)
                         {
-                            foreach(var processor in processors)
+                            mat = Object.Instantiate(mat);
+                            mat.name = $"{obj.name}(LLC)";
+                            ObjectRegistry.RegisterReplacedObject(obj, mat);
+                            AssetDatabase.AddObjectToAsset(mat, context.AssetContainer);
+
+                            foreach (var processor in processors)
                             {
                                 processor.OnMaterialCloned(mat);
                             }
-                        }
-                        else if (obj is RuntimeAnimatorController runtimeAnimatorController)
-                        {
-                            if (cache.TryGetValue(runtimeAnimatorController, out var mappedController))
-                            {
-                                p.objectReferenceValue = mappedController;
-                            }
 
+                            replace = mat;
+                            cache.TryAdd(obj, mat);
                         }
+                        //else if (obj is RuntimeAnimatorController runtimeAnimatorController)
+                        else
+                        {
+                            replace = obj;
+                        }
+
+                        p.objectReferenceValue = replace;
                     }
                 }
                 finally
@@ -299,19 +338,33 @@ internal sealed class LightLimitChangerProcessor : IDisposable
         }
     }
 
+    public LightLimitChangerProcessor AddProcessor<T>() where T : ShaderProcessor, new()
+    {
+        var t = new T();
+        (t as ILightLimitChangerProcessorReceiver).Initialize(this);
+        processors.Add(t);
+        return this;
+    }
     public void Dispose()
     {
 
     }
 
-    public LightLimitChangerProcessor AddProcessor<T>() where T : ShaderProcessor, new()
+    private static void RemoveEmptySubMenus(MAMenuItem menu)
     {
-        var t = new T();
-        (t as IShaderProcessor).Initialize(this);
-        processors.Add(t);
-        return this;
-    }
+        if (menu.Control.type != VRCExpressionsMenu.Control.ControlType.SubMenu)
+            return;
 
-    private static float NormalizeInRange(float value, float min, float max)
-        => (value - min) / (max - min);
+        var children = menu.transform.Cast<Transform>().Select(x => x.GetComponent<MAMenuItem>()).Where(x => x != null);
+        if (!children.Any())
+        {
+            Object.DestroyImmediate(menu);
+            return;
+        }
+
+        foreach (var child in children)
+        {
+            RemoveEmptySubMenus(child);
+        }
+    }
 }

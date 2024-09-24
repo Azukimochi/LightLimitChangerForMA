@@ -77,6 +77,10 @@ namespace gomoru.su
                 return motion;
             }
         }
+        public override IEnumerable<AnimationClip> GetAnimationClips()
+        {
+            yield return Animation;
+        }
     }
 
     static partial class DirectBlendTreeExtensions

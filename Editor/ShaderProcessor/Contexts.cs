@@ -12,13 +12,23 @@ internal struct CreateShaderSpecificControlContext
     public List<ParameterConfig> AvatarParameters;
 }
 
-internal class ConfigureShaderSpecificAnimationContext
+internal abstract class ConfigureAnimationContextBase
 {
     public string Name { get; init; }
-    public ParameterConfig AvatarParameter { get; init; }
     public AnimationClip AnimationClip { get; init; }
     public ReadOnlyMemory<Renderer> Renderers { get; init; }
-    public Vector2 Range { get; init; }
+}
+
+internal class ConfigureEmptyAnimationContext : ConfigureAnimationContextBase
+{
+    public GeneralControlType Type { get; init; }
+    public float Value { get; set; }
+}
+
+internal class ConfigureShaderSpecificAnimationContext : ConfigureAnimationContextBase
+{
+    public ParameterConfig AvatarParameter { get; init; }
+    public Vector2 Range { get; set; }
 }
 
 internal sealed class ConfigureGeneralAnimationContext : ConfigureShaderSpecificAnimationContext

@@ -3,6 +3,7 @@ using UnityEditor;
 using UnityEditor.Animations;
 using System;
 using io.github.azukimochi;
+using System.Linq;
 
 namespace gomoru.su
 {
@@ -72,6 +73,8 @@ namespace gomoru.su
             var blendTree = ToBlendTree(assetContainer);
             destination.AddChild(blendTree);
         }
+
+        public IEnumerable<AnimationClip> GetAnimationClips() => _items.SelectMany(x => x.GetAnimationClips());
 
         private static void SetNormalizedBlendValues(BlendTree blendTree, bool value)
         {

@@ -37,7 +37,7 @@ namespace io.github.azukimochi
 
         private void ConfigureBuiltinProcessors(LightLimitChangerProcessor processor)
         {
-            var targetShader = processor.Component.TargetShader;
+            var targetShader = processor.Component?.TargetShader ?? TargetShaderContainer.Nothing;
 
             if (targetShader.Contains(BuiltinSupportedShaders.LilToon))
             {

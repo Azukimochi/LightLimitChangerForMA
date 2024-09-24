@@ -1,4 +1,7 @@
-﻿namespace gomoru.su
+﻿using System.Collections.Generic;
+using System.Linq;
+
+namespace gomoru.su
 {
     internal abstract class DirectBlendTreeONOFFItemBase : DirectBlendTreeItemBase, IDirectBlendTreeONOFFContainer
     {
@@ -7,6 +10,8 @@
 
         void IDirectBlendTreeONOFFContainer.Add(IDirectBlendTreeItem tree, DirectBlendTree.Target target)
             => Add(tree, target);
+
+        public override IEnumerable<AnimationClip> GetAnimationClips() => ON.GetAnimationClips().Concat(OFF.GetAnimationClips());
 
         protected virtual void Add(IDirectBlendTreeItem tree, DirectBlendTree.Target target)
         {

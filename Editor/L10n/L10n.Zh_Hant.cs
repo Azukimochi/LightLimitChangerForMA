@@ -5,6 +5,7 @@ partial class L10n
     private sealed class Zh_Hant : L10n
     {
         protected override string DisplayName => "中文（繁體）";
+        protected override string Code => "zh-Hant";
 
         public override string Category_Select_Avatar
             => @"選擇 Avatar";

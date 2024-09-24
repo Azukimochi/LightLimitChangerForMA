@@ -1,4 +1,5 @@
-﻿using UnityEditor;
+﻿using System.Collections.Generic;
+using UnityEditor;
 using UnityEditor.Animations;
 
 namespace gomoru.su
@@ -8,6 +9,8 @@ namespace gomoru.su
         public string Name { get; set; }
 
         void IDirectBlendTreeItem.Apply(BlendTree destination, Object assetContainer) => Apply(destination, assetContainer);
+
+        public abstract IEnumerable<AnimationClip> GetAnimationClips();
 
         protected abstract void Apply(BlendTree destination, Object assetContainer);
 

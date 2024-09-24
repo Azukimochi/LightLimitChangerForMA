@@ -5,6 +5,7 @@ partial class L10n
     private sealed class Zh_Hans : L10n
     {
         protected override string DisplayName => "中文（简体）";
+        protected override string Code => "zh-Hans";
 
         public override string Category_Select_Avatar
             => @"选择 Avatar";

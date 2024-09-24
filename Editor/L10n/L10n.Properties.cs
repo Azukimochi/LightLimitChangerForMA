@@ -3,7 +3,7 @@
 partial class L10n
 {
     protected abstract string DisplayName { get; }
-
+    protected abstract string Code { get; }
 
     public abstract string Category_Select_Avatar { get; }
 
@@ -201,8 +201,10 @@ partial class L10n
     public abstract string ExpressionMenu_Control { get; }
 }
 
-public sealed class LocalizeAttribute : Attribute
+[AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
+internal sealed class KeyAttribute : Attribute
 {
-    public string En_US { get; set; }
-    public string Ja_JP { get; set; }
+    public KeyAttribute(string key) => Key = key;
+
+    public string Key { get; }
 }

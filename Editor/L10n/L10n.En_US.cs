@@ -5,6 +5,7 @@ partial class L10n
     private class En_US : L10n
     {
         protected override string DisplayName => "English (United States)";
+        protected override string Code => "en-US";
 
         public override string Category_Select_Avatar
             => @"Select Avatar";

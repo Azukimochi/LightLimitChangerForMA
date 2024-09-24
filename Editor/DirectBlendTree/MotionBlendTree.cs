@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
 using UnityEditor.Animations;
 using UnityEngine;
@@ -10,6 +11,34 @@ namespace gomoru.su
         public string ParameterName { get; set; }
 
         public List<Motion> Motions { get; } = new List<Motion>();
+
+        public override IEnumerable<AnimationClip> GetAnimationClips()
+        {
+            foreach (var motion in Motions)
+            {
+                if (motion is AnimationClip clip)
+                    yield return clip;
+                else if (motion is BlendTree blendTree)
+                    foreach(var x in Recurse(blendTree))
+                        yield return x;
+            }
+
+            IEnumerable<AnimationClip> Recurse(BlendTree blendTree)
+            {
+                if (blendTree == null)
+                    yield break;
+                
+                foreach(var x in blendTree.children)
+                {
+                    var m = x.motion;
+                    if (m is AnimationClip clip)
+                        yield return clip;
+                    else if (m is BlendTree tree)
+                        foreach(var y in Recurse(tree))
+                            yield return y;
+                }
+            }
+        }
 
         protected override void Apply(BlendTree destination, Object assetContainer)
         {

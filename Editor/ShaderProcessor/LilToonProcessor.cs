@@ -27,39 +27,74 @@ internal sealed class LilToonProcessor : ShaderProcessor
     public const string _ShadowEnvStrength = "_ShadowEnvStrength";
 
     #endregion
+    
+    private static readonly Unizy<Material> bakerMaterial = new(() => new Material(Shader.Find("Hidden/ltsother_baker")));
+
+    public override bool IsTargetMaterial(Material material)
+    {
+        if (material.shader.name.Contains("lilToon", StringComparison.OrdinalIgnoreCase))
+            return true;
+        return false;
+    }
+
+    public override string GetMaterialPropertyNameFromTypeOrName(GeneralControlType type, string name)
+    {
+        return (type, name) switch
+        {
+            (GeneralControlType.MinLight, _) => _LightMinLimit,
+            (GeneralControlType.MaxLight, _) => _LightMaxLimit,
+            (GeneralControlType.Monochrome, _) => _MonochromeLighting,
+            (GeneralControlType.Unlit, _) => _AsUnlit,
+            (GeneralControlType.ColorControlHue, _) => $"{_MainTexHSVG}.x",
+            (GeneralControlType.ColorControlSaturation, _) => $"{_MainTexHSVG}.y",
+            (GeneralControlType.ColorControlBrightness, _) => $"{_MainTexHSVG}.z",
+            (GeneralControlType.ColorControlGamma, _) => $"{_MainTexHSVG}.w",
+            (GeneralControlType.EmissionStrength, _) => _EmissionBlend,
+
+            (_, nameof(LilToonSettings.VertexLightStrength)) => _VertexLigthStrength,
+            (_, nameof(LilToonSettings.ShadowEnvStrength)) => _ShadowEnvStrength,
+
+            _ => null
+        };
+    }
 
     public override void ConfigureGeneralAnimation(ConfigureGeneralAnimationContext context)
     {
-        var (min, max) = context.Range;
-        string propertyName = context.Type switch
+        if (context.Type is GeneralControlType.ColorControlHue)
         {
-            GeneralControlType.MinLight => _LightMinLimit,
-            GeneralControlType.MaxLight => _LightMaxLimit,
-            GeneralControlType.Monochrome => _MonochromeLighting,
-            GeneralControlType.Unlit => _AsUnlit,
-            GeneralControlType.ColorControlHue => $"{_MainTexHSVG}.x",
-            GeneralControlType.ColorControlSaturation => $"{_MainTexHSVG}.y",
-            GeneralControlType.ColorControlBrightness => $"{_MainTexHSVG}.z",
-            GeneralControlType.ColorControlGamma => $"{_MainTexHSVG}.w",
-            GeneralControlType.EmissionStrength => _EmissionBlend,
-            _ => ""
-        };
+            context.Range *= 0.5f;
+        }
 
-        context.Renderers.AnimateAllFloat(context.AnimationClip, $"{MaterialAnimationKeyPrefix}{propertyName}", AnimationCurve.Linear(0, min, 1 / 60f, max));
+        base.ConfigureGeneralAnimation(context);
     }
 
-    public override void ConfigureShaderSpecificAnimation(ConfigureShaderSpecificAnimationContext context)
+    public override void NormalizeMaterial(Material material)
     {
-        string propertyName = context.Name switch
-        {
-            nameof(LilToonSettings.VertexLightStrength) => _VertexLigthStrength,
-            nameof(LilToonSettings.ShadowEnvStrength) => _ShadowEnvStrength,
-            _ => null,
-        };
-        if (propertyName is null)
+        var colorCtrl = Processor.Component.General.ColorControl;
+        if (!colorCtrl.Any(x => x.Enable))
             return;
 
-        var (min, max) = context.Range;
-        context.Renderers.AnimateAllFloat(context.AnimationClip, $"{MaterialAnimationKeyPrefix}{propertyName}", AnimationCurve.Linear(0, min, 1 / 60f, max));
+        var hsvg = material.Get(_MainTexHSVG, new Vector4(0, 1, 1, 1));
+        var writeback = hsvg;
+
+        hsvg.x = !colorCtrl.Hue.Enable ? 0 : hsvg.x;
+        hsvg.y = !colorCtrl.Saturation.Enable ? 1 : hsvg.y;
+        hsvg.z = !colorCtrl.Brightness.Enable ? 1 : hsvg.z;
+        hsvg.w = !colorCtrl.Gamma.Enable ? 1 : hsvg.w;
+
+        writeback.x = colorCtrl.Hue.Enable ? 0 : writeback.x;
+        writeback.y = colorCtrl.Saturation.Enable ? 1 : writeback.y;
+        writeback.z = colorCtrl.Brightness.Enable ? 1 : writeback.z;
+        writeback.w = colorCtrl.Gamma.Enable ? 1 : writeback.w;
+
+
+        var maintex = material.Get(_MainTex, Texture2D.whiteTexture);
+
+        Material mat = bakerMaterial;
+        mat.SetVector(_MainTexHSVG, hsvg);
+
+        var baked = TextureBaker.Bake(maintex, mat, maintex.format);
+        material.SetTexture(_MainTex, baked);
+        material.SetVector(_MainTexHSVG, writeback);
     }
 }

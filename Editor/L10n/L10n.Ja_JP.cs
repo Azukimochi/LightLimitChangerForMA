@@ -5,7 +5,7 @@ partial class L10n
     private class Ja_JP : L10n
     {
         protected override string DisplayName => "日本語 (日本)";
-
+        protected override string Code => "ja-JP";
 
         public override string Category_Select_Avatar
             => @"アバターを選択";
