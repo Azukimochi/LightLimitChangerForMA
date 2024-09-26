@@ -929,9 +929,12 @@ You can also significantly reduce the increase in texture memory by atlasing usi
 This may cause unrelated properties to be modified by the animation.",
                 @"{0}個のオブジェクト（レンダラー）内で除外されている、または対応していないシェーダーが使用されています。
 これにより、アニメーションによって関係のないプロパティが変更されてしまう可能性があります。", 
-                "zh-Hant",
-                "zh-Hans",
-                "ko-KR"
+                @"{0} 物件（渲染器）中使用了排除或不支援的著色器。
+這可能會導致動畫更改不相關的屬性。",
+                @"{0} 对象（渲染器）中使用了排除或不受支持的着色器。
+这可能会导致动画更改不相关的属性。",
+                @"{0}개의 객체(렌더러) 내에서 제외되거나 해당되지 않는 셰이더가 사용됩니다.
+이로 인해 애니메이션이 관련되지 않은 속성을 변경할 수 있습니다."
                 }
             },
             
@@ -976,14 +979,14 @@ If you are building for Quest, Quest shaders are not supported, so it is normal 
 これ以外のシェーダーを使用している場合には、アニメーションが生成されません。
 
 Quest向けのビルドの場合、Questシェーダーはサポートされていないので、このエラーがでることは正常です。",
-                    @"唯一支持的着色器是 lilToon/Poiyomi/Sunao 着色器。
-如果您使用任何其他着色器，则不会生成动画。
-
-为 Quest 构建时，此错误是正常的，因为不支持 Quest 着色器。",
                     @"唯一支援的著色器是 lilToon/Poiyomi/Sunao 著色器。
 如果您使用任何其他著色器，則不會產生動畫。
 
 為 Quest 建置時，此錯誤是正常的，因為不支援 Quest 著色器。",
+                    @"唯一支持的着色器是 lilToon/Poiyomi/Sunao 着色器。
+如果您使用任何其他着色器，则不会生成动画。
+
+为 Quest 构建时，此错误是正常的，因为不支持 Quest 着色器。",
                     @"지원 셰이더는 lilToon/Poiyomi/Sunao 셰이더뿐입니다.
 다른 셰이더를 사용하는 경우 애니메이션이 생성되지 않습니다.
 
