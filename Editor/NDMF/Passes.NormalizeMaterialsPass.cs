@@ -15,7 +15,7 @@ namespace io.github.azukimochi
 
                 //Report ColorTempCont or SaturationCnt information in NDMF error reporting  
 
-                IError error = new ErrorMessage("NDMF.info.useColorTemporSaturation", ErrorSeverity.Information);
+                IError error = new ErrorMessage("NDMF.info.useColorTemporSaturation", "NDMF.hint.useColorTemporSaturation", ErrorSeverity.Information);
                 ErrorReport.ReportError(error);
                 
                 foreach (var material in cache.MappedObjects.Select(x => x as Material).Where(x => x != null).ToArray())
