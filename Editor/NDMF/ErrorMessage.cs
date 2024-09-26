@@ -18,7 +18,9 @@ namespace io.github.azukimochi
             {
                 ("en-US", key => Localization.S(key, 0)),
                 ("ja-JP", key => Localization.S(key, 1)),
-                ("zh-Hant", key => Localization.S(key, 2))
+                ("zh-Hant", key => Localization.S(key, 2)),
+                ("zh-Hans", key => Localization.S(key, 3)),
+                ("ko-KR", key => Localization.S(key, 4))
             });
         }
         public ErrorMessage(string titleKey, string hintKey, ErrorSeverity severity)
@@ -30,7 +32,9 @@ namespace io.github.azukimochi
             {
                 ("en-US", key => Localization.S(key, 0)),
                 ("ja-JP", key => Localization.S(key, 1)),
-                ("zh-Hant", key => Localization.S(key, 2))
+                ("zh-Hant", key => Localization.S(key, 2)),
+                ("zh-Hans", key => Localization.S(key, 3)),
+                ("ko-KR", key => Localization.S(key, 4))
             });
         }
         public override Localizer Localizer { get; }
