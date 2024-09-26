@@ -904,6 +904,22 @@ If material colors appear abnormal, please disable these controls and file a bug
 머티리얼 색이 이상해진 경우에는 이 기능을 사용하지 말고, 제작자에게 버그 리포트를 부탁드립니다."
                 }
             },
+            
+            {
+                "NDMF.hint.useColorTemporSaturation", new[]
+                {
+                    @"In the case of lilToon, you can reduce the increase in texture memory by baking the texture in advance.
+You can also significantly reduce the increase in texture memory by atlasing using TexTransTool.",
+                    @"lilToonの場合は、事前にテクスチャの焼き込みを行うことで、テクスチャメモリの増加を低減することができます。
+また、TexTransToolを用いてアトラス化を行うことでも、テクスチャメモリの増加を大幅に低減することができます。",
+                    @"對於lilToon來說，可以透過提前燒錄紋理來減少紋理記憶體的增加。
+另外，透過使用TexTransTool進行圖集，可以顯著減少紋理記憶體的增加。 ",
+                    @"对于lilToon来说，可以通过提前烧录纹理来减少纹理内存的增加。
+另外，通过使用TexTransTool进行图集，可以显着减少纹理内存的增加。",
+                    @"lilToon의 경우, 사전에 텍스처를 태워서 텍스처 메모리의 증가를 줄일 수 있습니다.
+또한 TexTransTool을 사용하여 아틀라스화를 수행하면 텍스처 메모리의 증가를 크게 줄일 수 있습니다. ",
+                }
+            },
 
             {
                 // `{0}` is replaced by the number of items detected
@@ -918,6 +934,7 @@ This may cause unrelated properties to be modified by the animation.",
                 "ko-KR"
                 }
             },
+            
             {
                 "NDMF.info.poiyomi_old_version", new[]
                 {
@@ -946,6 +963,31 @@ Please check your settings if this is not what you intended.",
 如果你不是有意的，请检查你的设置。",
                     @"애니메이션 생성 대상이 존재하지 않아 메뉴를 생성하지 않았습니다.
 만약 의도한 상황이 아닌 경우, 설정을 확인해 주세요."
+                }
+            },
+            {
+                "NDMF.hint.non_generated", new []
+                {
+                    @"Only lilToon/Poiyomi/Sunao shaders are supported.
+If you use any other shader, animations will not be generated.
+
+If you are building for Quest, Quest shaders are not supported, so it is normal for this error to appear.",
+                    @"サポートシェーダーはlilToon/Poiyomi/Sunaoシェーダーのみです。
+これ以外のシェーダーを使用している場合には、アニメーションが生成されません。
+
+Quest向けのビルドの場合、Questシェーダーはサポートされていないので、このエラーがでることは正常です。",
+                    @"唯一支持的着色器是 lilToon/Poiyomi/Sunao 着色器。
+如果您使用任何其他着色器，则不会生成动画。
+
+为 Quest 构建时，此错误是正常的，因为不支持 Quest 着色器。",
+                    @"唯一支援的著色器是 lilToon/Poiyomi/Sunao 著色器。
+如果您使用任何其他著色器，則不會產生動畫。
+
+為 Quest 建置時，此錯誤是正常的，因為不支援 Quest 著色器。",
+                    @"지원 셰이더는 lilToon/Poiyomi/Sunao 셰이더뿐입니다.
+다른 셰이더를 사용하는 경우 애니메이션이 생성되지 않습니다.
+
+Quest용 빌드의 경우 Quest 셰이더가 지원되지 않으므로 이 오류가 발생하는 것이 정상입니다. ",
                 }
             },
             
