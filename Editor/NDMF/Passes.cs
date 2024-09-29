@@ -108,7 +108,7 @@ namespace io.github.azukimochi
                     Object.DestroyImmediate(settings.gameObject);
                     return;
                 }
-                InitializeSession(context.AvatarRootObject.GetComponentInChildren<LightLimitChangerSettings>(), GetObjectCache(context));
+                InitializeSession(settings, GetObjectCache(context));
             }
 
             public void InitializeSession(LightLimitChangerSettings settings, LightLimitChangerObjectCache cache)
