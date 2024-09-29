@@ -99,6 +99,15 @@ namespace io.github.azukimochi
 
             public void InitializeSession(BuildContext context)
             {
+                var settings = context.AvatarRootObject.GetComponentInChildren<LightLimitChangerSettings>(true);
+                if (settings == null)
+                    return;
+                if (!settings.gameObject.activeInHierarchy)
+                {
+                    // TODO: エラーとか出すかも？　とりあえず処理は行わない
+                    Object.DestroyImmediate(settings.gameObject);
+                    return;
+                }
                 InitializeSession(context.AvatarRootObject.GetComponentInChildren<LightLimitChangerSettings>(), GetObjectCache(context));
             }
 
