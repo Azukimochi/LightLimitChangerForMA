@@ -17,16 +17,6 @@ public abstract class Parameter
     /// 値を同期する
     /// </summary>
     public bool Synced = true;
-
-    /// <summary>
-    /// アニメーション用の初期値
-    /// </summary>
-    public float InitialValue;
-
-    /// <summary>
-    /// 上書き用の値
-    /// </summary>
-    public float OverrideValue;
 }
 
 [Serializable]
@@ -34,21 +24,19 @@ public sealed class Parameter<T> : Parameter
 {
     public Parameter() { }
 
-    public Parameter(T value) : this() => (InitialValue, OverrideValue) = (ToFloatValue(value), ToFloatValue(value));
+    public Parameter(T value, bool enable = true) : this() 
+        => (InitialValue, OverrideValue, Enable) = (value, value, enable);
 
-    private static float ToFloatValue(T value)
-    {
-        if (typeof(T) == typeof(float))
-            return (float)(object)value;
+    /// <summary>
+    /// アニメーション用の初期値
+    /// </summary>
+    public T InitialValue;
 
-        if (typeof(T) == typeof(int))
-            return (int)(object)value;
-
-        if (typeof(T) == typeof(bool))
-            return (bool)(object)value ? 1 : 0;
-
-        return float.NaN;
-    }
+    /// <summary>
+    /// 上書き用の値
+    /// </summary>
+    public T OverrideValue;
 
     public static implicit operator Parameter<T>(T value) => new(value);
+    public static implicit operator Parameter<T>((T, bool) value) => new(value.Item1, enable: value.Item2);
 }

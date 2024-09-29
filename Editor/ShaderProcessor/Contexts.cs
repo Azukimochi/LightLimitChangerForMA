@@ -17,6 +17,7 @@ internal abstract class ConfigureAnimationContextBase
     public string Name { get; init; }
     public AnimationClip AnimationClip { get; init; }
     public ReadOnlyMemory<Renderer> Renderers { get; init; }
+    public ISettings DeclaringSettings { get; init; }
 }
 
 internal class ConfigureEmptyAnimationContext : ConfigureAnimationContextBase

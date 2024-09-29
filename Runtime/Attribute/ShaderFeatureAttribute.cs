@@ -3,7 +3,7 @@
 /// <summary>
 /// シェーダー固有の機能のマーカー
 /// </summary>
-[AttributeUsage(AttributeTargets.Field)]
+[AttributeUsage(AttributeTargets.Field | AttributeTargets.Class)]
 internal sealed class ShaderFeatureAttribute : PropertyAttribute
 {
     /// <param name="names">プロセサーのID</param>

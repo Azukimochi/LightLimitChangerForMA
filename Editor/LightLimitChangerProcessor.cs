@@ -153,6 +153,10 @@ internal sealed class LightLimitChangerProcessor : IDisposable
 
             var generalType = field.GetCustomAttribute<GeneralControlAttribute>()?.Type ?? default;
             var shaderFeatureAttr = field.GetCustomAttribute<ShaderFeatureAttribute>();
+            if (shaderFeatureAttr == null)
+            {
+                shaderFeatureAttr = typeof(TSettings).GetCustomAttribute<ShaderFeatureAttribute>();
+            }
 
             var name = field.Name;
 
@@ -183,6 +187,7 @@ internal sealed class LightLimitChangerProcessor : IDisposable
                 AnimationClip = anim,
                 AvatarParameter = avatarParameter,
                 Type = generalType,
+                DeclaringSettings = settings,
             };
 
             foreach (var processor in processors.AsSpan())

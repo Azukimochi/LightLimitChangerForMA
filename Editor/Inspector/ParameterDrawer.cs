@@ -70,7 +70,14 @@ internal sealed class ParameterDrawer : PropertyDrawer
         }
         else
         {
-            EditorGUI.PropertyField(p, valueProp, GUIContent.none);
+            if (valueProp.propertyType == SerializedPropertyType.Boolean)
+            {
+                ToggleDrawer.Draw(p, valueProp, GUIContent.none);
+            }
+            else
+            {
+                EditorGUI.PropertyField(p, valueProp, GUIContent.none);
+            }
         }
         EditorGUI.EndDisabledGroup();
 

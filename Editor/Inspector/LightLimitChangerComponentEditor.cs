@@ -91,7 +91,7 @@ internal sealed class LightLimitChangerComponentEditor : Editor
         CategoryLabel("Shader Settings");
         EditorGUILayout.Space();
 
-        DoFoldoutedGroup(serializedObject.FindProperty("LilToon"), "lilToon Settings", static property =>
+        DoFoldoutedGroup(serializedObject.FindProperty("LilToon"), "lilToon Settings", property =>
         {
             EditorGUILayout.LabelField("Override Settings", EditorStyles.boldLabel);
             EditorGUILayout.PropertyField(property.FindPropertyRelative("ShadowEnvStrength"));
@@ -101,6 +101,12 @@ internal sealed class LightLimitChangerComponentEditor : Editor
             EditorGUILayout.LabelField("Additional Settings", EditorStyles.boldLabel);
 
             EditorGUILayout.Space();
+
+
+            DoFoldoutedGroup(property.FindPropertyRelative("Backlight"), "Backlight Settings", property =>
+            {
+                EditorGUILayout.PropertyField(property);
+            });
         });
 
         DoFoldoutedGroup(serializedObject.FindProperty("Poiyomi"), "Poiyomi Settings", property =>
