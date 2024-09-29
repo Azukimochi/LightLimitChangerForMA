@@ -24,6 +24,8 @@ namespace io.github.azukimochi
                     for (int i = 0; i <  materials.Length; i++)
                     {
                         var material = materials[i];
+                        if (material == null)
+                            continue;
                         // 対象レンダラー内に対象じゃないマテリアルが存在している？🤔
                         if (!ShaderInfo.TryGetShaderInfo(material, out var shaderInfo) || !session.Parameters.TargetShaders.Contains(shaderInfo.Name))
                         {
