@@ -16,6 +16,8 @@ internal abstract class ShaderProcessor : ILightLimitChangerProcessorReceiver
     protected LightLimitChangerProcessor Processor => processor;
     private LightLimitChangerProcessor processor;
 
+    protected LightLimitChangerComponent Component => processor.Component;
+
     void ILightLimitChangerProcessorReceiver.Initialize(LightLimitChangerProcessor processor) 
     { 
         this.processor = processor;
