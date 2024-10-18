@@ -42,13 +42,7 @@ internal abstract class ShaderProcessor : ILightLimitChangerProcessorReceiver
     /// マテリアルが複製された際に呼び出される
     /// </summary>
     /// <param name="material"></param>
-    public virtual void OnMaterialCloned(Material material) 
-    {
-        if (!IsTargetMaterial(material)) 
-            return;
-
-        NormalizeMaterial(material);
-    }
+    public virtual void OnMaterialCloned(Material material) { }
 
     /// <summary>
     /// マテリアルの正規化（テクスチャの焼き込みなど）を行う

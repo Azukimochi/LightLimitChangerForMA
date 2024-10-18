@@ -5,6 +5,7 @@ using gomoru.su;
 using nadena.dev.modular_avatar.core;
 using nadena.dev.ndmf;
 using UnityEditor.Animations;
+using UnityEngine;
 using VRC.Core;
 using VRC.SDK3.Avatars.Components;
 using VRC.SDK3.Avatars.ScriptableObjects;
@@ -25,7 +26,12 @@ internal sealed class LightLimitChangerProcessor : IDisposable
     private ModularAvatarMenuItem menuRoot;
     private DirectBlendTree blendTree;
     private Renderer[] targetRenderers;
+    private Material[] targetMaterials;
     private AnimatorController animatorController;
+
+    public ReadOnlySpan<ShaderProcessor> Processors => processors.AsSpan();
+    public ReadOnlySpan<Renderer> TargetRenderers => targetRenderers;
+    public ReadOnlySpan<Material> TargetMaterials => targetMaterials;
 
     public LightLimitChangerProcessor(BuildContext context)
     {
@@ -54,9 +60,19 @@ internal sealed class LightLimitChangerProcessor : IDisposable
 
         CloneMaterials();
 
-        GenerateAnimations();
+        SetupAnimations();
+
+        ConfigureSettings(Component.General.LightingControl);
+        ConfigureSettings(Component.General.ColorControl);
+        ConfigureSettings(Component.General.EmissionControl);
+        ConfigureSettings(Component.LilToon);
+        ConfigureSettings(Component.Poiyomi);
 
         GenerateParameters();
+
+
+        var layer = blendTree.ToAnimatorControllerLayer(animatorController);
+        animatorController.AddLayer(layer);
 
         RemoveEmptySubMenus(menuRoot);
     }
@@ -65,6 +81,7 @@ internal sealed class LightLimitChangerProcessor : IDisposable
     {
         var components = AvatarRootObject.GetComponentsInChildren<Component>(true);
         var rootAnimator = AvatarRootObject.GetComponent<Animator>();
+        var materials = new HashSet<Material>();
         foreach (var x in components)
         {
             if (x == rootAnimator || x == Component) continue;
@@ -77,39 +94,13 @@ internal sealed class LightLimitChangerProcessor : IDisposable
             {
                 try
                 {
-                    if (p.propertyType == SerializedPropertyType.ObjectReference)
+                    if (p.propertyType != SerializedPropertyType.ObjectReference)
+                        continue;
+
+                    var result = Clone(p.objectReferenceValue);
+                    if (result != null)
                     {
-                        var obj = p.objectReferenceValue;
-                        if (obj == null) continue;
-
-                        Object replace;
-
-                        if (cache.TryGetValue(obj, out var mapped))
-                        {
-                            replace = mapped;
-                        }
-                        else if (obj is Material mat)
-                        {
-                            mat = Object.Instantiate(mat);
-                            mat.name = $"{obj.name}(LLC)";
-                            ObjectRegistry.RegisterReplacedObject(obj, mat);
-                            AssetDatabase.AddObjectToAsset(mat, context.AssetContainer);
-
-                            foreach (var processor in processors)
-                            {
-                                processor.OnMaterialCloned(mat);
-                            }
-
-                            replace = mat;
-                            cache.TryAdd(obj, mat);
-                        }
-                        //else if (obj is RuntimeAnimatorController runtimeAnimatorController)
-                        else
-                        {
-                            replace = obj;
-                        }
-
-                        p.objectReferenceValue = replace;
+                        p.objectReferenceValue = result;
                     }
                 }
                 finally
@@ -147,9 +138,56 @@ internal sealed class LightLimitChangerProcessor : IDisposable
                 }
             }
         }
+
+        targetMaterials = materials.ToArray();
+
+        Object Clone(Object obj)
+        {
+            if (obj == null)
+                return null;
+
+            if (cache.TryGetValue(obj, out var mapped))
+            {
+                return mapped;
+            }
+            else if (obj is Material mat)
+            {
+                Material cloned = null;
+                foreach (var processor in Processors)
+                {
+                    if (!processor.IsTargetMaterial(mat))
+                        continue;
+
+                    cloned = Object.Instantiate(mat);
+                    cloned.name = $"{obj.name}(LLC)";
+                    ObjectRegistry.RegisterReplacedObject(obj, mat);
+                    AssetDatabase.AddObjectToAsset(mat, context.AssetContainer);
+
+                    materials.Add(cloned);
+                    cache.TryAdd(obj, cloned);
+                    break;
+                }
+
+                if (cloned == null)
+                    return null;
+
+                foreach (var processor in Processors)
+                {
+                    processor.OnMaterialCloned(cloned);
+                    if (!processor.IsTargetMaterial(cloned))
+                        continue;
+
+                    processor.NormalizeMaterial(cloned);
+                }
+
+                return cloned;
+            }
+
+            return null;
+        }
     }
 
-    private void GenerateAnimations()
+    private void SetupAnimations()
     {
         var go = Component.gameObject;
         blendTree = new DirectBlendTree() { Name = LightLimitChanger.Title };
@@ -174,17 +212,6 @@ internal sealed class LightLimitChangerProcessor : IDisposable
         mam.Control.type = VRCExpressionsMenu.Control.ControlType.SubMenu;
         mam.MenuSource = SubmenuSource.Children;
         menuRoot = mam;
-
-        ConfigureSettings(Component.General.LightingControl);
-        ConfigureSettings(Component.General.ColorControl);
-        ConfigureSettings(Component.General.EmissionControl);
-
-        ConfigureSettings(Component.LilToon);
-        ConfigureSettings(Component.Poiyomi);
-
-        var layer = blendTree.ToAnimatorControllerLayer(animatorController);
-        animatorController.AddLayer(layer);
-
     }
 
     private void GenerateParameters()
