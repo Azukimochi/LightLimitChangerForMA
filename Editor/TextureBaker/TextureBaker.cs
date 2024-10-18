@@ -1,9 +1,31 @@
-﻿using UnityEngine.Rendering;
+﻿using System.Collections.Generic;
+using UnityEngine.Rendering;
 
 namespace io.github.azukimochi;
 
 internal static class TextureBaker 
 {
+    private static Dictionary<int, Texture2D> cache = new();
+
+    public static Texture2D GetOrBake(Texture texture, Material material, TextureFormat format = default)
+    {
+        if (format == default)
+            format = GetTextureFormat(texture, material.Get("_Color", Color.white));
+
+        HashCode hash = new();
+        hash.Add(texture.GetHashCode());
+        hash.Add(material.ComputeCRC());
+        hash.Add(format);
+        var hashCode = hash.ToHashCode();
+
+        if (cache.TryGetValue(hashCode, out var result) && result != null)
+            return result;
+
+        result = Bake(texture, material, format);
+        cache[hashCode] = result;
+        return result;
+    }
+
     public static Texture2D Bake(Texture texture, Material material, TextureFormat format = default)
     {
         if (material == null)
