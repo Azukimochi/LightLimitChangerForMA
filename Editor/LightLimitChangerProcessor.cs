@@ -160,8 +160,8 @@ internal sealed class LightLimitChangerProcessor : IDisposable
 
                     cloned = Object.Instantiate(mat);
                     cloned.name = $"{obj.name}(LLC)";
-                    ObjectRegistry.RegisterReplacedObject(obj, mat);
-                    AssetDatabase.AddObjectToAsset(mat, context.AssetContainer);
+                    ObjectRegistry.RegisterReplacedObject(obj, cloned);
+                    AssetDatabase.AddObjectToAsset(cloned, context.AssetContainer);
 
                     materials.Add(cloned);
                     cache.TryAdd(obj, cloned);
