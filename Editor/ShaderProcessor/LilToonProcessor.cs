@@ -28,7 +28,7 @@ internal sealed class LilToonProcessor : ShaderProcessor
 
     #endregion
     
-    private static readonly Unizy<Material> bakerMaterial = new(() => new Material(Shader.Find("Hidden/ltsother_baker")));
+    private static readonly LazyObject<Material> bakerMaterial = new(() => new Material(Shader.Find("Hidden/ltsother_baker")));
 
     public override bool IsTargetMaterial(Material material)
     {

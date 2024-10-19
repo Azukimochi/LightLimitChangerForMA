@@ -1,11 +1,11 @@
 ﻿namespace io.github.azukimochi;
 
-internal sealed class Unizy<T> where T : Object
+internal sealed class LazyObject<T> where T : Object
 {
     private readonly Func<T> factory;
     private T value = null;
 
-    public Unizy(Func<T> factory)
+    public LazyObject(Func<T> factory)
     {
         this.factory = factory;
     }
@@ -20,5 +20,5 @@ internal sealed class Unizy<T> where T : Object
         }
     }
 
-    public static implicit operator T(Unizy<T> value) => value.Value;
+    public static implicit operator T(LazyObject<T> value) => value.Value;
 }
