@@ -1,0 +1,143 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &4142581062046429042
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6351261638362371547}
+  - component: {fileID: 1455933471504157708}
+  - component: {fileID: -8108710553420679277}
+  m_Layer: 0
+  m_Name: Light Limit Changer (V2)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6351261638362371547
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4142581062046429042}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -1, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1455933471504157708
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4142581062046429042}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dc1c13143f54e394ebe57b222b49f3d2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Version: 2
+  General:
+    AllowParameterController: 1
+    OverwriteMaterialParameters: 1
+    OverwriteMeshSettings: 1
+    LightingControl:
+      MinLight:
+        Enable: 1
+        Saved: 1
+        Synced: 1
+        InitialValue: 0.05
+        OverrideValue: 0.05
+      MaxLight:
+        Enable: 1
+        Saved: 1
+        Synced: 1
+        InitialValue: 1
+        OverrideValue: 1
+      MinLightRange: {x: 0, y: 1}
+      MaxLightRange: {x: 0, y: 1}
+      Monochrome:
+        Enable: 1
+        Saved: 1
+        Synced: 1
+        InitialValue: 0
+        OverrideValue: 0
+      Unlit:
+        Enable: 1
+        Saved: 1
+        Synced: 1
+        InitialValue: 0
+        OverrideValue: 0
+    ColorControl:
+      Hue:
+        Enable: 1
+        Saved: 1
+        Synced: 1
+        InitialValue: 0
+        OverrideValue: 0
+      Saturation:
+        Enable: 1
+        Saved: 1
+        Synced: 1
+        InitialValue: 1
+        OverrideValue: 1
+      Brightness:
+        Enable: 1
+        Saved: 1
+        Synced: 1
+        InitialValue: 1
+        OverrideValue: 1
+      Gamma:
+        Enable: 1
+        Saved: 1
+        Synced: 1
+        InitialValue: 1
+        OverrideValue: 1
+    EmissionControl:
+      Strength:
+        Enable: 1
+        Saved: 1
+        Synced: 1
+        InitialValue: 1
+        OverrideValue: 1
+  LilToon:
+    ShadowEnvStrength:
+      Enable: 1
+      Saved: 1
+      Synced: 1
+      InitialValue: 0
+      OverrideValue: 0
+    VertexLightStrength:
+      Enable: 1
+      Saved: 1
+      Synced: 1
+      InitialValue: 0
+      OverrideValue: 0
+  Excludes: []
+  WriteDefaults: 0
+  TargetShader:
+    ShaderIds:
+    - EVERYTHING
+--- !u!114 &-8108710553420679277
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4142581062046429042}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7ef83cb0c23d4d7c9d41021e544a1978, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  menuToAppend: {fileID: 0}
+  installTargetMenu: {fileID: 0}
