@@ -4,10 +4,9 @@ namespace io.github.azukimochi;
 
 internal abstract class BasePrefs<T> : ScriptableSingleton<T>, IPreferences where T : ScriptableSingleton<T>
 {
-    [SerializeField]
-    private List<string> presets;
+    public List<string> Presets = new();
 
-    public List<string> Presets => presets ??= new();
-    
+    List<string> IPreferences.Presets => Presets;
+
     public void Save() => Save(true);
 }
