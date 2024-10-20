@@ -8,7 +8,7 @@ namespace io.github.azukimochi
 {
     public sealed partial class LightLimitChanger : Plugin<LightLimitChanger>
     {
-        internal const string Title = "LightLimitChanger";
+        internal const string Title = "Light Limit Changer";
 
         public override string QualifiedName => "io.github.azukimochi.light-limit-changer";
 
