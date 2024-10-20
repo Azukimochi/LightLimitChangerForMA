@@ -3,5 +3,10 @@
 internal static class AssetUtils
 {
     public static T FromGUID<T>(string guid) where T : Object
-        => AssetDatabase.LoadAssetAtPath<T>(AssetDatabase.GUIDToAssetPath(guid));
+    { 
+        var path = AssetDatabase.GUIDToAssetPath(guid);
+        if (string.IsNullOrEmpty(path))
+            return null;
+        return AssetDatabase.LoadAssetAtPath<T>(path); 
+    }
 }
