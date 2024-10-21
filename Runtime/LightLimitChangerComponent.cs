@@ -3,14 +3,13 @@ using VRC.SDKBase;
 
 namespace io.github.azukimochi
 {
-
     [DisallowMultipleComponent]
     [AddComponentMenu("NDMF/Light Limit Changer")]
     public sealed class LightLimitChangerComponent : MonoBehaviour, IEditorOnly
     {
         // コンポーネント作成時のバージョン マイグレーションとかに使える？
         [HideInInspector]
-        public float Version = 2;
+        public SemVer Version = EditorMarshal.GetCurrentVersion?.Invoke() ?? new(2, 0, 0);
 
         /// <summary>
         /// 基本設定

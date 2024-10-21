@@ -23,4 +23,20 @@ internal static class StringExt
         }
         return -1;
     }
+
+    public static int SplitAny(this ReadOnlySpan<char> span, Span<Range> ranges, ReadOnlySpan<char> values)
+    {
+        int start = 0;
+        int count = 0;
+        int idx;
+        while ((idx = span[start..].IndexOfAny(values)) != -1)
+        {
+            if (ranges.Length + 1 < count)
+                break;
+            ranges[count++] = start..(start + idx);
+            start += idx + 1;
+        }
+        ranges[count++] = start..;
+        return count;
+    }
 }

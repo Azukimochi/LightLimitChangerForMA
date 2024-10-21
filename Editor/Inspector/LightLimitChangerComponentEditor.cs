@@ -27,7 +27,7 @@ internal sealed class LightLimitChangerComponentEditor : Editor
 
         using (new EditorGUI.DisabledScope(true))
         {
-            EditorGUILayout.FloatField("Version", target.Version);
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("Version"));
         }
         using (new EditorGUILayout.HorizontalScope()) {
             GUILayout.FlexibleSpace();

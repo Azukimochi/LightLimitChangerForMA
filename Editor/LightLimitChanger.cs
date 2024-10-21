@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.IO;
 using nadena.dev.ndmf;
 using UnityEngine;
 
@@ -18,6 +19,21 @@ namespace io.github.azukimochi
 
         public override Color? ThemeColor => new Color(0.0f, 0.2f, 0.8f);
 
+        public static SemVer Version { get; private set; }
+
+        static LightLimitChanger()
+        {
+            EditorApplication.delayCall += () =>
+            {
+                var packageInfo = JsonUtility.FromJson<PackageInfo>(
+                    File.ReadAllText(Path.Combine(Path.GetDirectoryName(Application.dataPath), AssetDatabase.GUIDToAssetPath("a82bfa088b3f7634aaadfdea98eb87e0"))));
+
+                if (packageInfo != null)
+                {
+                    Version = SemVer.Parse(packageInfo.version);
+                }
+            };
+        }
 
 
         protected override void Configure()
@@ -58,6 +74,12 @@ namespace io.github.azukimochi
             {
                 processor.AddProcessor<UnlitWFProcessor>();
             }
+        }
+
+        [Serializable]
+        private sealed class PackageInfo
+        {
+            public string version;
         }
     }
 }
