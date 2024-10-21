@@ -4,6 +4,6 @@ namespace io.github.azukimochi;
 
 internal interface IPreferences
 {
-    List<string> Presets { get; }
+    Dictionary<string, string> Presets { get; }
     void Save();
 }

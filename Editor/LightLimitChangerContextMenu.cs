@@ -17,25 +17,47 @@ namespace io.github.azukimochi;
 internal static class LightLimitChangerContextMenu
 {
     private const string MenuRoot = "GameObject/" + LightLimitChanger.Title + "/";
-    private const int MenuPriority = -1000;
+    private const int MenuPriority = -100;
 
     private const string SetupMenuPath = MenuRoot + "Setup";
 
     static LightLimitChangerContextMenu()
     {
+        const string PathRoot = LightLimitChanger.Title + "/" + "Preset/";
         SceneHierarchyHooks.addItemsToGameObjectContextMenu += (menu, gameObject) =>
         {
-            if (!gameObject.TryGetComponent<VRCAvatarDescriptor>(out _))
+            if (!Selection.gameObjects.Any(x => x.TryGetComponent<VRCAvatarDescriptor>(out _)))
                 return;
 
             // TODO: 保存済みのプリセットを追加できるようにする
+
+            foreach(var key in PresetManager.Local.Keys)
+            {
+                menu.AddItem(new($"{PathRoot}{key} [Local]"), false, static context => Setup(component => PresetManager.Local.TryLoad(context as string, component)), key);
+            }
+
+            foreach (var key in PresetManager.Global.Keys)
+            {
+                menu.AddItem(new($"{PathRoot}{key} [Global]"), false, static context => Setup(component => PresetManager.Global.TryLoad(context as string, component)), key);
+            }
+
+            menu.AddSeparator($"{PathRoot}");
+            menu.AddItem(new($"{PathRoot}Open Preset Manager ..."), false, () => { });
         };
 
         return;
     }
 
     [MenuItem(SetupMenuPath, false, MenuPriority)]
-    public static void Setup()
+    public static void Setup() => Setup(null);
+
+    [MenuItem(SetupMenuPath, true, MenuPriority)]
+    public static bool SetupValidate()
+    {
+        return Selection.gameObjects.Any(x => x.TryGetComponent<VRCAvatarDescriptor>(out _));
+    }
+
+    private static void Setup(Action<LightLimitChangerComponent> factory)
     {
         var selection = Selection.objects;
         foreach (ref var select in selection.AsSpan())
@@ -52,11 +74,13 @@ internal static class LightLimitChangerContextMenu
                 // TODO: 重複インストールの警告
             }
 
-            var prefab = LightLimitChangerPrefab.DefaultSettings;
+            var prefab = PresetManager.DefaultSettings;
             if (prefab != null)
             {
                 prefab = PrefabUtility.InstantiatePrefab(prefab, avatarRoot.transform) as GameObject;
                 prefab.name = LightLimitChanger.Title;
+                if (!prefab.TryGetComponent<LightLimitChangerComponent>(out _))
+                    prefab.AddComponent<LightLimitChangerComponent>();
             }
             else
             {
@@ -64,17 +88,13 @@ internal static class LightLimitChangerContextMenu
                 prefab.AddComponent<LightLimitChangerComponent>();
                 prefab.transform.parent = avatarRoot.transform;
             }
-            
+
+            factory?.Invoke(prefab.GetComponent<LightLimitChangerComponent>());
+
             select = prefab;
 
             EditorGUIUtility.PingObject(prefab);
         }
         Selection.objects = selection;
-    }
-
-    [MenuItem(SetupMenuPath, true, MenuPriority)]
-    public static bool SetupValidate()
-    {
-        return Selection.gameObjects.Any(x => x.TryGetComponent<VRCAvatarDescriptor>(out _));
     }
 }
