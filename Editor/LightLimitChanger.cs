@@ -25,14 +25,21 @@ namespace io.github.azukimochi
         {
             EditorApplication.delayCall += () =>
             {
-                var packageInfo = JsonUtility.FromJson<PackageInfo>(
-                    File.ReadAllText(Path.Combine(Path.GetDirectoryName(Application.dataPath), AssetDatabase.GUIDToAssetPath("a82bfa088b3f7634aaadfdea98eb87e0"))));
-
-                if (packageInfo != null)
-                {
-                    Version = SemVer.Parse(packageInfo.version);
-                }
+                Version = GetCurrentVersion();
             };
+        }
+
+        private static SemVer GetCurrentVersion()
+        {
+            var packageInfo = JsonUtility.FromJson<PackageInfo>(
+                File.ReadAllText(Path.Combine(Path.GetDirectoryName(Application.dataPath), AssetDatabase.GUIDToAssetPath("a82bfa088b3f7634aaadfdea98eb87e0"))));
+
+            if (packageInfo != null)
+            {
+                return SemVer.Parse(packageInfo.version);
+            }
+
+            return default;
         }
 
 
