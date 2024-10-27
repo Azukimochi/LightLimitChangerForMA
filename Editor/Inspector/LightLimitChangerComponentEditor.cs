@@ -1,4 +1,4 @@
-﻿using Target = io.github.azukimochi.LightLimitChangerComponent;
+using Target = io.github.azukimochi.LightLimitChangerComponent;
 using System.Linq;
 using UnityEngine.UIElements;
 
@@ -25,9 +25,7 @@ internal sealed class LightLimitChangerComponentEditor : Editor
     {
         var target = (Target)base.target;
 
-        using (new EditorGUI.DisabledScope(true))
-        {
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("Version"));
+        CategoryLabel($"{LightLimitChanger.Title} {LightLimitChanger.Version}");
         }
         using (new EditorGUILayout.HorizontalScope()) {
             GUILayout.FlexibleSpace();
