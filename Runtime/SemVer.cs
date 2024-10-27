@@ -1,9 +1,7 @@
-﻿using System.Collections.Generic;
-
-namespace io.github.azukimochi;
+﻿namespace io.github.azukimochi;
 
 [Serializable]
-public sealed class SemVer
+public struct SemVer
 {
     public int Major;
     public int Minor;
@@ -41,7 +39,7 @@ public sealed class SemVer
         return new SemVer(int.Parse(major), int.Parse(minor), int.Parse(patch), label);
     }
 
-    public int CompareTo(SemVer other)
+    public readonly int CompareTo(SemVer other)
     {
         var major = Major.CompareTo(other.Major);
         if (major != 0)
@@ -63,16 +61,21 @@ public sealed class SemVer
             return Label.AsSpan().CompareTo(other.Label, StringComparison.OrdinalIgnoreCase);
     }
 
-    public override string ToString() => $"{Major}.{Minor}.{Patch}{(Label.AsSpan().IsEmpty ? "" : "-")}{Label}";
-
-}
-
-internal sealed class SemVerComparer : IComparer<string>
-{
-    public static SemVerComparer Instance { get; } = new SemVerComparer();
-
-    public int Compare(string x, string y)
+    public readonly override bool Equals(object obj)
     {
-        return SemVer.Parse(x).CompareTo(SemVer.Parse(y));
+        if (obj is not SemVer other)
+            return false;
+
+        return 
+            this.Major == other.Major && 
+            this.Minor == other.Minor &&
+            this.Patch == other.Patch && 
+            this.Label == other.Label; 
     }
+
+    public readonly override string ToString() => $"{Major}.{Minor}.{Patch}{(Label.AsSpan().IsEmpty ? "" : "-")}{Label}";
+
+    public readonly override int GetHashCode() => HashCode.Combine(Major, Minor, Patch, Label);
+
+    public readonly bool IsDefault => Major == 0 && Minor == 0 && Patch == 0 && string.IsNullOrEmpty(Label);
 }
