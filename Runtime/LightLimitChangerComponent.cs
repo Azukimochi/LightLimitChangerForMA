@@ -11,6 +11,9 @@ namespace io.github.azukimochi
         [HideInInspector]
         public SemVer Version = EditorMarshal.GetCurrentVersion?.Invoke() ?? new(2, 0, 0);
 
+        [HideInInspector]
+        public string PresetName;
+
         /// <summary>
         /// 基本設定
         /// </summary>
