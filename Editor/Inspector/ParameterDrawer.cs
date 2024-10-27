@@ -27,6 +27,8 @@ internal sealed class ParameterDrawer : PropertyDrawer
         var valueProp = property.FindPropertyRelative(isOverrideValue ? "OverrideValue" : "InitialValue");
         //var rangeProp = property.FindPropertyRelative("Range");
         var enableProp = property.FindPropertyRelative("Enable");
+        var savedProp = property.FindPropertyRelative("Saved");
+        var syncedProp = property.FindPropertyRelative("Synced");
         position.height = EditorGUIUtility.singleLineHeight;
 
         var p = position;
@@ -77,26 +79,25 @@ internal sealed class ParameterDrawer : PropertyDrawer
         if (!property.isExpanded || LightLimitChangerComponentEditor.SelectedTab == LightLimitChangerComponentEditor.Tab.BasicSettings)
             return;
 
-        EditorGUI.indentLevel++;
+        
         position.y += EditorGUIUtility.singleLineHeight;
-        position.x += EditorGUIUtility.labelWidth + 30;
+        position.x += EditorGUIUtility.labelWidth;
         position.width -= EditorGUIUtility.labelWidth;
 
         p = position with { width = position.width / 3 };
-        for (int i = 0; i < 3; i++)
+        DrawEnableButton(ref p, enableProp);
+        DrawEnableButton(ref p, savedProp);
+        DrawEnableButton(ref p, syncedProp);
+    }
+
+    private static void DrawEnableButton(ref Rect p, SerializedProperty prop)
+    {
+        EditorGUI.BeginChangeCheck();
+        var v = EditorGUI.ToggleLeft(p, prop.displayName, prop.boolValue);
+        if (EditorGUI.EndChangeCheck())
         {
-            var p2 = EditorStyles.toggle;
-            EditorGUI.indentLevel -= 3;
-            EditorGUI.BeginChangeCheck();
-            var v = EditorGUI.ToggleLeft(p, enableProp.displayName, enableProp.boolValue);
-            if (EditorGUI.EndChangeCheck())
-            {
-                enableProp.boolValue = v;
-            }
-            EditorGUI.indentLevel += 3;
-            p.x += p.width;
-            enableProp.Next(false);
+            prop.boolValue = v;
         }
-        EditorGUI.indentLevel--;
+        p.x += p.width;
     }
 }
