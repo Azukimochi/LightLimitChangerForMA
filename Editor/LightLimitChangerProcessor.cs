@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using gomoru.su;
@@ -27,6 +29,7 @@ internal sealed class LightLimitChangerProcessor : IDisposable
     private DirectBlendTree blendTree;
     private Renderer[] targetRenderers;
     private Material[] targetMaterials;
+    private ImmutableDictionary<ShaderProcessor, Material[]> shaderMaterialPair;
     private AnimatorController animatorController;
 
     public ReadOnlySpan<ShaderProcessor> Processors => processors.AsSpan();
@@ -82,6 +85,7 @@ internal sealed class LightLimitChangerProcessor : IDisposable
         var components = AvatarRootObject.GetComponentsInChildren<Component>(true);
         var rootAnimator = AvatarRootObject.GetComponent<Animator>();
         var materials = new HashSet<Material>();
+        var dict = new Dictionary<ShaderProcessor, List<Material>>();
         foreach (var x in components)
         {
             if (x == rootAnimator || x == Component) continue;
@@ -140,6 +144,20 @@ internal sealed class LightLimitChangerProcessor : IDisposable
         }
 
         targetMaterials = materials.ToArray();
+        shaderMaterialPair = dict.ToImmutableDictionary(x => x.Key, x => x.Value.ToArray());
+
+        foreach (var processor in Processors)
+        {
+            processor.OnMaterialCloned(targetMaterials);
+        }
+
+        foreach (var pair in shaderMaterialPair)
+        {
+            foreach (var mat in pair.Value.AsSpan())
+            {
+                pair.Key.NormalizeMaterial(mat);
+            }
+        }
 
         Object Clone(Object obj)
         {
@@ -165,20 +183,12 @@ internal sealed class LightLimitChangerProcessor : IDisposable
 
                     materials.Add(cloned);
                     cache.TryAdd(obj, cloned);
+                    dict.GetOrAdd(processor, _ => new()).Add(cloned);
                     break;
                 }
 
                 if (cloned == null)
                     return null;
-
-                foreach (var processor in Processors)
-                {
-                    processor.OnMaterialCloned(cloned);
-                    if (!processor.IsTargetMaterial(cloned))
-                        continue;
-
-                    processor.NormalizeMaterial(cloned);
-                }
 
                 return cloned;
             }
@@ -265,20 +275,34 @@ internal sealed class LightLimitChangerProcessor : IDisposable
         }
 
         var fields = typeof(TSettings).GetFields(BindingFlags.Instance | BindingFlags.Public);
-        using ValueDictionary<string, List<(FieldInfo FieldInfo, Parameter<float> Parameter)>> vectorGroup = new();
+        using ValueDictionary<string, List<ParameterInfo>> vectorGroup = new();
         foreach (var field in fields)
         {
             if (field.FieldType.BaseType != typeof(Parameter))
                 continue;
 
-            var t = field.FieldType.GenericTypeArguments[0];
-            var parameter = field.GetValue(settings) as Parameter<float>;
+            var parameterInfo = new ParameterInfo(settings, field);
+            var parameter = parameterInfo.Parameter;
 
             if (field.GetCustomAttribute<VectorFieldAttribute>() is { } vectorAttr)
             {
                 ref var list = ref vectorGroup.GetOrAdd(vectorAttr.Group);
                 list ??= new();
-                list.Add((field, parameter));
+                list.Add(parameterInfo);
+            }
+
+            if (parameter.IsOverride)
+            {
+                foreach (var pair in shaderMaterialPair)
+                {
+                    if (!parameterInfo.MaterialProperties.TryGetValue(pair.Key.QualifiedName, out var propertyName))
+                        propertyName = pair.Key.GetMaterialPropertyName(parameterInfo);
+
+                    if (propertyName == null)
+                        continue;
+
+                    pair.Key.OverrideMaterialValue(new OverrideMaterialValueContext() { ParameterInfo = parameterInfo, PropertyName = propertyName, Materials = pair.Value });
+                }
             }
 
             if (!parameter.Enable)
@@ -305,7 +329,7 @@ internal sealed class LightLimitChangerProcessor : IDisposable
             var tree = group.AddMotionTime(name);
             var anim = tree.Animation = new AnimationClip() { name = $"{LightLimitChanger.Title} {name}" };
             AssetDatabase.AddObjectToAsset(anim, AssetContainer);
-
+            var t = parameterInfo.ParameterType;
             var avatarParameter = new ParameterConfig()
             {
                 nameOrPrefix = $"{settings.ParameterPrefix}{field.Name}",
@@ -323,7 +347,8 @@ internal sealed class LightLimitChangerProcessor : IDisposable
 
             var context = new ConfigureGeneralAnimationContext()
             {
-                Name = name,
+                ParameterInfo = parameterInfo,
+                PropertyName = null,
                 Renderers = targetRenderers,
                 AnimationClip = anim,
                 AvatarParameter = avatarParameter,
@@ -333,6 +358,17 @@ internal sealed class LightLimitChangerProcessor : IDisposable
             foreach (var processor in processors.AsSpan())
             {
                 context.Range = range; // Range is mutable.
+
+                // 操作対象のパラメーター名を取得する
+                // Parameter<T>にMaterialPropertyNameAttr. が付いてればそっちから、なかったらProcessorに問い合わせる
+                if (!parameterInfo.MaterialProperties.TryGetValue(processor.QualifiedName, out var propertyName))
+                    propertyName = processor.GetMaterialPropertyName(parameterInfo);
+
+                if (propertyName == null)
+                    continue;
+
+                context.PropertyName = propertyName;
+
                 if (shaderFeatureAttr is null)
                 {
                     processor.ConfigureGeneralAnimation(context);
@@ -374,20 +410,27 @@ internal sealed class LightLimitChangerProcessor : IDisposable
 
             foreach (var x in entry.Value.AsSpan())
             {
-                var (field, parameter) = x;
+                var parameter = x.Parameter;
                 if (parameter.Enable)
                     continue;
 
-                var generalType = field.GetCustomAttribute<GeneralControlAttribute>()?.Type ?? default;
+                var generalType = x.FieldInfo.GetCustomAttribute<GeneralControlAttribute>()?.Type ?? default;
                 var context = new ConfigureEmptyAnimationContext()
                 {
-                    Name = field.Name,
+                    ParameterInfo = x,
                     Renderers = targetRenderers,
                     AnimationClip = anim,
                     Type = generalType,
                 };
                 foreach (var processor in processors.AsSpan())
                 {
+                    if (!x.MaterialProperties.TryGetValue(processor.QualifiedName, out var propertyName))
+                        propertyName = processor.GetMaterialPropertyName(x);
+
+                    if (propertyName == null)
+                        continue;
+
+                    context.PropertyName = propertyName;
                     context.Value = parameter.InitialValue;
                     processor.ConfigreEmptyAnimation(context);
                 }

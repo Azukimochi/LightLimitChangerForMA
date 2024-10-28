@@ -1,4 +1,6 @@
-﻿namespace io.github.azukimochi;
+﻿using System.Reflection;
+
+namespace io.github.azukimochi;
 
 internal sealed class LilToonProcessor : ShaderProcessor
 {
@@ -37,25 +39,14 @@ internal sealed class LilToonProcessor : ShaderProcessor
         return false;
     }
 
-    public override string GetMaterialPropertyNameFromTypeOrName(GeneralControlType type, string name)
+    public SerializedProperty GetMaterialProperty(SerializedProperty properties, ISettings settings, Parameter parameter)
     {
-        return (type, name) switch
+        if (settings is LightingSettings lightingSettings)
         {
-            (GeneralControlType.MinLight, _) => _LightMinLimit,
-            (GeneralControlType.MaxLight, _) => _LightMaxLimit,
-            (GeneralControlType.Monochrome, _) => _MonochromeLighting,
-            (GeneralControlType.Unlit, _) => _AsUnlit,
-            (GeneralControlType.ColorControlHue, _) => $"{_MainTexHSVG}.x",
-            (GeneralControlType.ColorControlSaturation, _) => $"{_MainTexHSVG}.y",
-            (GeneralControlType.ColorControlBrightness, _) => $"{_MainTexHSVG}.z",
-            (GeneralControlType.ColorControlGamma, _) => $"{_MainTexHSVG}.w",
-            (GeneralControlType.EmissionStrength, _) => _EmissionBlend,
-
-            (_, nameof(LilToonSettings.VertexLightStrength)) => _VertexLigthStrength,
-            (_, nameof(LilToonSettings.ShadowEnvStrength)) => _ShadowEnvStrength,
-
-            _ => null
-        };
+            if (parameter == lightingSettings.MinLight)
+                return properties.FindPropertyRelative(_LightMinLimit);
+        }
+        return null;
     }
 
     public override void ConfigureGeneralAnimation(ConfigureGeneralAnimationContext context)

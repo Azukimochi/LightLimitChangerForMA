@@ -13,6 +13,7 @@ public sealed class LightingSettings : ISettings
     /// </summary>
     [RangeParameter(nameof(MinLightRange))]
     [GeneralControl(GeneralControlType.MinLight)]
+    [MaterialPropertyName(BuiltinSupportedShaders.LilToon, "_LightMinLimit")]
     [MenuIcon(Icons.Light_Min)]
     public Parameter<float> MinLight = 0.05f;
 
@@ -21,6 +22,7 @@ public sealed class LightingSettings : ISettings
     /// </summary>
     [RangeParameter(nameof(MaxLightRange))]
     [GeneralControl(GeneralControlType.MaxLight)]
+    [MaterialPropertyName(BuiltinSupportedShaders.LilToon, "_LightMaxLimit")]
     [MenuIcon(Icons.Light_Max)]
     public Parameter<float> MaxLight = 1;
 
@@ -41,6 +43,7 @@ public sealed class LightingSettings : ISettings
     /// </summary>
     [GeneralControl(GeneralControlType.Monochrome)]
     [MenuIcon(Icons.Monochrome)]
+    [MaterialPropertyName(BuiltinSupportedShaders.LilToon, "_MonochromeLighting")]
     [Range(0, 1)]
     public Parameter<float> Monochrome = 0;
 
@@ -49,6 +52,7 @@ public sealed class LightingSettings : ISettings
     /// </summary>
     [GeneralControl(GeneralControlType.Unlit)]
     [MenuIcon(Icons.Unlit)]
+    [MaterialPropertyName(BuiltinSupportedShaders.LilToon, "_AsUnlit")]
     [Range(0, 10)]
     public Parameter<float> Unlit = 0;
 }

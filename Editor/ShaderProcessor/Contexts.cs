@@ -14,7 +14,8 @@ internal struct CreateShaderSpecificControlContext
 
 internal abstract class ConfigureAnimationContextBase
 {
-    public string Name { get; init; }
+    public ParameterInfo ParameterInfo { get; init; }
+    public string PropertyName { get; set; }
     public AnimationClip AnimationClip { get; init; }
     public ReadOnlyMemory<Renderer> Renderers { get; init; }
 }
@@ -34,4 +35,11 @@ internal class ConfigureShaderSpecificAnimationContext : ConfigureAnimationConte
 internal sealed class ConfigureGeneralAnimationContext : ConfigureShaderSpecificAnimationContext
 {
     public GeneralControlType Type { get; init; }
+}
+
+internal struct OverrideMaterialValueContext
+{
+    public ParameterInfo ParameterInfo;
+    public string PropertyName;
+    public Material[] Materials;
 }

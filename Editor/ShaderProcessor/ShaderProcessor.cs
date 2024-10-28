@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Globalization;
 using nadena.dev.modular_avatar.core;
+using nadena.dev.ndmf.util;
 
 namespace io.github.azukimochi;
 
@@ -44,7 +45,7 @@ internal abstract class ShaderProcessor : ILightLimitChangerProcessorReceiver
     /// マテリアルが複製された際に呼び出される
     /// </summary>
     /// <param name="material"></param>
-    public virtual void OnMaterialCloned(Material material) { }
+    public virtual void OnMaterialCloned(Span<Material> material) { }
 
     /// <summary>
     /// マテリアルの正規化（テクスチャの焼き込みなど）を行う
@@ -55,16 +56,14 @@ internal abstract class ShaderProcessor : ILightLimitChangerProcessorReceiver
     /// <summary>
     /// パラメーターの種類か名前から操作対象の名前を取得する
     /// </summary>
-    public virtual string GetMaterialPropertyNameFromTypeOrName(GeneralControlType type, string name) => null;
+    public virtual string GetMaterialPropertyName(ParameterInfo parameterInfo) => null;
 
     /// <summary>
     /// アニメーションを設定する
     /// </summary>
     public virtual void ConfigureGeneralAnimation(ConfigureGeneralAnimationContext context)
     {
-        string propertyName = GetMaterialPropertyNameFromTypeOrName(context.Type, context.Name);
-        if (propertyName is null)
-            return;
+        string propertyName = context.PropertyName;
 
         var (min, max) = context.Range;
         context.Renderers.AnimateAllFloat(context.AnimationClip, $"{MaterialAnimationKeyPrefix}{propertyName}", AnimationCurve.Linear(0, min, 1 / 60f, max));
@@ -75,9 +74,7 @@ internal abstract class ShaderProcessor : ILightLimitChangerProcessorReceiver
     /// </summary>
     public virtual void ConfigureShaderSpecificAnimation(ConfigureShaderSpecificAnimationContext context)
     {
-        string propertyName = GetMaterialPropertyNameFromTypeOrName(default, context.Name);
-        if (propertyName is null)
-            return;
+        string propertyName = context.PropertyName;
 
         var (min, max) = context.Range;
         context.Renderers.AnimateAllFloat(context.AnimationClip, $"{MaterialAnimationKeyPrefix}{propertyName}", AnimationCurve.Linear(0, min, 1 / 60f, max));
@@ -89,10 +86,7 @@ internal abstract class ShaderProcessor : ILightLimitChangerProcessorReceiver
     /// <param name="context"></param>
     public virtual void ConfigreEmptyAnimation(ConfigureEmptyAnimationContext context)
     {
-        string propertyName = GetMaterialPropertyNameFromTypeOrName(context.Type, context.Name);
-        if (propertyName is null)
-            return;
-
+        string propertyName = context.PropertyName;
         context.Renderers.AnimateAllFloat(context.AnimationClip, $"{MaterialAnimationKeyPrefix}{propertyName}", AnimationCurve.Constant(0, 0, context.Value));
     }
 
@@ -100,4 +94,25 @@ internal abstract class ShaderProcessor : ILightLimitChangerProcessorReceiver
     /// シェーダー固有のメニューを生成する
     /// </summary>
     public virtual void CreateShaderSpecificControl(in CreateShaderSpecificControlContext context) {  }
+
+
+    public virtual void OverrideMaterialValue(in OverrideMaterialValueContext context)
+    {
+        using var so = new SerializedObject(context.Materials);
+        so.maxArraySizeForMultiEditing = 512;
+        var savedProperties = so.FindProperty("m_SavedProperties");
+        var x = savedProperties.FindPropertyRelative("m_Floats");
+        foreach (SerializedProperty prop in x)
+        {
+            if (prop.name == context.PropertyName)
+            {
+                prop.FindPropertyRelative("second").floatValue = context.ParameterInfo.Parameter.OverrideValue;
+                break;
+            }
+        }
+    }
+
+    public override bool Equals(object obj) => obj is ShaderProcessor proc && proc.QualifiedName == this.QualifiedName;
+
+    public override int GetHashCode() => this.QualifiedName.GetHashCode();
 }

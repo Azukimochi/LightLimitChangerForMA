@@ -9,6 +9,11 @@ public abstract class Parameter
     public bool Enable = true;
 
     /// <summary>
+    /// 値を上書きするかどうか
+    /// </summary>
+    public bool IsOverride = true;
+
+    /// <summary>
     /// 値をセーブする
     /// </summary>
     public bool Saved = true;

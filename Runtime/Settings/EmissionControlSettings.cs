@@ -9,5 +9,6 @@ public sealed class EmissionControlSettings : ISettings
 
     [GeneralControl(GeneralControlType.EmissionStrength)]
     [Range(0, 1)]
+    [MaterialPropertyName(BuiltinSupportedShaders.LilToon, "_EmissionBlend")]
     public Parameter<float> Strength = 1;
 }
