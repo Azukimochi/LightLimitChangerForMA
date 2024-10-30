@@ -1,4 +1,4 @@
-using Target = io.github.azukimochi.LightLimitChangerComponent;
+﻿using Target = io.github.azukimochi.LightLimitChangerComponent;
 using System.Linq;
 using UnityEngine.UIElements;
 
@@ -26,7 +26,17 @@ internal sealed class LightLimitChangerComponentEditor : Editor
         var target = (Target)base.target;
 
         CategoryLabel($"{LightLimitChanger.Title} {LightLimitChanger.Version}");
+        {
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.DelayedTextField(serializedObject.FindProperty(nameof(Target.PresetName)), GUIContent.none);
+            if (GUILayout.Button("S", GUILayout.Width(24)))
+            {
+                PresetManager.Global.Update(target.PresetName, target);
+            }
+            EditorGUILayout.EndHorizontal();
         }
+
+
         using (new EditorGUILayout.HorizontalScope()) {
             GUILayout.FlexibleSpace();
             // タブを描画する
@@ -222,6 +232,7 @@ internal sealed class LightLimitChangerComponentEditor : Editor
             style.fontStyle = FontStyle.Bold;
             style.fontSize = 14;
             style.normal.textColor = Color.white;
+            style.richText = true;
             return style;
         }, isThreadSafe: false);
     }
