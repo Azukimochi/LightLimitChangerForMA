@@ -284,6 +284,7 @@ internal sealed class LightLimitChangerProcessor : IDisposable
             var parameterInfo = new ParameterInfo(settings, field);
             var parameter = parameterInfo.Parameter;
 
+            // Vector4/Colorは無効になってるパラメータの情報が無いとしんどいので収集する
             if (field.GetCustomAttribute<VectorFieldAttribute>() is { } vectorAttr)
             {
                 ref var list = ref vectorGroup.GetOrAdd(vectorAttr.Group);
@@ -291,40 +292,22 @@ internal sealed class LightLimitChangerProcessor : IDisposable
                 list.Add(parameterInfo);
             }
 
-            if (parameter.IsOverride)
-            {
-                foreach (var pair in shaderMaterialPair)
-                {
-                    if (!parameterInfo.MaterialProperties.TryGetValue(pair.Key.QualifiedName, out var propertyName))
-                        propertyName = pair.Key.GetMaterialPropertyName(parameterInfo);
-
-                    if (propertyName == null)
-                        continue;
-
-                    pair.Key.OverrideMaterialValue(new OverrideMaterialValueContext() { ParameterInfo = parameterInfo, PropertyName = propertyName, Materials = pair.Value });
-                }
-            }
-
             if (!parameter.Enable)
                 continue;
 
-            Vector2 range = Vector2.up;
-            if (field.GetCustomAttribute<RangeParameterAttribute>() is { } rangeParamAttr)
+            // まてりあうの設定値を上書きする
+            foreach (var pair in shaderMaterialPair)
             {
-                var val = typeof(TSettings).GetField(rangeParamAttr.ParameterName)?.GetValue(settings) ?? null;
-                if (val is Vector2 v)
-                    range = v;
-            }
-            else if (field.GetCustomAttribute<RangeAttribute>() is { } rangeAttr)
-            {
-                range = new(rangeAttr.Min, rangeAttr.Max);
-            }
+                if (!parameterInfo.MaterialProperties.TryGetValue(pair.Key.QualifiedName, out var propertyName))
+                    propertyName = pair.Key.GetMaterialPropertyName(parameterInfo);
 
-            var generalType = field.GetCustomAttribute<GeneralControlAttribute>()?.Type ?? default;
-            var shaderFeatureAttr = field.GetCustomAttribute<ShaderFeatureAttribute>();
+                if (propertyName == null)
+                    continue;
+
+                pair.Key.OverrideMaterialValue(new OverrideMaterialValueContext() { ParameterInfo = parameterInfo, PropertyName = propertyName, Materials = pair.Value });
+            }　
 
             var name = field.Name;
-
             var group = blendTree.Items.FirstOrDefault(x => x is DirectBlendTree d && d.Name == settings.ParameterPrefix) as DirectBlendTree ?? blendTree.AddDirectBlendTree(settings.ParameterPrefix);
             var tree = group.AddMotionTime(name);
             var anim = tree.Animation = new AnimationClip() { name = $"{LightLimitChanger.Title} {name}" };
@@ -333,7 +316,7 @@ internal sealed class LightLimitChangerProcessor : IDisposable
             var avatarParameter = new ParameterConfig()
             {
                 nameOrPrefix = $"{settings.ParameterPrefix}{field.Name}",
-                defaultValue = Utils.NormalizeInRange(parameter.InitialValue, range.x, range.y),
+                defaultValue = Utils.NormalizeInRange(parameter.GetValues().First(), parameterInfo.Range.x, parameterInfo.Range.y),
                 syncType =
                     t == typeof(bool) ? ParameterSyncType.Bool :
                     t == typeof(int) ? ParameterSyncType.Int :
@@ -352,12 +335,12 @@ internal sealed class LightLimitChangerProcessor : IDisposable
                 Renderers = targetRenderers,
                 AnimationClip = anim,
                 AvatarParameter = avatarParameter,
-                Type = generalType,
+                Type = parameterInfo.GeneralControlType,
             };
 
             foreach (var processor in processors.AsSpan())
             {
-                context.Range = range; // Range is mutable.
+                context.Range = parameterInfo.Range; // Range is mutable.
 
                 // 操作対象のパラメーター名を取得する
                 // Parameter<T>にMaterialPropertyNameAttr. が付いてればそっちから、なかったらProcessorに問い合わせる
@@ -369,13 +352,13 @@ internal sealed class LightLimitChangerProcessor : IDisposable
 
                 context.PropertyName = propertyName;
 
-                if (shaderFeatureAttr is null)
+                if (parameterInfo.ShaderFeatureAttribute is null)
                 {
                     processor.ConfigureGeneralAnimation(context);
                 }
                 else
                 {
-                    var names = shaderFeatureAttr.QualifiedNames;
+                    var names = parameterInfo.ShaderFeatureAttribute.QualifiedNames;
                     if (!names.Contains(processor.QualifiedName))
                         continue;
 
@@ -431,7 +414,7 @@ internal sealed class LightLimitChangerProcessor : IDisposable
                         continue;
 
                     context.PropertyName = propertyName;
-                    context.Value = parameter.InitialValue;
+                    context.Value = parameter.GetValues().First();
                     processor.ConfigreEmptyAnimation(context);
                 }
             }
