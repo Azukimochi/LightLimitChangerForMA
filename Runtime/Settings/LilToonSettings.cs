@@ -1,6 +1,9 @@
-﻿namespace io.github.azukimochi;
+﻿using System.Drawing;
+
+namespace io.github.azukimochi;
 
 [Serializable]
+[MenuIcon(Icons.LilToon)]
 public sealed class LilToonSettings : ISettings
 {
     string ISettings.ParameterPrefix => "LilToon";
@@ -12,6 +15,7 @@ public sealed class LilToonSettings : ISettings
     /// </summary>
     [ShaderFeature(BuiltinSupportedShaders.LilToon)]
     [MaterialPropertyName(BuiltinSupportedShaders.LilToon, "_ShadowEnvStrength")]
+    [MenuIcon(Icons.ShadowEnvStrength)]
     [Range(0, 1)]
     public Parameter<float> ShadowEnvStrength = 0;
 
@@ -20,6 +24,7 @@ public sealed class LilToonSettings : ISettings
     /// </summary>
     [ShaderFeature(BuiltinSupportedShaders.LilToon)]
     [MaterialPropertyName(BuiltinSupportedShaders.LilToon, "_VertexLightStrength")]
+    [MenuIcon(Icons.VertexLightStrength)]
     [Range(0, 1)]
     public Parameter<float> VertexLightStrength = 0;
 }
