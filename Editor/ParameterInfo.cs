@@ -1,6 +1,7 @@
 ﻿using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
+using UnityEditor;
 
 namespace io.github.azukimochi;
 
@@ -14,6 +15,8 @@ internal sealed class ParameterInfo
     public Vector2 Range { get; }
     public GeneralControlType GeneralControlType { get; }
     public ShaderFeatureAttribute ShaderFeatureAttribute { get; }
+    public VectorFieldAttribute VectorFieldAttribute { get; }
+    public Texture2D Icon { get; }
 
     public ImmutableDictionary<string, string> MaterialProperties { get; }
 
@@ -42,5 +45,22 @@ internal sealed class ParameterInfo
 
         GeneralControlType = fieldInfo.GetCustomAttribute<GeneralControlAttribute>()?.Type ?? default;
         ShaderFeatureAttribute = fieldInfo.GetCustomAttribute<ShaderFeatureAttribute>();
+        VectorFieldAttribute = fieldInfo.GetCustomAttribute<VectorFieldAttribute>();
+
+        if (fieldInfo.GetCustomAttribute<MenuIconAttribute>() is { } iconAttr)
+        {
+            Icon = AssetUtils.FromGUID<Texture2D>(iconAttr.Guid);
+        }
+    }
+}
+
+internal static class ParameterCache<TSettings> where TSettings : ISettings, new()
+{
+    public static readonly ImmutableDictionary<string, Parameter> InitialParameters;
+
+    static ParameterCache()
+    {
+        var instance = new TSettings();
+        InitialParameters = instance.AllParameterFields().ToImmutableDictionary(x => x.Name, x => x.GetValue(instance) as Parameter);
     }
 }

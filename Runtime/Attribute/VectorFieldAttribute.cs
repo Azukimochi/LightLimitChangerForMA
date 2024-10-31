@@ -7,7 +7,7 @@ internal sealed class VectorFieldAttribute : Attribute
 
     public VectorField Field { get; }
 
-    public string Group { get; set; } = "";
+    public string Group { get; set; } = null;
 }
 
 internal enum VectorField

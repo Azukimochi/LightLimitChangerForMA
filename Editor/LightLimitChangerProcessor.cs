@@ -266,7 +266,7 @@ internal sealed class LightLimitChangerProcessor : IDisposable
         }
     }
 
-    private void ConfigureSettings<TSettings>(TSettings settings) where TSettings : ISettings
+    private void ConfigureSettings<TSettings>(TSettings settings) where TSettings : ISettings, new()
     {
         var menuGroup = menuRoot.GetOrAdd(settings.DisplayName);
         if (typeof(TSettings).GetCustomAttribute<MenuIconAttribute>() is { } groupIconAttr)
@@ -274,9 +274,10 @@ internal sealed class LightLimitChangerProcessor : IDisposable
             menuGroup.Control.icon = AssetUtils.FromGUID<Texture2D>(groupIconAttr.Guid);
         }
 
-        var fields = typeof(TSettings).GetFields(BindingFlags.Instance | BindingFlags.Public);
-        using ValueDictionary<string, List<ParameterInfo>> vectorGroup = new();
-        foreach (var field in fields)
+        var parameterBuffer = (stackalloc float[8]);
+        Dictionary<string, List<ParameterInfo>> entries = new();
+
+        foreach (var field in settings.AllParameterFields())
         {
             if (field.FieldType.BaseType != typeof(Parameter))
                 continue;
@@ -284,141 +285,143 @@ internal sealed class LightLimitChangerProcessor : IDisposable
             var parameterInfo = new ParameterInfo(settings, field);
             var parameter = parameterInfo.Parameter;
 
-            // Vector4/Colorは無効になってるパラメータの情報が無いとしんどいので収集する
-            if (field.GetCustomAttribute<VectorFieldAttribute>() is { } vectorAttr)
-            {
-                ref var list = ref vectorGroup.GetOrAdd(vectorAttr.Group);
-                list ??= new();
-                list.Add(parameterInfo);
-            }
-
-            if (!parameter.Enable)
-                continue;
-
-            // まてりあうの設定値を上書きする
-            foreach (var pair in shaderMaterialPair)
-            {
-                if (!parameterInfo.MaterialProperties.TryGetValue(pair.Key.QualifiedName, out var propertyName))
-                    propertyName = pair.Key.GetMaterialPropertyName(parameterInfo);
-
-                if (propertyName == null)
-                    continue;
-
-                pair.Key.OverrideMaterialValue(new OverrideMaterialValueContext() { ParameterInfo = parameterInfo, PropertyName = propertyName, Materials = pair.Value });
-            }　
-
-            var name = field.Name;
-            var group = blendTree.Items.FirstOrDefault(x => x is DirectBlendTree d && d.Name == settings.ParameterPrefix) as DirectBlendTree ?? blendTree.AddDirectBlendTree(settings.ParameterPrefix);
-            var tree = group.AddMotionTime(name);
-            var anim = tree.Animation = new AnimationClip() { name = $"{LightLimitChanger.Title} {name}" };
-            AssetDatabase.AddObjectToAsset(anim, AssetContainer);
-            var t = parameterInfo.ParameterType;
-            var avatarParameter = new ParameterConfig()
-            {
-                nameOrPrefix = $"{settings.ParameterPrefix}{field.Name}",
-                defaultValue = Utils.NormalizeInRange(parameter.GetValues().First(), parameterInfo.Range.x, parameterInfo.Range.y),
-                syncType =
-                    t == typeof(bool) ? ParameterSyncType.Bool :
-                    t == typeof(int) ? ParameterSyncType.Int :
-                    t == typeof(float) ? ParameterSyncType.Float :
-                    ParameterSyncType.NotSynced,
-                saved = parameter.Saved,
-                localOnly = !parameter.Synced,
-            };
-            tree.ParameterName = avatarParameter.nameOrPrefix;
-            avatarParameters.Add(avatarParameter);
-
-            var context = new ConfigureGeneralAnimationContext()
-            {
-                ParameterInfo = parameterInfo,
-                PropertyName = null,
-                Renderers = targetRenderers,
-                AnimationClip = anim,
-                AvatarParameter = avatarParameter,
-                Type = parameterInfo.GeneralControlType,
-            };
-
-            foreach (var processor in processors.AsSpan())
-            {
-                context.Range = parameterInfo.Range; // Range is mutable.
-
-                // 操作対象のパラメーター名を取得する
-                // Parameter<T>にMaterialPropertyNameAttr. が付いてればそっちから、なかったらProcessorに問い合わせる
-                if (!parameterInfo.MaterialProperties.TryGetValue(processor.QualifiedName, out var propertyName))
-                    propertyName = processor.GetMaterialPropertyName(parameterInfo);
-
-                if (propertyName == null)
-                    continue;
-
-                context.PropertyName = propertyName;
-
-                if (parameterInfo.ShaderFeatureAttribute is null)
-                {
-                    processor.ConfigureGeneralAnimation(context);
-                }
-                else
-                {
-                    var names = parameterInfo.ShaderFeatureAttribute.QualifiedNames;
-                    if (!names.Contains(processor.QualifiedName))
-                        continue;
-
-                    processor.ConfigureShaderSpecificAnimation(context);
-                }
-
-                var menuItem = menuGroup.GetOrAdd(name, menu => (VRCExpressionsMenu.Control.ControlType.RadialPuppet, avatarParameter.nameOrPrefix));
-                if (menuItem.Control.icon == null && field.GetCustomAttribute<MenuIconAttribute>() is { } iconAttr)
-                {
-                    menuItem.Control.icon = AssetUtils.FromGUID<Texture2D>(iconAttr.Guid);
-                }
-            }
+            string key = parameterInfo.VectorFieldAttribute != null ? parameterInfo.VectorFieldAttribute.Group ?? settings.ParameterPrefix : "";
+            var list = entries.GetOrAdd(key, _ => new());
+            list.Add(parameterInfo);
         }
 
-        const string MissingVectorFieldGroupName = "Missing Fields";
-        foreach (var entry in vectorGroup.Entries)
+        foreach (var entry in entries)
         {
-            if (entry.Value.Select(x => x.Parameter.Enable).Aggregate((x, y) => x == y))
-                continue;
-
-            var name = entry.Key;
-            if (string.IsNullOrEmpty(name))
+            var items = entry.Value.AsSpan();
+            bool generateEmpty = entry.Value.Any(x => x.VectorFieldAttribute != null && x.Parameter.Enable && x.Parameter.IsAnimated);
+            foreach (var parameterInfo in items)
             {
-                name = settings.DisplayName;
-            }
+                var parameter = parameterInfo.Parameter;
+                var t = parameterInfo.ParameterType;
 
-            var group = blendTree.Items.FirstOrDefault(x => x is DirectBlendTree d && d.Name == settings.ParameterPrefix) as DirectBlendTree ?? blendTree.AddDirectBlendTree(settings.ParameterPrefix);
-            var group2 = group.Items.FirstOrDefault(x => x is DirectBlendTree d && d.Name == MissingVectorFieldGroupName) as DirectBlendTree ?? group.AddDirectBlendTree(MissingVectorFieldGroupName);
-            var anim = new AnimationClip() { name = $"{LightLimitChanger.Title} {name}" };
-            AssetDatabase.AddObjectToAsset(anim, AssetContainer);
-            var tree = group.AddMotion(anim);
-
-            foreach (var x in entry.Value.AsSpan())
-            {
-                var parameter = x.Parameter;
                 if (parameter.Enable)
+                {
+                    foreach (var pair in shaderMaterialPair)
+                    {
+                        if (!parameterInfo.MaterialProperties.TryGetValue(pair.Key.QualifiedName, out var propertyName))
+                            propertyName = pair.Key.GetMaterialPropertyName(parameterInfo);
+
+                        if (propertyName == null)
+                            continue;
+
+                        pair.Key.OverrideMaterialValue(new OverrideMaterialValueContext() { ParameterInfo = parameterInfo, PropertyName = propertyName, Materials = pair.Value });
+                    }
+                }
+
+                if ((!parameter.Enable || !parameter.IsAnimated) && !generateEmpty)
                     continue;
 
-                var generalType = x.FieldInfo.GetCustomAttribute<GeneralControlAttribute>()?.Type ?? default;
-                var context = new ConfigureEmptyAnimationContext()
-                {
-                    ParameterInfo = x,
-                    Renderers = targetRenderers,
-                    AnimationClip = anim,
-                    Type = generalType,
-                };
-                foreach (var processor in processors.AsSpan())
-                {
-                    if (!x.MaterialProperties.TryGetValue(processor.QualifiedName, out var propertyName))
-                        propertyName = processor.GetMaterialPropertyName(x);
+                var group = GetBlendTreeGroup(settings.ParameterPrefix);
+                ReadOnlySpan<float> values = parameterBuffer[..parameterInfo.Parameter.GetValues(parameterBuffer)];
 
-                    if (propertyName == null)
-                        continue;
+                for(int i = 0; i < values.Length; i++)
+                {
+                    var value = values[i];
+                    string postfix = values.Length == 1 ? "" : t == typeof(Vector4) ? $".{"xyzw"[i]}" : $".{"rgba"[i]}";
+                    var name = $"{parameterInfo.Name}{postfix}";
+                    var anim = new AnimationClip() { name = $"{LightLimitChanger.Title} {name}" };
+                    AssetDatabase.AddObjectToAsset(anim, AssetContainer);
 
-                    context.PropertyName = propertyName;
-                    context.Value = parameter.GetValues().First();
-                    processor.ConfigreEmptyAnimation(context);
+                    if (!parameter.IsAnimated)
+                    {
+                        var tree = group.AddMotion(anim);
+                        var context = new ConfigureEmptyAnimationContext()
+                        {
+                            ParameterInfo = parameterInfo,
+                            PropertyName = null,
+                            Renderers = targetRenderers,
+                            AnimationClip = anim,
+                            Type = parameterInfo.GeneralControlType,
+                        };
+
+                        foreach (var processor in processors.AsSpan())
+                        {
+                            var propertyName = parameterInfo.GetPropertyName(processor);
+                            if (string.IsNullOrEmpty(propertyName))
+                                continue;
+
+                            context.PropertyName = $"{propertyName}{postfix}";
+                            var buffer = parameterBuffer[4..];
+                            buffer = buffer[..ParameterCache<TSettings>.InitialParameters[parameterInfo.Name].GetValues(buffer)];
+                            context.Value = buffer[i];
+
+                            processor.ConfigreEmptyAnimation(context);
+                        }
+                    }
+                    else
+                    {
+                        var tree = group.AddMotionTime(name);
+                        tree.Animation = anim;
+                        var avatarParameter = new ParameterConfig()
+                        {
+                            nameOrPrefix = $"{settings.ParameterPrefix}{name}",
+                            defaultValue = Utils.NormalizeInRange(value, parameterInfo.Range.x, parameterInfo.Range.y),
+                            syncType =
+                            t == typeof(bool) ? ParameterSyncType.Bool :
+                            t == typeof(int) ? ParameterSyncType.Int :
+                            t == typeof(float) || t == typeof(Vector4) || t == typeof(Color) ? ParameterSyncType.Float :
+                            ParameterSyncType.NotSynced,
+                            saved = parameter.Saved,
+                            localOnly = !parameter.Synced,
+                        };
+                        tree.ParameterName = avatarParameter.nameOrPrefix;
+                        avatarParameters.Add(avatarParameter);
+
+                        var context = new ConfigureGeneralAnimationContext()
+                        {
+                            ParameterInfo = parameterInfo,
+                            PropertyName = null,
+                            Renderers = targetRenderers,
+                            AnimationClip = anim,
+                            AvatarParameter = avatarParameter,
+                            Type = parameterInfo.GeneralControlType,
+                        };
+
+                        foreach (var processor in processors.AsSpan())
+                        {
+                            context.Range = parameterInfo.Range; // Range is mutable
+
+                            var propertyName = parameterInfo.GetPropertyName(processor);
+                            if (string.IsNullOrEmpty(propertyName))
+                                continue;
+
+                            context.PropertyName = $"{propertyName}{postfix}";
+
+                            if (parameterInfo.ShaderFeatureAttribute is null)
+                            {
+                                processor.ConfigureGeneralAnimation(context);
+                            }
+                            else
+                            {
+                                var names = parameterInfo.ShaderFeatureAttribute.QualifiedNames;
+                                if (!names.Contains(processor.QualifiedName))
+                                    continue;
+
+                                processor.ConfigureShaderSpecificAnimation(context);
+                            }
+                            var menuPath = $"{parameterInfo.Name}{(values.Length == 1 ? "" : $"/{(char)(postfix[1] & ~0x20)}")}";
+                            var menuItem = menuGroup.GetOrAdd(menuPath, menu => (VRCExpressionsMenu.Control.ControlType.RadialPuppet, avatarParameter.nameOrPrefix));
+                            if (menuItem.Control.icon == null)
+                            {
+                                menuItem.Control.icon = parameterInfo.Icon;
+                            }
+                        }
+                    }
                 }
             }
         }
+    }
+
+    private DirectBlendTree GetBlendTreeGroup(string name)
+    {
+        return blendTree.Items
+            .FirstOrDefault(x => x is DirectBlendTree d && d.Name == name) as DirectBlendTree 
+            ?? blendTree.AddDirectBlendTree(name);
     }
 
     public LightLimitChangerProcessor AddProcessor<T>() where T : ShaderProcessor, new()
