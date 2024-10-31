@@ -67,7 +67,6 @@ internal sealed class LightLimitChangerProcessor : IDisposable
 
         ConfigureSettings(Component.General.LightingControl);
         ConfigureSettings(Component.General.ColorControl);
-        ConfigureSettings(Component.General.EmissionControl);
         ConfigureSettings(Component.LilToon);
         ConfigureSettings(Component.Poiyomi);
 

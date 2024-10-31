@@ -90,9 +90,9 @@ internal sealed class LightLimitChangerComponentEditor : Editor
             EditorGUILayout.PropertyField(property.FindPropertyRelative("Gamma"));
         });
 
-        DoFoldoutedGroup(serializedObject.FindProperty("General.EmissionControl"), "Emission Settings", static property =>
+        DoFoldoutedGroup(serializedObject.FindProperty("General.LightingControl"), "Lighting Settings", static property =>
         {
-            EditorGUILayout.PropertyField(property.FindPropertyRelative("Strength"));
+            EditorGUILayout.PropertyField(property.FindPropertyRelative("EmissionStrength"));
         });
 
 

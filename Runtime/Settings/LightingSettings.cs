@@ -55,4 +55,13 @@ public sealed class LightingSettings : ISettings
     [MaterialPropertyName(BuiltinSupportedShaders.LilToon, "_AsUnlit")]
     [Range(0, 10)]
     public Parameter<float> Unlit = 0;
+    
+    /// <summary>
+    /// エミッションの強度
+    /// </summary>
+    [GeneralControl(GeneralControlType.EmissionStrength)]
+    [MenuIcon(Icons.Emission)]
+    [MaterialPropertyName(BuiltinSupportedShaders.LilToon, "_EmissionBlend")]
+    [Range(0, 1)]
+    public Parameter<float> EmissionStrength = 1;
 }

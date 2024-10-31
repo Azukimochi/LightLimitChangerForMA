@@ -20,5 +20,4 @@ public sealed class GeneralSettings
 
     public LightingSettings LightingControl = new();
     public ColorControlSettings ColorControl = new();
-    public EmissionControlSettings EmissionControl = new();
 }
