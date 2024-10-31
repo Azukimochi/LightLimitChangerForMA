@@ -24,9 +24,10 @@ internal sealed class ParameterDrawer : PropertyDrawer
     public static void Draw(Rect position, SerializedProperty property, GUIContent label, Vector2? range = null, bool isOverrideValue = false)
     {
         using var scope = new PropertyScope(position, label, property);
-        var valueProp = property.FindPropertyRelative(isOverrideValue ? "OverrideValue" : "InitialValue");
+        var valueProp = property.FindPropertyRelative("Value");
         //var rangeProp = property.FindPropertyRelative("Range");
         var enableProp = property.FindPropertyRelative("Enable");
+        var isAnimatedProp = property.FindPropertyRelative("IsAnimated");
         var savedProp = property.FindPropertyRelative("Saved");
         var syncedProp = property.FindPropertyRelative("Synced");
         position.height = EditorGUIUtility.singleLineHeight;
@@ -84,8 +85,9 @@ internal sealed class ParameterDrawer : PropertyDrawer
         position.x += EditorGUIUtility.labelWidth;
         position.width -= EditorGUIUtility.labelWidth;
 
-        p = position with { width = position.width / 3 };
+        p = position with { width = position.width / 4 };
         DrawEnableButton(ref p, enableProp);
+        DrawEnableButton(ref p, isAnimatedProp);
         DrawEnableButton(ref p, savedProp);
         DrawEnableButton(ref p, syncedProp);
     }

@@ -1,17 +1,19 @@
-﻿namespace io.github.azukimochi;
+﻿using System.Collections.Generic;
+
+namespace io.github.azukimochi;
 
 [Serializable]
 public abstract class Parameter 
 {
     /// <summary>
-    /// 有効／無効
+    /// マテリアルの設定を上書きする
     /// </summary>
     public bool Enable = true;
 
     /// <summary>
-    /// 値を上書きするかどうか
+    /// アニメーション・メニューを生成する
     /// </summary>
-    public bool IsOverride = true;
+    public bool IsAnimated = true;
 
     /// <summary>
     /// 値をセーブする
@@ -24,14 +26,9 @@ public abstract class Parameter
     public bool Synced = true;
 
     /// <summary>
-    /// アニメーション用の初期値
+    /// 設定値をfloatで取得する
     /// </summary>
-    public float InitialValue;
-
-    /// <summary>
-    /// 上書き用の値
-    /// </summary>
-    public float OverrideValue;
+    public abstract IEnumerable<float> GetValues();
 }
 
 [Serializable]
@@ -39,20 +36,33 @@ public sealed class Parameter<T> : Parameter
 {
     public Parameter() { }
 
-    public Parameter(T value) : this() => (InitialValue, OverrideValue) = (ToFloatValue(value), ToFloatValue(value));
+    public Parameter(T value) : this() => Value = value;
 
-    private static float ToFloatValue(T value)
+    public T Value;
+
+    public override IEnumerable<float> GetValues()
     {
+        // switch is not JIT friendly... 🥺
         if (typeof(T) == typeof(float))
-            return (float)(object)value;
-
-        if (typeof(T) == typeof(int))
-            return (int)(object)value;
-
-        if (typeof(T) == typeof(bool))
-            return (bool)(object)value ? 1 : 0;
-
-        return float.NaN;
+        {
+            yield return (float)(object)Value;
+        }
+        else if (typeof(T) == typeof(int))
+        {
+            yield return (int)(object)Value;
+        }
+        else if (typeof(T) == typeof(bool))
+        {
+            yield return (bool)(object)Value ? 1 : 0;
+        }
+        else if (typeof(T) == typeof(Color))
+        {
+            var color = (Color)(object)Value;
+            yield return color.r;
+            yield return color.g;
+            yield return color.b;
+            yield return color.a;
+        }
     }
 
     public static implicit operator Parameter<T>(T value) => new(value);

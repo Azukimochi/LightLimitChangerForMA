@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System.Buffers;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Runtime.InteropServices;
 using nadena.dev.modular_avatar.core;
 using nadena.dev.ndmf.util;
 
@@ -98,17 +100,39 @@ internal abstract class ShaderProcessor : ILightLimitChangerProcessorReceiver
 
     public virtual void OverrideMaterialValue(in OverrideMaterialValueContext context)
     {
-        using var so = new SerializedObject(context.Materials);
-        so.maxArraySizeForMultiEditing = 512;
-        var savedProperties = so.FindProperty("m_SavedProperties");
-        var x = savedProperties.FindPropertyRelative("m_Floats");
-        foreach (SerializedProperty prop in x)
+        var t = context.ParameterInfo.ParameterType;
+        var propertyName = context.PropertyName;
+        var parameter = context.ParameterInfo.Parameter;
+
+        if (t == typeof(int))
         {
-            if (prop.name == context.PropertyName)
-            {
-                prop.FindPropertyRelative("second").floatValue = context.ParameterInfo.Parameter.OverrideValue;
-                break;
-            }
+            var value = parameter.GetValueDirect<int>();
+            foreach (var mat in context.Materials)
+                mat.SetInt(propertyName, value);
+        }
+        else if (t == typeof(float))
+        {
+            var value = parameter.GetValueDirect<float>();
+            foreach (var mat in context.Materials)
+                mat.SetFloat(propertyName, value);
+        }
+        else if (t == typeof(bool))
+        {
+            var value = parameter.GetValueDirect<bool>() ? 1 : 0;
+            foreach (var mat in context.Materials)
+                mat.SetInt(propertyName, value);
+        }
+        else if (t == typeof(Vector4))
+        {
+            var value = parameter.GetValueDirect<Vector4>();
+            foreach (var mat in context.Materials)
+                mat.SetVector(propertyName, value);
+        }
+        else if (t == typeof(Color))
+        {
+            var value = parameter.GetValueDirect<Color>();
+            foreach (var mat in context.Materials)
+                mat.SetColor(propertyName, value);
         }
     }
 
