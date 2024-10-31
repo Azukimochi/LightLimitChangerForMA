@@ -3,6 +3,7 @@ using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using Anatawa12.AvatarOptimizer;
 using gomoru.su;
 using nadena.dev.modular_avatar.core;
 using nadena.dev.ndmf;
@@ -21,7 +22,6 @@ internal sealed class LightLimitChangerProcessor : IDisposable
     public Object AssetContainer { get; }
 
     private readonly BuildContext context;
-    private readonly Dictionary<Object, Object> cache = new();
     private readonly List<ShaderProcessor> processors = new();
     private readonly HashSet<ParameterConfig> avatarParameters = new();
 
@@ -82,68 +82,44 @@ internal sealed class LightLimitChangerProcessor : IDisposable
     private void CloneMaterials()
     {
         var components = AvatarRootObject.GetComponentsInChildren<Component>(true);
-        var rootAnimator = AvatarRootObject.GetComponent<Animator>();
-        var materials = new HashSet<Material>();
-        var dict = new Dictionary<ShaderProcessor, List<Material>>();
-        foreach (var x in components)
+        var cloner = new MaterialCloner(this);
+
+        foreach (var component in components)
         {
-            if (x == rootAnimator || x == Component) continue;
-
-            var so = new SerializedObject(x);
-
-            bool enterChildren = true;
-            var p = so.GetIterator();
-            while (p.Next(enterChildren))
+            switch (component)
             {
-                try
-                {
-                    if (p.propertyType != SerializedPropertyType.ObjectReference)
-                        continue;
-
-                    var result = Clone(p.objectReferenceValue);
-                    if (result != null)
+                // skip some known unrelated components
+                case Transform:
+                case ParticleSystem:
+                    break;
+                case SkinnedMeshRenderer renderer:
                     {
-                        p.objectReferenceValue = result;
+                        var mats = renderer.sharedMaterials;
+                        foreach(ref var mat in mats.AsSpan())
+                        {
+                            mat = cloner.MapObject(mat);
+                        }
+                        renderer.sharedMaterials = mats;
                     }
-                }
-                finally
-                {
-                    enterChildren = p.propertyType switch
+                    break;
+                default:
                     {
-                        SerializedPropertyType.String or
-                        SerializedPropertyType.Integer or
-                        SerializedPropertyType.Boolean or
-                        SerializedPropertyType.Float or
-                        SerializedPropertyType.Color or
-                        SerializedPropertyType.ObjectReference or
-                        SerializedPropertyType.LayerMask or
-                        SerializedPropertyType.Enum or
-                        SerializedPropertyType.Vector2 or
-                        SerializedPropertyType.Vector3 or
-                        SerializedPropertyType.Vector4 or
-                        SerializedPropertyType.Rect or
-                        SerializedPropertyType.ArraySize or
-                        SerializedPropertyType.Character or
-                        SerializedPropertyType.AnimationCurve or
-                        SerializedPropertyType.Bounds or
-                        SerializedPropertyType.Gradient or
-                        SerializedPropertyType.Quaternion or
-                        SerializedPropertyType.FixedBufferSize or
-                        SerializedPropertyType.Vector2Int or
-                        SerializedPropertyType.Vector3Int or
-                        SerializedPropertyType.RectInt or
-                        SerializedPropertyType.BoundsInt
-                            => false,
+                        using var serializedObject = new SerializedObject(component);
 
-                        _ => true,
-                    };
-                    so.ApplyModifiedProperties();
-                }
+                        foreach (var objectReferenceProperty in serializedObject.ObjectReferenceProperties())
+                        {
+                            objectReferenceProperty.objectReferenceValue = cloner.MapObject(objectReferenceProperty.objectReferenceValue);
+                        }
+
+                        serializedObject.ApplyModifiedPropertiesWithoutUndo();
+
+                        break;
+                    }
             }
         }
 
-        targetMaterials = materials.ToArray();
-        shaderMaterialPair = dict.ToImmutableDictionary(x => x.Key, x => x.Value.ToArray());
+        targetMaterials = cloner.Cloned.Values.ToArray();
+        shaderMaterialPair = cloner.ShaderMaterialPair.ToImmutableDictionary(x => x.Key, x => x.Value.ToArray());
 
         foreach (var processor in Processors)
         {
@@ -156,43 +132,6 @@ internal sealed class LightLimitChangerProcessor : IDisposable
             {
                 pair.Key.NormalizeMaterial(mat);
             }
-        }
-
-        Object Clone(Object obj)
-        {
-            if (obj == null)
-                return null;
-
-            if (cache.TryGetValue(obj, out var mapped))
-            {
-                return mapped;
-            }
-            else if (obj is Material mat)
-            {
-                Material cloned = null;
-                foreach (var processor in Processors)
-                {
-                    if (!processor.IsTargetMaterial(mat))
-                        continue;
-
-                    cloned = Object.Instantiate(mat);
-                    cloned.name = $"{obj.name}(LLC)";
-                    ObjectRegistry.RegisterReplacedObject(obj, cloned);
-                    AssetDatabase.AddObjectToAsset(cloned, context.AssetContainer);
-
-                    materials.Add(cloned);
-                    cache.TryAdd(obj, cloned);
-                    dict.GetOrAdd(processor, _ => new()).Add(cloned);
-                    break;
-                }
-
-                if (cloned == null)
-                    return null;
-
-                return cloned;
-            }
-
-            return null;
         }
     }
 
