@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System.Buffers;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Runtime.InteropServices;
 using nadena.dev.modular_avatar.core;
 using nadena.dev.ndmf.util;
 
@@ -102,14 +104,39 @@ internal abstract class ShaderProcessor : ILightLimitChangerProcessorReceiver
         so.maxArraySizeForMultiEditing = 512;
         var savedProperties = so.FindProperty("m_SavedProperties");
         var x = savedProperties.FindPropertyRelative("m_Floats");
-        foreach (SerializedProperty prop in x)
+
+        var values = (stackalloc float[4]);
+        values = values[..context.ParameterInfo.Parameter.GetValues(values)];
+
+        SerializedProperty array;
+        SpanAction<float, SerializedProperty> setValue;
+
+        if (values.Length == 4) // Color or Vector4
         {
-            if (prop.name == context.PropertyName)
+            array = savedProperties.FindPropertyRelative("m_Colors");
+            setValue = (span, x) => x.colorValue = MemoryMarshal.Read<Color>(MemoryMarshal.AsBytes(span));
+        }
+        else if (context.ParameterInfo.ParameterType != typeof(float)) // Int
+        {
+            array = savedProperties.FindPropertyRelative("m_Ints");
+            setValue = (span, x) => x.intValue = (int)span[0];
+        }
+        else // Float
+        {
+            array = savedProperties.FindPropertyRelative("m_Floats");
+            setValue = (span, x) => x.floatValue = span[0];
+        }
+
+        foreach (SerializedProperty prop in array)
+        {
+            if (prop.displayName == context.PropertyName)
             {
-                prop.FindPropertyRelative("second").floatValue = context.ParameterInfo.Parameter.OverrideValue;
+                setValue(values, prop.FindPropertyRelative("second"));
                 break;
             }
         }
+
+        so.ApplyModifiedPropertiesWithoutUndo();
     }
 
     public override bool Equals(object obj) => obj is ShaderProcessor proc && proc.QualifiedName == this.QualifiedName;
