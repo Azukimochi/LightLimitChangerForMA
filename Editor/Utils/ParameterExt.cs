@@ -44,6 +44,8 @@ internal static class ParameterExt
         }
     }
 
+    internal static T GetValueDirect<T>(this Parameter parameter) => (parameter as Parameter<T>).Value;
+
     /// <summary>
     /// 操作対象のパラメーター名を取得する<br/>
     /// ParameterにMaterialPropertyNameAttr. が付いてればそっちから、なかったらProcessorに問い合わせる

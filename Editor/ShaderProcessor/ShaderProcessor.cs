@@ -100,43 +100,40 @@ internal abstract class ShaderProcessor : ILightLimitChangerProcessorReceiver
 
     public virtual void OverrideMaterialValue(in OverrideMaterialValueContext context)
     {
-        using var so = new SerializedObject(context.Materials);
-        so.maxArraySizeForMultiEditing = 512;
-        var savedProperties = so.FindProperty("m_SavedProperties");
-        var x = savedProperties.FindPropertyRelative("m_Floats");
+        var t = context.ParameterInfo.ParameterType;
+        var propertyName = context.PropertyName;
+        var parameter = context.ParameterInfo.Parameter;
 
-        var values = (stackalloc float[4]);
-        values = values[..context.ParameterInfo.Parameter.GetValues(values)];
-
-        SerializedProperty array;
-        SpanAction<float, SerializedProperty> setValue;
-
-        if (values.Length == 4) // Color or Vector4
+        if (t == typeof(int))
         {
-            array = savedProperties.FindPropertyRelative("m_Colors");
-            setValue = (span, x) => x.colorValue = MemoryMarshal.Read<Color>(MemoryMarshal.AsBytes(span));
+            var value = parameter.GetValueDirect<int>();
+            foreach (var mat in context.Materials)
+                mat.SetInt(propertyName, value);
         }
-        else if (context.ParameterInfo.ParameterType != typeof(float)) // Int
+        else if (t == typeof(float))
         {
-            array = savedProperties.FindPropertyRelative("m_Ints");
-            setValue = (span, x) => x.intValue = (int)span[0];
+            var value = parameter.GetValueDirect<float>();
+            foreach (var mat in context.Materials)
+                mat.SetFloat(propertyName, value);
         }
-        else // Float
+        else if (t == typeof(bool))
         {
-            array = savedProperties.FindPropertyRelative("m_Floats");
-            setValue = (span, x) => x.floatValue = span[0];
+            var value = parameter.GetValueDirect<bool>() ? 1 : 0;
+            foreach (var mat in context.Materials)
+                mat.SetInt(propertyName, value);
         }
-
-        foreach (SerializedProperty prop in array)
+        else if (t == typeof(Vector4))
         {
-            if (prop.displayName == context.PropertyName)
-            {
-                setValue(values, prop.FindPropertyRelative("second"));
-                break;
-            }
+            var value = parameter.GetValueDirect<Vector4>();
+            foreach (var mat in context.Materials)
+                mat.SetVector(propertyName, value);
         }
-
-        so.ApplyModifiedPropertiesWithoutUndo();
+        else if (t == typeof(Color))
+        {
+            var value = parameter.GetValueDirect<Color>();
+            foreach (var mat in context.Materials)
+                mat.SetColor(propertyName, value);
+        }
     }
 
     public override bool Equals(object obj) => obj is ShaderProcessor proc && proc.QualifiedName == this.QualifiedName;
