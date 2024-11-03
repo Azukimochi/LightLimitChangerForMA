@@ -2,6 +2,7 @@
 
 [Serializable]
 [MenuIcon(Icons.Color)]
+[SettingOptions(id: "color-control", displayName: "Color Control", parameterPrefix: "Color")]
 public sealed class ColorControlSettings : ISettings
 {
     string ISettings.ParameterPrefix => "Color";

@@ -2,6 +2,7 @@
 
 [Serializable]
 [MenuIcon(Icons.Light)]
+[SettingOptions(id: "lighting", displayName: "Lighting", parameterPrefix: "Light")]
 public sealed class LightingSettings : ISettings
 {
     string ISettings.ParameterPrefix => "Light";
