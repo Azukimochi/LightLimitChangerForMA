@@ -1,4 +1,7 @@
-﻿namespace io.github.azukimochi;
+﻿using System.Runtime.CompilerServices;
+using System.Text;
+
+namespace io.github.azukimochi;
 
 internal static class StringExt
 {
@@ -38,5 +41,10 @@ internal static class StringExt
         }
         ranges[count++] = start..;
         return count;
+    }
+
+    public static string Create(StringBuilder sb, [InterpolatedStringHandlerArgument("sb")] ref StringBuilderInterpolatedStringHandler handler)
+    {
+        return handler.ToStringAndClear();
     }
 }
