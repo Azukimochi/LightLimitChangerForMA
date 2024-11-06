@@ -1,0 +1,1 @@
+../CL4EE~/Editor/CustomLocalization4EditorExtension.Editor.cs
