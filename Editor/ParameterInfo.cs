@@ -17,6 +17,7 @@ internal class ParameterFieldInfo
     public RangeAttribute RangeAttribute { get; }
     public MinMaxRangeAttribute MinMaxRangeAttribute { get; }
     public DisplayOptionAttribute DisplayOptionAttribute { get; }
+    public DisableInitialValueSliderAttribute DisableInitialValueSliderAttribute { get; }
     public Texture2D Icon { get; }
 
     public ParameterFieldInfo(FieldInfo fieldInfo)
@@ -33,6 +34,7 @@ internal class ParameterFieldInfo
         RangeAttribute = GetAttribute<RangeAttribute>(attributes);
         MinMaxRangeAttribute = GetAttribute<MinMaxRangeAttribute>(attributes);
         DisplayOptionAttribute = GetAttribute<DisplayOptionAttribute>(attributes);
+        DisableInitialValueSliderAttribute = GetAttribute<DisableInitialValueSliderAttribute>(attributes);
 
         if (GetAttribute<MenuIconAttribute>(attributes) is { } iconAttr)
         {

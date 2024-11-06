@@ -80,7 +80,7 @@ partial class LightLimitChangerComponentEditor
                 il.Call<SerializedProperty, Func<string, SerializedProperty>>(x => x.FindPropertyRelative);
                 il.Ldstr(StringExt.Create(sb, $"settings:{SettingsFieldInfo<TSettings>.Id}/{char.ToLowerInvariant(field.Name[0])}{field.Name.AsSpan(1)}/label"));
                 il.Call<Func<string, GUIContent>>(EditorGUIUtility.TrTempContent);
-                il.Int(1);
+                il.Int(info.DisableInitialValueSliderAttribute is null ? 1 : 0);
                 il.Ldloc(local_range);
                 il.Ldloc(local_minMaxRange);
                 il.Ldloc(local_isAdvancedMode);

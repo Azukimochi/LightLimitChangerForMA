@@ -142,7 +142,7 @@ internal sealed class ParameterDrawer : PropertyDrawer
         EditorGUI.BeginDisabledGroup(!enable);
         try
         {
-            if (showInitialSlider)
+            using (DisableScope.If(!showInitialSlider))
             {
                 Vector2? r = null;
                 if (range.HasValue)
@@ -168,12 +168,9 @@ internal sealed class ParameterDrawer : PropertyDrawer
             if (!property.isExpanded || !advancedMode)
                 return;
 
-            if (showInitialSlider)
-            {
-                p.width = EditorStyles.label.CalcSize(EditorGUIUtility.TrTempContent("Value:")).x;
-                p.x -= p.width + 8;
-                EditorGUI.LabelField(p, "Value:");
-            }
+            p.width = EditorStyles.label.CalcSize(EditorGUIUtility.TrTempContent("Value:")).x;
+            p.x -= p.width + 8;
+            EditorGUI.LabelField(p, "Value:");
 
             if (showInitialSlider && minMaxRange is { } minMax)
             {
