@@ -206,7 +206,7 @@ internal sealed class LightLimitChangerProcessor : IDisposable
 
     private void ConfigureSettings<TSettings>(TSettings settings) where TSettings : ISettings, new()
     {
-        var menuGroup = menuRoot.GetOrAdd(settings.DisplayName);
+        var menuGroup = menuRoot.GetOrAdd(SettingsFieldInfo<TSettings>.DisplayName);
         if (typeof(TSettings).GetCustomAttribute<MenuIconAttribute>() is { } groupIconAttr)
         {
             menuGroup.Control.icon = AssetUtils.FromGUID<Texture2D>(groupIconAttr.Guid);
@@ -223,7 +223,7 @@ internal sealed class LightLimitChangerProcessor : IDisposable
             var parameterInfo = new ParameterInfo(settings, field);
             var parameter = parameterInfo.Parameter;
 
-            string key = parameterInfo.VectorFieldAttribute != null ? parameterInfo.VectorFieldAttribute.Group ?? settings.ParameterPrefix : "";
+            string key = parameterInfo.VectorFieldAttribute != null ? parameterInfo.VectorFieldAttribute.Group ?? SettingsFieldInfo<TSettings>.ParameterPrefix : "";
             var list = entries.GetOrAdd(key, _ => new());
             list.Add(parameterInfo);
         }
@@ -254,7 +254,7 @@ internal sealed class LightLimitChangerProcessor : IDisposable
                 if ((!parameter.Enable || !parameter.IsAnimated) && !generateEmpty)
                     continue;
 
-                var group = GetBlendTreeGroup(settings.ParameterPrefix);
+                var group = GetBlendTreeGroup(SettingsFieldInfo<TSettings>.ParameterPrefix);
                 ReadOnlySpan<float> values = parameterBuffer[..parameterInfo.Parameter.GetValues(parameterBuffer)];
 
                 for(int i = 0; i < values.Length; i++)
@@ -297,7 +297,7 @@ internal sealed class LightLimitChangerProcessor : IDisposable
                         tree.Animation = anim;
                         var avatarParameter = new ParameterConfig()
                         {
-                            nameOrPrefix = $"{settings.ParameterPrefix}{name}",
+                            nameOrPrefix = $"{SettingsFieldInfo<TSettings>.ParameterPrefix}{name}",
                             defaultValue = Utils.NormalizeInRange(value, parameterInfo.Range.x, parameterInfo.Range.y),
                             syncType =
                             t == typeof(bool) ? ParameterSyncType.Bool :

@@ -14,7 +14,6 @@ internal class ParameterFieldInfo
     public GeneralControlType GeneralControlType { get; }
     public ShaderFeatureAttribute ShaderFeatureAttribute { get; }
     public VectorFieldAttribute VectorFieldAttribute { get; }
-    public RangeParameterAttribute RangeParameterAttribute { get;  }
     public RangeAttribute RangeAttribute { get; }
     public MinMaxRangeAttribute MinMaxRangeAttribute { get; }
     public DisplayOptionAttribute DisplayOptionAttribute { get; }
@@ -31,7 +30,6 @@ internal class ParameterFieldInfo
         GeneralControlType = GetAttribute<GeneralControlAttribute>(attributes)?.Type ?? default;
         ShaderFeatureAttribute = GetAttribute<ShaderFeatureAttribute>(attributes);
         VectorFieldAttribute = GetAttribute<VectorFieldAttribute>(attributes);
-        RangeParameterAttribute = GetAttribute<RangeParameterAttribute>(attributes);
         RangeAttribute = GetAttribute<RangeAttribute>(attributes);
         MinMaxRangeAttribute = GetAttribute<MinMaxRangeAttribute>(attributes);
         DisplayOptionAttribute = GetAttribute<DisplayOptionAttribute>(attributes);
@@ -65,11 +63,9 @@ internal sealed class ParameterInfo : ParameterFieldInfo
         MaterialProperties = fieldInfo.GetCustomAttributes<MaterialPropertyNameAttribute>(false).ToImmutableDictionary(x => x.Shader, x => x.Name);
 
         Vector2 range = Vector2.up;
-        if (RangeParameterAttribute is { } rangeParamAttr)
+        if (MinMaxRangeAttribute is { } minMaxRange)
         {
-            var val = settings.GetType().GetField(rangeParamAttr.ParameterName)?.GetValue(settings) ?? null;
-            if (val is Vector2 v)
-                range = v;
+            range = Parameter.MinMaxRange;
         }
         else if (RangeAttribute is { } rangeAttr)
         {

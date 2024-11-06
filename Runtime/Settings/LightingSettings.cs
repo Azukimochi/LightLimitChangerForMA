@@ -5,14 +5,9 @@
 [SettingOptions(id: "lighting", displayName: "Lighting", parameterPrefix: "Light")]
 public sealed class LightingSettings : ISettings
 {
-    string ISettings.ParameterPrefix => "Light";
-
-    string ISettings.DisplayName => "Lighting";
-
     /// <summary>
     /// 明るさの下限
     /// </summary>
-    [RangeParameter(nameof(MinLightRange))]
     [MinMaxRange(0, 1)]
     [GeneralControl(GeneralControlType.MinLight)]
     [MaterialPropertyName(BuiltinSupportedShaders.LilToon, "_LightMinLimit")]
@@ -22,24 +17,11 @@ public sealed class LightingSettings : ISettings
     /// <summary>
     /// 明るさの上限
     /// </summary>
-    [RangeParameter(nameof(MaxLightRange))]
     [MinMaxRange(0, 10)]
     [GeneralControl(GeneralControlType.MaxLight)]
     [MaterialPropertyName(BuiltinSupportedShaders.LilToon, "_LightMaxLimit")]
     [MenuIcon(Icons.Light_Max)]
     public Parameter<float> MaxLight = 1;
-
-    /// <summary>
-    /// 明るさの下限の範囲
-    /// </summary>
-    [MinMaxSlider(0, 1)]
-    public Vector2 MinLightRange = new(0, 1);
-
-    /// <summary>
-    /// 明るさの上限の範囲
-    /// </summary>
-    [MinMaxSlider(0, 10)]
-    public Vector2 MaxLightRange = new(0, 1);
 
     /// <summary>
     /// 光の色の無視具合
