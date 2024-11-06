@@ -13,6 +13,7 @@ public sealed class LightingSettings : ISettings
     /// 明るさの下限
     /// </summary>
     [RangeParameter(nameof(MinLightRange))]
+    [MinMaxRange(0, 1)]
     [GeneralControl(GeneralControlType.MinLight)]
     [MaterialPropertyName(BuiltinSupportedShaders.LilToon, "_LightMinLimit")]
     [MenuIcon(Icons.Light_Min)]
@@ -22,6 +23,7 @@ public sealed class LightingSettings : ISettings
     /// 明るさの上限
     /// </summary>
     [RangeParameter(nameof(MaxLightRange))]
+    [MinMaxRange(0, 10)]
     [GeneralControl(GeneralControlType.MaxLight)]
     [MaterialPropertyName(BuiltinSupportedShaders.LilToon, "_LightMaxLimit")]
     [MenuIcon(Icons.Light_Max)]

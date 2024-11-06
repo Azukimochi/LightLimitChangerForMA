@@ -16,6 +16,7 @@ internal class ParameterFieldInfo
     public VectorFieldAttribute VectorFieldAttribute { get; }
     public RangeParameterAttribute RangeParameterAttribute { get;  }
     public RangeAttribute RangeAttribute { get; }
+    public MinMaxRangeAttribute MinMaxRangeAttribute { get; }
     public DisplayOptionAttribute DisplayOptionAttribute { get; }
     public Texture2D Icon { get; }
 
@@ -32,6 +33,7 @@ internal class ParameterFieldInfo
         VectorFieldAttribute = GetAttribute<VectorFieldAttribute>(attributes);
         RangeParameterAttribute = GetAttribute<RangeParameterAttribute>(attributes);
         RangeAttribute = GetAttribute<RangeAttribute>(attributes);
+        MinMaxRangeAttribute = GetAttribute<MinMaxRangeAttribute>(attributes);
         DisplayOptionAttribute = GetAttribute<DisplayOptionAttribute>(attributes);
 
         if (GetAttribute<MenuIconAttribute>(attributes) is { } iconAttr)

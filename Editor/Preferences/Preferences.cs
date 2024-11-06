@@ -11,4 +11,13 @@ internal static class Preferences
     public static GlobalPrefs Global => GlobalPrefs.instance;
 
     public static LocalPrefs Local => LocalPrefs.instance;
+
+    static Preferences()
+    {
+        EditorApplication.quitting += () =>
+        {
+            Global.Save();
+            Local.Save();
+        };
+    }
 }
