@@ -7,18 +7,33 @@ internal sealed class ParameterDrawer : PropertyDrawer
         new(() => EditorStyles.foldout.CalcSize(GUIContent.none), false);
 
     public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
-        => Draw(position, property, label);
+        => Draw(position, property, label, false, null, null, false);
 
     public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         => GetPropertyHeight(property);
 
     public static float GetPropertyHeight(SerializedProperty property) 
-        => EditorGUIUtility.singleLineHeight * (property.isExpanded && LightLimitChangerComponentEditor.SelectedTab != LightLimitChangerComponentEditor.Tab.BasicSettings ? 2 : 1) ;
-
-    public static void DrawLayout(SerializedProperty property, GUIContent label, Vector2? range = null, bool isOverrideValue = false)
+        => EditorGUIUtility.singleLineHeight * (property.isExpanded && LightLimitChangerComponentEditor.SelectedTab != LightLimitChangerComponentEditor.Tab.BasicSettings ? 2 : 1);
+    public static float GetPropertyHeight(SerializedProperty property, bool advancedMode = false, bool showMinMaxRangeSlider = false)
     {
-        var position = EditorGUILayout.GetControlRect(label != null, GetPropertyHeight(property));
-        Draw(position, property, label, range, isOverrideValue);
+        var lineCount = 1;
+        if (advancedMode)
+        {
+            if (property.isExpanded)
+            {
+                lineCount++;
+
+                if (showMinMaxRangeSlider)
+                    lineCount++;
+            }
+        }
+        return EditorGUIUtility.singleLineHeight * lineCount;
+    }
+
+    public static void DrawLayout(SerializedProperty property, GUIContent label, bool showInitialSlider = true, Vector2? range = null, Vector2? minMaxRange = null, bool advancedMode = false)
+    {
+        var position = EditorGUILayout.GetControlRect(label != null, GetPropertyHeight(property, advancedMode, minMaxRange.HasValue));
+        Draw(position, property, label, showInitialSlider, range, minMaxRange, advancedMode);
     }
 
     public static void Draw(Rect position, SerializedProperty property, GUIContent label, Vector2? range = null, bool isOverrideValue = false)
@@ -92,14 +107,164 @@ internal sealed class ParameterDrawer : PropertyDrawer
         DrawEnableButton(ref p, syncedProp);
     }
 
-    private static void DrawEnableButton(ref Rect p, SerializedProperty prop)
+
+    public static void Draw(Rect position, SerializedProperty property, GUIContent label, bool showInitialSlider = true, Vector2? range = null, Vector2? minMaxRange = null, bool advancedMode = false)
     {
+        using var scope = new PropertyScope(position, label, property);
+        var valueProp = property.FindPropertyRelative("Value");
+        var minMaxRangeProp = property.FindPropertyRelative("MinMaxRange");
+        var enableProp = property.FindPropertyRelative("Enable");
+        var isAnimatedProp = property.FindPropertyRelative("IsAnimated");
+        var savedProp = property.FindPropertyRelative("Saved");
+        var syncedProp = property.FindPropertyRelative("Synced");
+        position.height = EditorGUIUtility.singleLineHeight;
+
+        var p = position;
+        p.width = EditorGUIUtility.labelWidth;
+        bool enable;
+
+        if (advancedMode)
+        {
+            p.x += FoldoutStyleSize.Value.x;
+            property.isExpanded = EditorGUI.Foldout(p, property.isExpanded, scope.Label);
+            enable = enableProp.boolValue;
+        }
+        else
+        {
+            enable = EditorGUI.ToggleLeft(p, scope.Label, enableProp.boolValue);
+            enableProp.boolValue = enable;
+        }
+
+        p = position;
+        p.x += EditorGUIUtility.labelWidth - EditorGUI.indentLevel * 15;
+        p.width -= EditorGUIUtility.labelWidth - EditorGUI.indentLevel * 15;
+
+        EditorGUI.BeginDisabledGroup(!enable);
+        try
+        {
+            using (DisableScope.If(!showInitialSlider))
+            {
+                Vector2? r = null;
+                if (range.HasValue)
+                    r = range.Value;
+                else if (minMaxRange.HasValue)
+                    r = minMaxRangeProp.vector2Value;
+
+                if (r is { } v)
+                {
+                    EditorGUI.BeginChangeCheck();
+                    var value = EditorGUI.Slider(p, GUIContent.none, valueProp.floatValue, v.x, v.y);
+                    if (EditorGUI.EndChangeCheck())
+                    {
+                        valueProp.floatValue = value;
+                    }
+                }
+                else
+                {
+                    EditorGUI.PropertyField(p, valueProp, GUIContent.none);
+                }
+            }
+
+            if (!property.isExpanded || !advancedMode)
+                return;
+
+            p.width = EditorStyles.label.CalcSize(EditorGUIUtility.TrTempContent("Value:")).x;
+            p.x -= p.width + 8;
+            EditorGUI.LabelField(p, "Value:");
+
+            if (showInitialSlider && minMaxRange is { } minMax)
+            {
+                position.y += EditorGUIUtility.singleLineHeight;
+                p = position;
+                p.x += EditorGUIUtility.labelWidth;
+                p.width -= EditorGUIUtility.labelWidth;
+                MinMaxSlider(p, minMaxRangeProp, GUIContent.none, minMax);
+                p.width = EditorStyles.label.CalcSize(EditorGUIUtility.TrTempContent("Range:")).x;
+                p.x -= p.width + 8;
+                EditorGUI.LabelField(p, "Range:");
+            }
+
+            position.y += EditorGUIUtility.singleLineHeight;
+            p = position;
+
+            p.x += EditorGUIUtility.labelWidth;
+            p.width -= EditorGUIUtility.labelWidth;
+
+            p = p with { width = p.width / 4 };
+            EditorGUI.EndDisabledGroup();
+            DrawEnableButton(ref p, enableProp);
+            EditorGUI.BeginDisabledGroup(!enable);
+            DrawEnableButton(ref p, isAnimatedProp, "Animation");
+            DrawEnableButton(ref p, savedProp);
+            DrawEnableButton(ref p, syncedProp);
+
+            p.width = EditorStyles.label.CalcSize(EditorGUIUtility.TrTempContent("Options:")).x;
+            p.x = position.x + EditorGUIUtility.labelWidth - (p.width + 8);
+            EditorGUI.LabelField(p, "Options:");
+
+        }
+        finally
+        {
+            EditorGUI.EndDisabledGroup();
+        }
+    }
+
+    private static void DrawEnableButton(ref Rect p, SerializedProperty prop, string label = null)
+    {
+        label ??= prop.displayName;
         EditorGUI.BeginChangeCheck();
-        var v = EditorGUI.ToggleLeft(p, prop.displayName, prop.boolValue);
+        var v = EditorGUI.ToggleLeft(p, label, prop.boolValue);
         if (EditorGUI.EndChangeCheck())
         {
             prop.boolValue = v;
         }
         p.x += p.width;
+    }
+
+    public static void MinMaxSlider(Rect position, SerializedProperty property, GUIContent label, Vector2 range)
+    {
+        if (property.propertyType != SerializedPropertyType.Vector2)
+        {
+            return;
+        }
+        //using var scope = new PropertyScope(position, label, property);
+        var vector = property.vector2Value;
+
+        position = EditorGUI.PrefixLabel(position, label);
+        position.x -= EditorGUI.indentLevel * 15f;
+        position.width += EditorGUI.indentLevel * 15f;
+
+
+        float floatFieldWidth = Mathf.Max(position.width * 0.1f, 50);
+        float padding = 10f;
+
+        var left = position with { width = floatFieldWidth };
+        var mid = position with { width = position.width - (floatFieldWidth * 2 + padding * 2), x = position.x + left.width + padding };
+        var right = position with { width = floatFieldWidth, x = position.x + left.width + mid.width + padding * 2 };
+
+        EditorGUI.BeginChangeCheck();
+        var f = EditorGUI.FloatField(left, GUIContent.none, vector.x);
+        if (EditorGUI.EndChangeCheck())
+        {
+            vector.x = Mathf.Clamp(f, range.x, vector.y);
+            property.vector2Value = vector;
+        }
+        EditorGUI.BeginChangeCheck();
+        EditorGUI.MinMaxSlider(mid, GUIContent.none, ref vector.x, ref vector.y, range.x, range.y);
+        if (EditorGUI.EndChangeCheck())
+        {
+            const float N = 0.025f;
+            vector.x = Mathf.Ceil(vector.x / N) * N;
+            vector.y = Mathf.Ceil(vector.y / N) * N;
+            property.vector2Value = vector;
+        }
+
+        EditorGUI.BeginChangeCheck();
+        f = EditorGUI.FloatField(right, GUIContent.none, vector.y);
+        if (EditorGUI.EndChangeCheck())
+        {
+            vector.y = Mathf.Clamp(f, vector.x, range.y);
+            property.vector2Value = vector;
+        }
     }
 }

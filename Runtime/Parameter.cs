@@ -26,6 +26,11 @@ public abstract class Parameter
     public bool Synced = true;
 
     /// <summary>
+    /// パラメータが稼働する下限と上限
+    /// </summary>
+    public Vector2 MinMaxRange = Vector2.up;
+
+    /// <summary>
     /// 設定値をfloatで取得する
     /// </summary>
     public abstract IEnumerable<float> GetValues();
