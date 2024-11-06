@@ -1,0 +1,12 @@
+msgid ""
+msgstr ""
+"Language: ja\n"
+
+msgid "settings:lighting/minLight/label"
+msgstr "明るさの下限"
+
+msgid "settings:lighting/minLight/description"
+msgstr "明るさの下限です！！"
+
+msgid "settings:lighting/maxLight/label"
+msgstr "明るさの上限"

@@ -1,44 +1,35 @@
 ﻿using System.Linq;
+using CustomLocalization4EditorExtension;
 using nadena.dev.ndmf.localization;
 
 namespace io.github.azukimochi;
 
-internal abstract partial class L10n
+internal static class L10n
 {
     private const string PreferenceKey = "io.github.azukimochi.light-limit-changer.lang";
 
-    private static readonly L10n[] Instances = { 
-        new En_US(), 
-        new Ja_JP(),
-        new Zh_Hant(),
-        new Zh_Hans(),
-    };
+    [AssemblyCL4EELocalization]
+    public static Localization Localization { get; } = new Localization("e955a6e9f59e118418cedcf05a7d1a4e", "ja", PreferenceKey);
 
-    public static L10n Default => Instances[0];
+    private static GUIContent tempContent;
 
-    public static L10n Current => Instances[CurrentLanguageIndex];
-
-    public static Localizer NDMFLocalizer = new(Instances[0].Code, () => Instances.Select<L10n, (string, Func<string, string>)>(x => (x.Code, key => key /* TODO: あとでやる！*/)).ToList());
-
-    public static int CurrentLanguageIndex
+    public static GUIContent Tr(string localizationKey)
     {
-        get => cachedLanguageIndex;
-        set {
-            value = Math.Clamp(value, 0, Instances.Length - 1);
-            if (cachedLanguageIndex == value)
-                return;
-            
-            EditorPrefs.SetInt(PreferenceKey, value);
-            cachedLanguageIndex = value;
+        var text = Localization.Tr(localizationKey);
+        if (tempContent == null)
+        {
+            tempContent = new(text);
         }
+        else
+        {
+            tempContent.text = text;
+        }
+        return tempContent;
     }
 
-    private static int cachedLanguageIndex;
+    public static string TrStr(string localizationKey) 
+        => Localization.Tr(localizationKey);
 
-    static L10n()
-    {
-        EditorApplication.delayCall += () => cachedLanguageIndex = EditorPrefs.GetInt(PreferenceKey, 0);
-    }
-
-    protected L10n() { }
+    public static Localizer Localizer { get; } = 
+        new Localizer("ja", () => Localization.LocalizationByIsoCode.Select(x => ValueTuple.Create<string, Func<string, string>>(x.Key, y => x.Value.TryGetLocalizedString(y))).ToList());
 }
