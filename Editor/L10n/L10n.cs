@@ -9,7 +9,7 @@ internal static class L10n
     private const string PreferenceKey = "io.github.azukimochi.light-limit-changer.lang";
 
     [AssemblyCL4EELocalization]
-    public static Localization Localization { get; } = new Localization("e955a6e9f59e118418cedcf05a7d1a4e", "ja", PreferenceKey);
+    public static Localization Localization { get; } = new Localization("e955a6e9f59e118418cedcf05a7d1a4e", "en", PreferenceKey);
 
     private static GUIContent tempContent;
 
@@ -31,5 +31,5 @@ internal static class L10n
         => Localization.Tr(localizationKey);
 
     public static Localizer Localizer { get; } = 
-        new Localizer("ja", () => Localization.LocalizationByIsoCode.Select(x => ValueTuple.Create<string, Func<string, string>>(x.Key, y => x.Value.TryGetLocalizedString(y))).ToList());
+        new Localizer("en", () => Localization.LocalizationByIsoCode.Select(x => ValueTuple.Create<string, Func<string, string>>(x.Key, y => x.Value.TryGetLocalizedString(y))).ToList());
 }
