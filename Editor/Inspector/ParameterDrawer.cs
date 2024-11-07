@@ -168,9 +168,9 @@ internal sealed class ParameterDrawer : PropertyDrawer
             if (!property.isExpanded || !advancedMode)
                 return;
 
-            p.width = EditorStyles.label.CalcSize(EditorGUIUtility.TrTempContent("Value:")).x;
+            p.width = EditorStyles.label.CalcSize(L10n.Tr("common:label/initialvalue")).x;
             p.x -= p.width + 8;
-            EditorGUI.LabelField(p, "Value:");
+            EditorGUI.LabelField(p, L10n.Tr("common:label/initialvalue"));
 
             if (showInitialSlider && minMaxRange is { } minMax)
             {
@@ -179,9 +179,9 @@ internal sealed class ParameterDrawer : PropertyDrawer
                 p.x += EditorGUIUtility.labelWidth;
                 p.width -= EditorGUIUtility.labelWidth;
                 MinMaxSlider(p, minMaxRangeProp, GUIContent.none, minMax);
-                p.width = EditorStyles.label.CalcSize(EditorGUIUtility.TrTempContent("Range:")).x;
+                p.width = EditorStyles.label.CalcSize(L10n.Tr("common:label/range")).x;
                 p.x -= p.width + 8;
-                EditorGUI.LabelField(p, "Range:");
+                EditorGUI.LabelField(p, L10n.Tr("common:label/range"));
             }
 
             position.y += EditorGUIUtility.singleLineHeight;
@@ -192,15 +192,15 @@ internal sealed class ParameterDrawer : PropertyDrawer
 
             p = p with { width = p.width / 4 };
             EditorGUI.EndDisabledGroup();
-            DrawEnableButton(ref p, enableProp);
+            DrawEnableButton(ref p, enableProp, L10n.TrStr("common:label/enable"));
             EditorGUI.BeginDisabledGroup(!enable);
-            DrawEnableButton(ref p, isAnimatedProp, "Animation");
-            DrawEnableButton(ref p, savedProp);
-            DrawEnableButton(ref p, syncedProp);
+            DrawEnableButton(ref p, isAnimatedProp, L10n.TrStr("common:label/animation"));
+            DrawEnableButton(ref p, savedProp, L10n.TrStr("common:label/saved"));
+            DrawEnableButton(ref p, syncedProp, L10n.TrStr("common:label/synced"));
 
-            p.width = EditorStyles.label.CalcSize(EditorGUIUtility.TrTempContent("Options:")).x;
+            p.width = EditorStyles.label.CalcSize(L10n.Tr("common:label/option")).x;
             p.x = position.x + EditorGUIUtility.labelWidth - (p.width + 8);
-            EditorGUI.LabelField(p, "Options:");
+            EditorGUI.LabelField(p, L10n.Tr("common:label/option"));
 
         }
         finally

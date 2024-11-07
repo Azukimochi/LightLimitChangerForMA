@@ -43,7 +43,7 @@ internal sealed partial class LightLimitChangerComponentEditor : Editor
         }
         EditorGUILayout.Space();
 
-        CategoryLabel("Preset");
+        CategoryLabel(L10n.TrStr("category:preset"));
         EditorGUILayout.Space();
         {
             EditorGUILayout.BeginHorizontal();
@@ -55,7 +55,7 @@ internal sealed partial class LightLimitChangerComponentEditor : Editor
             EditorGUILayout.EndHorizontal();
         }
         EditorGUILayout.Space();
-        CategoryLabel("General Settings");
+        CategoryLabel(L10n.TrStr("category:general-settings"));
         EditorGUILayout.Space();
 
         static void DoPropertyGUI<TSettings>(SerializedProperty property, string title) where TSettings: ISettings
@@ -74,31 +74,44 @@ internal sealed partial class LightLimitChangerComponentEditor : Editor
             catch(Exception e) { Debug.LogException(e); }
         }
 
-        DoPropertyGUI<LightingSettings>(serializedObject.FindProperty("General.LightingControl"), "Lighting Settings");
-        DoPropertyGUI<ColorControlSettings>(serializedObject.FindProperty("General.ColorControl"), "Color Settings");
+        DoPropertyGUI<LightingSettings>(serializedObject.FindProperty("General.LightingControl"), L10n.TrStr("category:lighting-settings"));
+        DoPropertyGUI<ColorControlSettings>(serializedObject.FindProperty("General.ColorControl"), L10n.TrStr("category:color-settings"));
 
-        CategoryLabel("Shader Settings");
+        CategoryLabel(L10n.TrStr("category:material-settings"));
         EditorGUILayout.Space();
 
-        DoPropertyGUI<LilToonSettings>(serializedObject.FindProperty("LilToon"), "lilToon Settings");
-        DoPropertyGUI<PoiyomiSettings>(serializedObject.FindProperty("Poiyomi"), "Poiyomi Settings");
-        DoPropertyGUI<UnlitWFSettings>(serializedObject.FindProperty("UnlitWF"), "UnlitWF Settings");
+        DoPropertyGUI<LilToonSettings>(serializedObject.FindProperty("LilToon"), L10n.TrStr("category:liltoon-settings"));
+        DoPropertyGUI<PoiyomiSettings>(serializedObject.FindProperty("Poiyomi"), L10n.TrStr("category:poiyomi-settings"));
+        DoPropertyGUI<UnlitWFSettings>(serializedObject.FindProperty("UnlitWF"), L10n.TrStr("category:unlitwf-settings"));
 
+        CategoryLabel(L10n.TrStr("category:other-settings"));
 
         EditorGUILayout.Space();
-        EditorGUILayout.LabelField("Excludes", EditorStyles.boldLabel);
+        EditorGUILayout.LabelField(L10n.TrStr("settings:other/excludes/label"), EditorStyles.boldLabel);
         EditorGUILayout.PropertyField(serializedObject.FindProperty("Excludes"), true);
+        if(ShowDescriptions)
+        {
+            EditorGUILayout.HelpBox(L10n.TrStr("settings:other/excludes/description"), MessageType.Info);
+        }
 
         EditorGUILayout.Space();
-        EditorGUILayout.LabelField("Write Defaults", EditorStyles.boldLabel);
+        EditorGUILayout.LabelField(L10n.TrStr("settings:other/writedefault/label"), EditorStyles.boldLabel);
         EditorGUILayout.PropertyField(serializedObject.FindProperty("WriteDefaults"));
+        if(ShowDescriptions)
+        {
+            EditorGUILayout.HelpBox(L10n.TrStr("settings:other/writedefault/description"), MessageType.Info);
+        }
 
         EditorGUILayout.Space();
-        EditorGUILayout.LabelField("Target Shader", EditorStyles.boldLabel);
+        EditorGUILayout.LabelField(L10n.TrStr("settings:other/target_shader/label"), EditorStyles.boldLabel);
         EditorGUILayout.PropertyField(serializedObject.FindProperty("TargetShader"));
+        if(ShowDescriptions)
+        {
+            EditorGUILayout.HelpBox(L10n.TrStr("settings:other/target_shader/description"), MessageType.Info);
+        }
 
         EditorGUILayout.Space();
-        EditorGUILayout.LabelField("Language", EditorStyles.boldLabel);
+        EditorGUILayout.LabelField(L10n.TrStr("settings:other/language/label"), EditorStyles.boldLabel);
         {
             var position = EditorGUILayout.GetControlRect(true, L10n.Localization.GetDrawLanguagePickerHeight());
             var p = position;

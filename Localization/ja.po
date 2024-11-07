@@ -2,11 +2,246 @@ msgid ""
 msgstr ""
 "Language: ja\n"
 
+## メニュー項目のラベル
+msgid "common:label/initialvalue"
+msgstr "初期値"
+
+msgid "common:label/range"
+msgstr "操作範囲"
+
+msgid "common:label/enable"
+msgstr "有効"
+
+msgid "common:label/option"
+msgstr "オプション"
+
+msgid "common:label/animation"
+msgstr "アニメーション制御"
+
+msgid "common:label/saved"
+msgstr "パラメーター保存"
+
+msgid "common:label/synced"
+msgstr "パラメーター同期"
+
+##################
+## 設定カテゴリーのラベル
+
+msgid "category:basicsettings"
+msgstr "基本設定"
+
+msgid "category:advancedsettings"
+msgstr "詳細設定"
+
+msgid "category:discriptionmode"
+msgstr "解説モード"
+
+msgid "category:preset"
+msgstr "プリセット"
+
+msgid "category:general-settings"
+msgstr "一般設定"
+
+msgid "category:lighting-settings"
+msgstr "ライティング設定"
+
+msgid "category:color-settings"
+msgstr "カラー設定"
+
+msgid "category:material-settings"
+msgstr "シェーダー設定"
+
+msgid "category:liltoon-settings"
+msgstr "lilToon"
+
+msgid "category:poiyomi-settings"
+msgstr "Poiyomi"
+
+msgid "category:sunao-settings"
+msgstr "Sunao"
+
+msgid "category:unlitwf-settings"
+msgstr "UnlitWF"
+
+msgid "category:other-settings"
+msgstr "その他の設定"
+
+#################
+## ライティング設定
+
 msgid "settings:lighting/minLight/label"
 msgstr "明るさの下限"
 
 msgid "settings:lighting/minLight/description"
-msgstr "明るさの下限です！！"
+msgstr ""
+"この値を変更すると、アバターの明るさの下限値が変わります。\n\n"
+"初期値はアバターリセットなどで初期化されるときの値です。\n"
+"操作範囲はメニューの0~100%の範囲で操作する値の範囲です。\n\n"
+"操作パラメーター\n"
+"lilToon:_LightMinLimit\n"
+"poiyomi:*****\n"
+"sunao:*****\n"
+"UnlitWF:*****"
 
 msgid "settings:lighting/maxLight/label"
 msgstr "明るさの上限"
+
+msgid "settings:lighting/maxLight/description"
+msgstr ""
+"この値を変更すると、アバターの明るさの上限値が変わります。\n\n"
+"初期値はアバターリセットなどで初期化されるときの値です。\n"
+"操作パラメーター\n"
+"lilToon:_LightMaxLimit\n"
+"poiyomi:*****\n"
+"sunao:*****\n"
+"UnlitWF:*****"
+
+msgid "settings:lighting/monochrome/label"
+msgstr "ライトのモノクロ化機能"
+
+msgid "settings:lighting/monochrome/description"
+msgstr ""
+"ライトのモノクロ化は、アバターに影響するワールドライトの色をモノクロ化するパラメーターです。\n\n"
+"初期値はアバターリセットなどで初期化されるときの値です。\n\n"
+"操作パラメーター\n"
+"lilToon:_MonochromeLighting\n"
+"poiyomi:*****\n"
+"sunao:*****\n"
+"UnlitWF:*****"
+
+msgid "settings:lighting/unlit/label"
+msgstr "Unlit機能"
+
+msgid "settings:lighting/unlit/description"
+msgstr ""
+"Unlitは、アバターへのライティングの影響を無効にするパラメーターです。\n\n"
+"初期値はアバターリセットなどで初期化されるときの値です。\n"
+"操作範囲はメニューの0~100%の範囲で操作する値の範囲です。\n\n"
+"操作パラメーター\n"
+"lilToon:_AsUnlit\n"
+"poiyomi:*****\n"
+"sunao:*****\n"
+"UnlitWF:*****"
+
+msgid "settings:lighting/emissionStrength/label"
+msgstr "エミッション機能"
+
+msgid "settings:lighting/emissionStrength/description"
+msgstr ""
+"エミッションは、アバターのエミッションの強さを調整するパラメーターです。\n\n"
+"初期値はアバターリセットなどで初期化されるときの値です。\n\n"
+"操作パラメーター\n"
+"lilToon:_EmissionBlend\n"
+"poiyomi:*****\n"
+"sunao:*****\n"
+"UnlitWF:*****"
+
+#################
+## カラー設定
+
+msgid "settings:color-control/hue/label"
+msgstr "色相"
+
+msgid "settings:color-control/hue/description"
+msgstr ""
+"色相は、アバターの色相を調整するパラメーターです。\n\n"
+"初期値はアバターリセットなどで初期化されるときの値です。\n\n"
+"操作パラメーター\n"
+"lilToon:_MainTexHSVG.x\n"
+"poiyomi:*****\n"
+"sunao:*****\n"
+"UnlitWF:*****"
+
+msgid "settings:color-control/saturation/label"
+msgstr "彩度"
+
+msgid "settings:color-control/saturation/description"
+msgstr ""
+"彩度は、アバターの彩度を調整するパラメーターです。\n\n"
+"初期値はアバターリセットなどで初期化されるときの値です。\n\n"
+"操作パラメーター\n"
+"lilToon:_MainTexHSVG.y\n"
+"poiyomi:*****\n"
+"sunao:*****\n"
+"UnlitWF:*****"
+
+msgid "settings:color-control/brightness/label"
+msgstr "明度"
+
+msgid "settings:color-control/brightness/description"
+msgstr ""
+"明度は、アバターの明度を調整するパラメーターです。\n\n"
+"初期値はアバターリセットなどで初期化されるときの値です。\n\n"
+"操作パラメーター\n"
+"lilToon:_MainTexHSVG.z\n"
+"poiyomi:*****\n"
+"sunao:*****\n"
+"UnlitWF:*****"
+
+msgid "settings:color-control/gamma/label"
+msgstr "ガンマ"
+
+msgid "settings:color-control/gamma/description"
+msgstr ""
+"ガンマは、アバターのガンマを調整するパラメーターです。\n\n"
+"初期値はアバターリセットなどで初期化されるときの値です。\n\n"
+"操作パラメーター\n"
+"lilToon:_MainTexHSVG.w\n"
+"poiyomi:*****\n"
+"sunao:*****\n"
+"UnlitWF:*****"
+
+#################
+## lilToon設定
+
+msgid "settings:lilToon/shadowEnvStrength/label"
+msgstr "影環境強度"
+
+msgid "settings:lilToon/shadowEnvStrength/description"
+msgstr ""
+"影環境強度は、影の環境強度を調整するパラメーターです。\n\n"
+"初期値はアバターリセットなどで初期化されるときの値です。\n\n"
+"操作パラメーター\n"
+"lilToon:_ShadowEnvStrength"
+
+msgid "settings:lilToon/vertexLightStrength/label"
+msgstr "頂点ライト強度"
+
+msgid "settings:lilToon/vertexLightStrength/description"
+msgstr ""
+"頂点ライト強度は、頂点ライトの強度を調整するパラメーターです。\n\n"
+"初期値はアバターリセットなどで初期化されるときの値です。\n\n"
+"操作パラメーター\n"
+"lilToon:_VertexLightStrength"
+
+#################
+## シェーダー設定
+
+#################
+## その他の設定
+
+msgid "settings:other/excludes/label"
+msgstr "除外設定"
+
+msgid "settings:other/excludes/description"
+msgstr ""
+"除外設定は、アバター内の特定のマテリアルを制御対象から除外する設定です。\n"
+"マテリアルを直接指定することで、特定のマテリアルのみを制御対象から除外することができます。\n"
+
+msgid "settings:other/writedefault/label"
+msgstr "Write Default設定"
+
+msgid "settings:other/writedefault/description"
+msgstr ""
+"Write Default設定は、アバターのWriteDefault設定を変更する機能です。\n"
+
+msgid "settings:other/target_shader/label"
+msgstr "対象シェーダー"
+
+msgid "settings:other/target_shader/description"
+msgstr ""
+"対象シェーダーは、設定を適用するシェーダーを指定するパラメーターです。\n"
+"特定のシェーダーのみ制御対象から除外することができます。"
+
+msgid "settings:other/language/label"
+msgstr "言語設定"

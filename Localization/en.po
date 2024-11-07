@@ -2,6 +2,7 @@ msgid ""
 msgstr ""
 "Language: en\n"
 
+# Labels for settings items
 msgid "settings:lighting/minLight/label"
 msgstr "Min Brightness"
 
