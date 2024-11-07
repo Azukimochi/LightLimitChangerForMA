@@ -19,9 +19,13 @@ internal sealed partial class LightLimitChangerComponentEditor : Editor
 
     public static bool ShowDescriptions { get => Preferences.Local.ShowDescription; set => Preferences.Local.ShowDescription = value; }
 
+    public bool PresetMode { get; set; }
+
     public void OnEnable()
     {
         SelectedTab = IsAdvancedMode ? ShowDescriptions ? Tab.DiescriptionMode : Tab.AdvancedSettings : Tab.BasicSettings;
+        var target = (Target)base.target;
+        PresetMode = target.transform.parent?.GetComponent<Target>() != null;
     }
 
     public override void OnInspectorGUI()
@@ -84,32 +88,35 @@ internal sealed partial class LightLimitChangerComponentEditor : Editor
         DoPropertyGUI<PoiyomiSettings>(serializedObject.FindProperty("Poiyomi"), L10n.TrStr("category:poiyomi-settings"));
         DoPropertyGUI<UnlitWFSettings>(serializedObject.FindProperty("UnlitWF"), L10n.TrStr("category:unlitwf-settings"));
 
-        CategoryLabel(L10n.TrStr("category:other-settings"));
-
-        EditorGUILayout.Space();
-        EditorGUILayout.LabelField(L10n.TrStr("settings:other/excludes/label"), EditorStyles.boldLabel);
-        EditorGUILayout.PropertyField(serializedObject.FindProperty("Excludes"), true);
-        if(ShowDescriptions)
+        if (!PresetMode)
         {
-            EditorGUILayout.HelpBox(L10n.TrStr("settings:other/excludes/description"), MessageType.Info);
-        }
+            CategoryLabel(L10n.TrStr("category:other-settings"));
 
-        EditorGUILayout.Space();
-        EditorGUILayout.LabelField(L10n.TrStr("settings:other/writedefault/label"), EditorStyles.boldLabel);
-        EditorGUILayout.PropertyField(serializedObject.FindProperty("WriteDefaults"));
-        if(ShowDescriptions)
-        {
-            EditorGUILayout.HelpBox(L10n.TrStr("settings:other/writedefault/description"), MessageType.Info);
-        }
+            EditorGUILayout.Space();
+            EditorGUILayout.LabelField(L10n.TrStr("settings:other/excludes/label"), EditorStyles.boldLabel);
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("Excludes"), true);
+            if(ShowDescriptions)
+            {
+                EditorGUILayout.HelpBox(L10n.TrStr("settings:other/excludes/description"), MessageType.Info);
+            }
 
-        EditorGUILayout.Space();
-        EditorGUILayout.LabelField(L10n.TrStr("settings:other/target_shader/label"), EditorStyles.boldLabel);
-        EditorGUILayout.PropertyField(serializedObject.FindProperty("TargetShader"));
-        if(ShowDescriptions)
-        {
-            EditorGUILayout.HelpBox(L10n.TrStr("settings:other/target_shader/description"), MessageType.Info);
-        }
+            EditorGUILayout.Space();
+            EditorGUILayout.LabelField(L10n.TrStr("settings:other/writedefault/label"), EditorStyles.boldLabel);
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("WriteDefaults"));
+            if(ShowDescriptions)
+            {
+                EditorGUILayout.HelpBox(L10n.TrStr("settings:other/writedefault/description"), MessageType.Info);
+            }
 
+            EditorGUILayout.Space();
+            EditorGUILayout.LabelField(L10n.TrStr("settings:other/target_shader/label"), EditorStyles.boldLabel);
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("TargetShader"));
+            if(ShowDescriptions)
+            {
+                EditorGUILayout.HelpBox(L10n.TrStr("settings:other/target_shader/description"), MessageType.Info);
+            }
+        }
+        
         EditorGUILayout.Space();
         EditorGUILayout.LabelField(L10n.TrStr("settings:other/language/label"), EditorStyles.boldLabel);
         {
