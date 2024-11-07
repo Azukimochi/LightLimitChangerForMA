@@ -14,8 +14,19 @@ internal static class L10n
     private static GUIContent tempContent;
 
     public static GUIContent Tr(string localizationKey)
+        => GetTemporaryStringContent(Localization.Tr(localizationKey));
+
+    public static GUIContent Tr(string localizationKey, string fallback)
+        => GetTemporaryStringContent(Localization.TryTr(localizationKey) ?? fallback);
+
+    public static string TrStr(string localizationKey) 
+        => Localization.Tr(localizationKey);
+
+    public static string TrStr(string localizationKey, string fallback)
+        => Localization.TryTr(localizationKey) ?? fallback;
+
+    private static GUIContent GetTemporaryStringContent(string text)
     {
-        var text = Localization.Tr(localizationKey);
         if (tempContent == null)
         {
             tempContent = new(text);
@@ -26,9 +37,6 @@ internal static class L10n
         }
         return tempContent;
     }
-
-    public static string TrStr(string localizationKey) 
-        => Localization.Tr(localizationKey);
 
     public static Localizer Localizer { get; } = 
         new Localizer("ja", () => Localization.LocalizationByIsoCode.Select(x => ValueTuple.Create<string, Func<string, string>>(x.Key, y => x.Value.TryGetLocalizedString(y))).ToList());

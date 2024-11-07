@@ -5,7 +5,39 @@ using MenuItem = nadena.dev.modular_avatar.core.ModularAvatarMenuItem;
 
 internal static class MenuItemExt
 {
-    public static MenuItem GetOrAdd(this MenuItem menu, string path, Func<MenuItem, (VRCExpressionsMenu.Control.ControlType ControlType, string ParameterName)> factory = null)
+    public static MenuItem GetOrAdd(this MenuItem menu, string path)
+        => menu.GetOrAdd(path, default(Action<MenuItem>));
+
+    public static MenuItem GetOrAdd(this MenuItem menu, string path, Func<MenuItem, (VRCExMenuControlType ControlType, string ParameterName)> factory = null)
+        => menu.GetOrAdd(path, factory is null ? null : menu =>
+        {
+            var x = factory(menu);
+            return (x.ControlType, x.ParameterName, 0);
+        });
+
+    public static MenuItem GetOrAdd(this MenuItem menu, string path, Func<MenuItem, (VRCExMenuControlType ControlType, string ParameterName, float Value)> factory = null)
+    {
+        return menu.GetOrAdd(path, menu =>
+        {
+            if (factory == null)
+                return;
+
+            var (type, param, value) = factory(menu);
+            menu.Control.type = type;
+            var p = new VRCExpressionsMenu.Control.Parameter() { name = param };
+            if (type == VRCExMenuControlType.RadialPuppet)
+            {
+                menu.Control.subParameters = new[] { p };
+            }
+            else
+            {
+                menu.Control.parameter = p;
+            }
+            menu.Control.value = value;
+        });
+    }
+
+    public static MenuItem GetOrAdd(this MenuItem menu, string path, Action<MenuItem> action = null)
     {
         var split = path.Split("/");
         bool flag = false;
@@ -30,20 +62,8 @@ internal static class MenuItemExt
             }
         }
 
-        if (!flag || factory is null)
-            return menu;
-
-        var (type, param) = factory(menu);
-        menu.Control.type = type;
-        var p = new VRCExpressionsMenu.Control.Parameter() { name = param };
-        if (type == VRCExpressionsMenu.Control.ControlType.RadialPuppet)
-        {
-            menu.Control.subParameters = new[] { p };
-        }
-        else
-        {
-            menu.Control.parameter = p;
-        }
+        if (flag)
+            action?.Invoke(menu);
 
         return menu;
     }
