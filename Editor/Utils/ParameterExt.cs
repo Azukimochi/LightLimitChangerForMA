@@ -4,6 +4,9 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using nadena.dev.ndmf;
+using NUnit.Framework.Interfaces;
+using UnityEngine;
 
 namespace io.github.azukimochi;
 
@@ -64,5 +67,20 @@ internal static class ParameterExt
     {
         var fields = typeof(TSettings).GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
         return fields.Where(x => typeof(Parameter).IsAssignableFrom(x.FieldType) && x.IsPublic || (x.IsPrivate && x.GetCustomAttribute<SerializeField>() != null));
+    }
+
+    public static string GetName(this ParameterInfo parameterInfo, int index = 0)
+    {
+        string postfix;
+        var t = parameterInfo.ParameterType;
+        if (t == typeof(Vector4) || t == typeof(Color))
+        {
+            postfix = t == typeof(Vector4) ? $".{"xyzw"[index]}" : $".{"rgba"[index]}";
+        }
+        else
+        {
+            postfix = "";
+        }
+        return $"{parameterInfo.Name}{postfix}";
     }
 }
