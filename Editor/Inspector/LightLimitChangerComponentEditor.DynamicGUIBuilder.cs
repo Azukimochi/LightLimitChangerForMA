@@ -2,11 +2,6 @@
 using System.Reflection;
 using System.Linq;
 using System.Text;
-using System.Collections.Immutable;
-using System.Collections.Generic;
-using System.Runtime.InteropServices;
-using System.Runtime.CompilerServices;
-using static VRC.Core.ApiVRChatProductDetails;
 
 namespace io.github.azukimochi;
 
@@ -79,7 +74,7 @@ partial class LightLimitChangerComponentEditor
                 il.Ldstr(field.Name);
                 il.Call<SerializedProperty, Func<string, SerializedProperty>>(x => x.FindPropertyRelative);
                 il.Ldstr(StringExt.Create(sb, $"settings:{SettingsFieldInfo<TSettings>.Id}/{char.ToLowerInvariant(field.Name[0])}{field.Name.AsSpan(1)}/label"));
-                il.Call<Func<string, GUIContent>>(EditorGUIUtility.TrTempContent);
+                il.Call(L10n.Tr);
                 il.Int(info.DisableInitialValueSliderAttribute is null ? 1 : 0);
                 il.Ldloc(local_range);
                 il.Ldloc(local_minMaxRange);
@@ -90,6 +85,7 @@ partial class LightLimitChangerComponentEditor
                 il.If(() =>
                 {
                     il.Ldstr(StringExt.Create(sb, $"settings:{SettingsFieldInfo<TSettings>.Id}/{char.ToLowerInvariant(field.Name[0])}{field.Name.AsSpan(1)}/description"));
+                    il.Call(L10n.TrStr);
                     il.Int((int)MessageType.Info);
                     il.Call<Action<string, MessageType>>(EditorGUILayout.HelpBox);
                 });

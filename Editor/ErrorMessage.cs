@@ -11,7 +11,7 @@ internal class ErrorMessage : SimpleError
         Severity = severity;
     }
 
-    public override Localizer Localizer => L10n.NDMFLocalizer;
+    public override Localizer Localizer => L10n.Localizer;
 
     public override string TitleKey { get; }
 

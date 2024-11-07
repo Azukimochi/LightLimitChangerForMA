@@ -1,6 +1,4 @@
 ﻿using Target = io.github.azukimochi.LightLimitChangerComponent;
-using UnityEngine.UIElements;
-using System.Globalization;
 
 namespace io.github.azukimochi;
 
@@ -99,6 +97,17 @@ internal sealed partial class LightLimitChangerComponentEditor : Editor
         EditorGUILayout.LabelField("Target Shader", EditorStyles.boldLabel);
         EditorGUILayout.PropertyField(serializedObject.FindProperty("TargetShader"));
 
+        EditorGUILayout.Space();
+        EditorGUILayout.LabelField("Language", EditorStyles.boldLabel);
+        {
+            var position = EditorGUILayout.GetControlRect(true, L10n.Localization.GetDrawLanguagePickerHeight());
+            var p = position;
+            p.width = EditorGUIUtility.labelWidth;
+            EditorGUI.LabelField(p, L10n.Tr("Language"));
+            position.x += p.width + 4;
+            position.width -= p.width + 4;
+            L10n.Localization.DrawLanguagePicker(position);
+        }
 
         serializedObject.ApplyModifiedProperties();
     }
