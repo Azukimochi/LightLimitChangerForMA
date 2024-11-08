@@ -261,7 +261,7 @@ internal sealed class LightLimitChangerProcessor : IDisposable
 
                     for (int i = 0; i < values.Length; i++)
                     {
-                        var value = values[i];
+                        var value = Utils.NormalizeInRange(values[i], parameterInfo.Range.x, parameterInfo.Range.y);
                         string postfix = values.Length == 1 ? "" : parameterInfo.ParameterType == typeof(Vector4) ? $".{"xyzw"[i]}" : $".{"rgba"[i]}";
                         var name = $"{SettingsFieldInfo<T>.ParameterPrefix}{parameterInfo.Name}{postfix}";
                         if (parameters.Any(x => x.name == name))
