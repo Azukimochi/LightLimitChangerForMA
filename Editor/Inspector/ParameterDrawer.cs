@@ -150,7 +150,11 @@ internal sealed class ParameterDrawer : PropertyDrawer
                 else if (minMaxRange.HasValue)
                     r = minMaxRangeProp.vector2Value;
 
-                if (r is { } v)
+                if (property.propertyType == SerializedPropertyType.Boolean)
+                {
+                    PopupCheckbox(property, label);
+                }
+                else if (r is { } v)
                 {
                     EditorGUI.BeginChangeCheck();
                     var value = EditorGUI.Slider(p, GUIContent.none, valueProp.floatValue, v.x, v.y);
@@ -265,6 +269,24 @@ internal sealed class ParameterDrawer : PropertyDrawer
         {
             vector.y = Mathf.Clamp(f, vector.x, range.y);
             property.vector2Value = vector;
+        }
+    }
+
+    private static GUIContent[] TogglePopupContents = new GUIContent[] { new(""), new("") };
+
+    public static void PopupCheckbox(SerializedProperty property, GUIContent label)
+    {
+        var contents = TogglePopupContents;
+        _ = contents.Length;
+        contents[0].text = L10n.TrStr("common:label/false");
+        contents[1].text = L10n.TrStr("common:label/true");
+
+        int index = property.boolValue ? 1 : 0;
+        EditorGUI.BeginChangeCheck();
+        EditorGUILayout.Popup(label, index, contents);
+        if (EditorGUI.EndChangeCheck())
+        {
+            property.boolValue = index != 0;
         }
     }
 }

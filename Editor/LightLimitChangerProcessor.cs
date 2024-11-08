@@ -445,7 +445,7 @@ internal sealed class LightLimitChangerProcessor : IDisposable
                                 processor.ConfigureShaderSpecificAnimation(context);
                             }
                             var menuPath = $"{parameterInfo.Name}{(values.Length == 1 ? "" : $"/{(char)(postfix[1] & ~0x20)}")}";
-                            var menuItem = menuGroup.GetOrAdd(menuPath, menu => (VRCExpressionsMenu.Control.ControlType.RadialPuppet, avatarParameter.nameOrPrefix));
+                            var menuItem = menuGroup.GetOrAdd(menuPath, menu => (parameterInfo.ParameterType == typeof(bool) ? VRCExMenuControlType.Toggle : VRCExMenuControlType.RadialPuppet, avatarParameter.nameOrPrefix));
                             if (menuItem.Control.icon == null)
                             {
                                 menuItem.Control.icon = parameterInfo.Icon;

@@ -24,6 +24,12 @@ msgstr "パラメーター保存"
 msgid "common:label/synced"
 msgstr "パラメーター同期"
 
+msgid "common:label/false"
+msgstr "無効"
+
+msgid "common:label/true"
+msgstr "有効"
+
 ##################
 ## 設定カテゴリーのラベル
 
