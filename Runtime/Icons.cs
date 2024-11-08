@@ -36,6 +36,12 @@ namespace io.github.azukimochi
         public const string LilToon = "59ee4e39fac4154418380a1ef8f5b120";
         public const string ShadowEnvStrength = "184bac53094308c45a57d27739ea3512";
         public const string VertexLightStrength = "0d1a0f75b33fd5842a241e2caab31750";
+        
+        public const string DistanceFade = "75cdf4ab5baf72a4f8b6463d3720bd35";
+        public const string DistanceFadeX = "75cdf4ab5baf72a4f8b6463d3720bd35";
+        public const string DistanceFadeY = "75cdf4ab5baf72a4f8b6463d3720bd35";
+        public const string DistanceFadeZ = "75cdf4ab5baf72a4f8b6463d3720bd35";
+        public const string DistanceFadeW = "75cdf4ab5baf72a4f8b6463d3720bd35";
 
         /// <summary>
         /// Poiyomiメニューアイコン
