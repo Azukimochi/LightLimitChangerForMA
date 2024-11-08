@@ -179,10 +179,11 @@ internal sealed class LightLimitChangerProcessor : IDisposable
                 defaultInt = (int)parameter.defaultValue,
                 type = parameter.syncType switch
                 {
-                    ParameterSyncType.Int => AnimatorControllerParameterType.Int,
-                    ParameterSyncType.Bool => AnimatorControllerParameterType.Bool,
-                    ParameterSyncType.Float => AnimatorControllerParameterType.Float,
-                    _ => default,
+                    //ParameterSyncType.Int => AnimatorControllerParameterType.Int,
+                    //ParameterSyncType.Bool => AnimatorControllerParameterType.Bool,
+                    //ParameterSyncType.Float => AnimatorControllerParameterType.Float,
+                    //_ => default,
+                    _ => AnimatorControllerParameterType.Float, // Floatへ自動変換されるのでこれでOK
                 },
             });
         }
@@ -446,7 +447,7 @@ internal sealed class LightLimitChangerProcessor : IDisposable
                                 processor.ConfigureShaderSpecificAnimation(context);
                             }
                             var menuPath = $"{parameterInfo.Name}{(values.Length == 1 ? "" : $"/{(char)(postfix[1] & ~0x20)}")}";
-                            var menuItem = menuGroup.GetOrAdd(menuPath, menu => (parameterInfo.ParameterType == typeof(bool) ? VRCExMenuControlType.Toggle : VRCExMenuControlType.RadialPuppet, avatarParameter.nameOrPrefix));
+                            var menuItem = menuGroup.GetOrAdd(menuPath, menu => (parameterInfo.ParameterType == typeof(bool) ? VRCExMenuControlType.Toggle : VRCExMenuControlType.RadialPuppet, avatarParameter.nameOrPrefix, parameterInfo.ParameterType == typeof(bool) ? 1 : 0)); 
                             if (menuItem.Control.icon == null)
                             {
                                 menuItem.Control.icon = parameterInfo.Icon;
