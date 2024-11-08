@@ -24,4 +24,10 @@ public sealed class LilToonSettings : ISettings
     [MenuIcon(Icons.VertexLightStrength)]
     [Range(0, 1)]
     public Parameter<float> VertexLightStrength = 0;
+
+    /// <summary>
+    /// 距離フェード
+    /// </summary>
+    public LilDistanceFadeSettings DistanceFade;
+    
 }

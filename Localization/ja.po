@@ -63,6 +63,9 @@ msgstr "lilToon"
 msgid "category:poiyomi-settings"
 msgstr "Poiyomi"
 
+msgid "category:liltoon-distancefade-settings"
+msgstr "距離フェード"
+
 msgid "category:sunao-settings"
 msgstr "Sunao"
 
@@ -222,6 +225,46 @@ msgstr ""
 "初期値はアバターリセットなどで初期化されるときの値です。\n\n"
 "操作パラメーター\n"
 "lilToon:_VertexLightStrength"
+
+msgid "settings:liltoon-distancefade/start/label"
+msgstr "開始距離"
+
+msgid "settings:liltoon-distancefade/start/description"
+msgstr ""
+"開始距離は、距離フェードの開始距離を調整するパラメーターです。\n\n"
+"初期でアニメーション制御は無効にしているため、必要に応じて有効にしてください。\n\n"
+"操作パラメーター\n"
+"lilToon:_DistanceFade.x"
+
+msgid "settings:liltoon-distancefade/end/label"
+msgstr "終了距離"
+
+msgid "settings:liltoon-distancefade/end/description"
+msgstr ""
+"終了距離は、距離フェードの終了距離を調整するパラメーターです。\n\n"
+"初期でアニメーション制御は無効にしているため、必要に応じて有効にしてください。\n\n"
+"操作パラメーター\n"
+"lilToon:_DistanceFade.y"
+
+msgid "settings:liltoon-distancefade/strength/label"
+msgstr "強度"
+
+msgid "settings:liltoon-distancefade/strength/description"
+msgstr ""
+"強度は、距離フェードの強度を調整するパラメーターです。\n\n"
+"初期でアニメーション制御は無効にしているため、必要に応じて有効にしてください。\n\n"
+"操作パラメーター\n"
+"lilToon:_DistanceFade.z"
+
+msgid "settings:liltoon-distancefade/backfaceForceShadow/label"
+msgstr "裏面を影にする"
+
+msgid "settings:liltoon-distancefade/backfaceForceShadow/description"
+msgstr ""
+"裏面を影にするは、裏面を影にするかどうかを調整するパラメーターです。\n\n"
+"初期でアニメーション制御は無効にしているため、必要に応じて有効にしてください。\n\n"
+"操作パラメーター\n"
+"lilToon:_DistanceFade.w"
 
 #################
 ## シェーダー設定
