@@ -66,6 +66,9 @@ msgstr "Poiyomi"
 msgid "category:liltoon-distancefade-settings"
 msgstr "距離フェード"
 
+msgid "category:liltoon-backlight-settings"
+msgstr "逆光ライト"
+
 msgid "category:sunao-settings"
 msgstr "Sunao"
 
@@ -226,6 +229,9 @@ msgstr ""
 "操作パラメーター\n"
 "lilToon:_VertexLightStrength"
 
+#################
+## lilToon 距離フェード
+
 msgid "settings:liltoon-distancefade/start/label"
 msgstr "開始距離"
 
@@ -265,6 +271,76 @@ msgstr ""
 "初期でアニメーション制御は無効にしているため、必要に応じて有効にしてください。\n\n"
 "操作パラメーター\n"
 "lilToon:_DistanceFade.w"
+
+#################
+## lilToon 逆光ライト
+
+msgid "settings:liltoon-backlight/useBacklight/label"
+msgstr "逆光ライトを使用する"
+
+msgid "settings:liltoon-backlight/useBacklight/description"
+msgstr ""
+"有効にすることで、逆光ライトを使用するかどうかを制御することができます。\n"
+
+msgid "settings:liltoon-backlight/backlightColor/label"
+msgstr "逆光ライトの色"
+
+msgid "settings:liltoon-backlight/backlightColor/description"
+msgstr ""
+"逆光ライトの色は、逆光ライトの色を調整するパラメーターです。\n"
+"逆光ライトを使用する場合には、逆光ライトの色を調整することができます。\n\n"
+"操作パラメーター\n"
+"lilToon:_BacklightColor"
+
+msgid "settings:liltoon-backlight/backlightMainStrength/label"
+msgstr "メインカラーの強度"
+
+msgid "settings:liltoon-backlight/backlightMainStrength/description"
+msgstr ""
+"メインカラーの強度は、逆光ライトのメインカラーの強度を調整するパラメーターです。\n"
+"逆光ライトを使用する場合には、逆光ライトのメインカラーの強度を調整することができます。\n\n"
+"操作パラメーター\n"
+"lilToon:_BacklightMainStrength"
+
+msgid "settings:liltoon-backlight/backlightBorder/label"
+msgstr "範囲"
+
+msgid "settings:liltoon-backlight/backlightBorder/description"
+msgstr ""
+"範囲は、逆光ライトの範囲を調整するパラメーターです。\n"
+"逆光ライトを使用する場合には、逆光ライトの範囲を調整することができます。\n\n"
+"操作パラメーター\n"
+"lilToon:_BacklightBorder"
+
+msgid "settings:liltoon-backlight/backlightBlur/label"
+msgstr "ぼかし"
+
+msgid "settings:liltoon-backlight/backlightBlur/description"
+msgstr ""
+"ぼかしは、逆光ライトのぼかしを調整するパラメーターです。\n"
+"逆光ライトを使用する場合には、逆光ライトのぼかしを調整することができます。\n\n"
+"操作パラメーター\n"
+"lilToon:_BacklightBlur"
+
+msgid "settings:liltoon-backlight/backlightDirectivity/label"
+msgstr "指向性"
+
+msgid "settings:liltoon-backlight/backlightDirectivity/description"
+msgstr ""
+"指向性は、逆光ライトの指向性を調整するパラメーターです。\n"
+"逆光ライトを使用する場合には、逆光ライトの指向性を調整することができます。\n\n"
+"操作パラメーター\n"
+"lilToon:_BacklightDirectivity"
+
+msgid "settings:liltoon-backlight/backlightViewStrength/label"
+msgstr "視線方向の影響度"
+
+msgid "settings:liltoon-backlight/backlightViewStrength/description"
+msgstr ""
+"視線方向の影響度は、逆光ライトの視線方向の影響度を調整するパラメーターです。\n"
+"逆光ライトを使用する場合には、逆光ライトの視線方向の影響度を調整することができます。\n\n"
+"操作パラメーター\n"
+"lilToon:_BacklightViewStrength"
 
 #################
 ## シェーダー設定

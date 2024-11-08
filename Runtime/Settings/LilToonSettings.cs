@@ -30,4 +30,8 @@ public sealed class LilToonSettings : ISettings
     /// </summary>
     public LilDistanceFadeSettings DistanceFade;
     
+    /// <summary>
+    /// 逆光ライト
+    /// </summary>
+    public LilBacklightSettings Backlight;
 }

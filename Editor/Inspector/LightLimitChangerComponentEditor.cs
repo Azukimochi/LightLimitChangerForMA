@@ -86,6 +86,7 @@ internal sealed partial class LightLimitChangerComponentEditor : Editor
 
         DoPropertyGUI<LilToonSettings>(serializedObject.FindProperty("LilToon"), L10n.TrStr("category:liltoon-settings"));
         DoPropertyGUI<LilDistanceFadeSettings>(serializedObject.FindProperty("LilToon.DistanceFade"), L10n.TrStr("category:liltoon-distancefade-settings"));
+        DoPropertyGUI<LilBacklightSettings>(serializedObject.FindProperty("LilToon.Backlight"), L10n.TrStr("category:liltoon-backlight-settings"));
         DoPropertyGUI<PoiyomiSettings>(serializedObject.FindProperty("Poiyomi"), L10n.TrStr("category:poiyomi-settings"));
         DoPropertyGUI<UnlitWFSettings>(serializedObject.FindProperty("UnlitWF"), L10n.TrStr("category:unlitwf-settings"));
 

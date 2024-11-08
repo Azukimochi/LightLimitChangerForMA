@@ -68,6 +68,7 @@ internal sealed class LightLimitChangerProcessor : IDisposable
         ConfigureSettings(Component.General.ColorControl);
         ConfigureSettings(Component.LilToon);
         ConfigureSettings(Component.LilToon.DistanceFade);
+        ConfigureSettings(Component.LilToon.Backlight);
         ConfigureSettings(Component.Poiyomi);
 
         GenerateParameters();
