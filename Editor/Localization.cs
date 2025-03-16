@@ -21,6 +21,37 @@ namespace io.github.azukimochi
         private static Dictionary<string, string[]> _LocalizedText = new Dictionary<string, string[]>()
         {
             ///////////////////////////////////////////////////////
+            ///  更新停止 outdated
+            {
+                "outdated.title", new []
+                {
+                    "End of update support for Light Limit Changer v1",
+                    "Light Limit Changer v1 の更新サポート終了",
+                    "Light Limit Changer v1 更新支援結束",
+                    "Light Limit Changer v1 更新支持结束",
+                    "Light Limit Changer v1 업데이트 지원 종료"
+                }
+            },
+            {
+                "outdated.message", new []
+                {
+                    @"Support for Light Limit Changer v1 has ended with 1.14.4, except for critical bugs.
+Light Limit Changer v2 has been released as its successor, 
+so please consider using the latter version if it becomes unusable.",
+                    @"Light Limit Changer v1 の更新は1.14.4をもって重大なバグを除きサポートを終了しました。
+後継として Light Limit Changer v2 がリリースされていますので、
+利用不能となった場合には移行をご検討ください",
+                    @"除嚴重錯誤外，Light Limit Changer v1 更新在 1.14.4 之後不再受支援。
+後續版本 Light Limit Changer v2 已經發布，
+因此如果不可用，請考慮使用後一個版本。",
+                    @"除严重错误外，Light Limit Changer v1 更新在 1.14.4 之后不再受支持。
+后续版本 Light Limit Changer v2 已经发布，
+因此如果不可用，请考虑使用后一个版本。",
+                    @"Light Limit Changer v1 업데이트는 1.14.4로 심각한 버그를 제외하고 지원을 종료했습니다.
+후속으로 Light Limit Changer v2가 출시되었으므로 사용 불가능한 경우에는 이후를 고려하십시오."
+                }
+            },
+            ///////////////////////////////////////////////////////
             // カテゴリ category
             {
                 "category.select_avatar", new []

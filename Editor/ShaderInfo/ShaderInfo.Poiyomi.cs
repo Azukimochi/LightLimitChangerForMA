@@ -1,6 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection.Emit;
 using nadena.dev.ndmf;
 using UnityEngine;
+using UnityEditor;
 
 namespace io.github.azukimochi
 {
@@ -63,16 +67,9 @@ namespace io.github.azukimochi
                 bool result = false;
 
 #if POIYOMI
-
-                // ロックされてるかどうか確認
-                if (Thry.ShaderOptimizer.IsMaterialLocked(material))
-                {
-                    // されてるなら解除してしまう（どのみちアップロード時には自動でロックされるはずなので）
-                    singleMaterialArray[0] = material;
-                    if (!Thry.ShaderOptimizer.SetLockedForAllMaterials(singleMaterialArray, 0))
-                        return false;
-                }
-
+                singleMaterialArray[0] = material;
+                if (!ShaderOptimizer.SetLockedForAllMaterials(singleMaterialArray, 0))
+                    return false;
 #endif
 
                 {
@@ -246,6 +243,66 @@ namespace io.github.azukimochi
                 monochrome = material.GetOrDefault(PropertyIDs.MonochromeLighting, DefaultParameters.MonochromeLighting);
                 monochromeAdditive = material.GetOrDefault(PropertyIDs.MonoChromeAdditiveLighting, DefaultParameters.MonoChromeAdditiveLighting);
                 return true;
+            }
+            internal static class ShaderOptimizer
+            {
+                static ShaderOptimizer()
+                {
+                    var proxyMethod = typeof(ShaderOptimizer).GetMethod(nameof(SetLockedForAllMaterials));
+                    var methodParameters = proxyMethod.GetParameters().Select(x => x.ParameterType).ToArray();
+
+                    foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+                    {
+                        if (!assembly.FullName.Contains("Thry", StringComparison.OrdinalIgnoreCase) && !assembly.FullName.Contains("Poiyomi", StringComparison.OrdinalIgnoreCase))
+                            continue;
+
+                        foreach (var type in assembly.GetTypes())
+                        {
+                            if (!type.Name.Contains("ShaderOptimizer"))
+                                continue;
+
+                            var targetMethod = type.GetMethod(proxyMethod.Name, System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static, null, methodParameters, null);
+
+                            if (targetMethod == null)
+                                continue;
+
+                            var method = new DynamicMethod($"{proxyMethod.Name}_Proxy", proxyMethod.ReturnType, methodParameters, true);
+                            var il = method.GetILGenerator();
+                            for (int i = 0; i < methodParameters.Length; i++)
+                            {
+                                if (i < 4)
+                                {
+                                    il.Emit(i switch
+                                    {
+                                        0 => OpCodes.Ldarg_0,
+                                        1 => OpCodes.Ldarg_1,
+                                        2 => OpCodes.Ldarg_2,
+                                        _ => OpCodes.Ldarg_3,
+                                    });
+                                }
+                                else
+                                {
+                                    il.Emit(i < byte.MaxValue ? OpCodes.Ldarg_S : OpCodes.Ldarg, i);
+                                }
+                            }
+                            il.Emit(OpCodes.Call, targetMethod);
+                            il.Emit(OpCodes.Ret);
+
+                            SetLockedForAllMaterialsProxy = method.CreateDelegate(typeof(SetLockedForAllMaterialsDelegate)) as SetLockedForAllMaterialsDelegate;
+
+                            return;
+                        }
+                    }
+                }
+
+                private delegate bool SetLockedForAllMaterialsDelegate(IEnumerable<Material> materials, int lockState, bool showProgressbar = false, bool showDialog = false, bool allowCancel = true, MaterialProperty shaderOptimizer = null);
+
+                private static readonly SetLockedForAllMaterialsDelegate SetLockedForAllMaterialsProxy;
+
+                public static bool SetLockedForAllMaterials(IEnumerable<Material> materials, int lockState, bool showProgressbar = false, bool showDialog = false, bool allowCancel = true, MaterialProperty shaderOptimizer = null)
+                {
+                    return SetLockedForAllMaterialsProxy?.Invoke(materials, lockState, showProgressbar, showDialog, allowCancel, shaderOptimizer) ?? false;
+                }
             }
         }
     }
