@@ -230,11 +230,22 @@ namespace io.github.azukimochi
 
         public static void ShowVersionInfo()
         {
+            GUIStyle boldLabel = new GUIStyle(EditorStyles.label) { fontStyle = FontStyle.Bold, fontSize = 14};
+            
             if (_titleCache == null)
             {
                 _titleCache = new GUIContent($"{LightLimitChanger.Title} {GetVersion()}");
             }
             EditorGUILayout.LabelField(_titleCache, new GUIStyle(EditorStyles.label) { fontStyle = FontStyle.Bold, fontSize = 15});
+            
+            EditorGUILayout.Space(5);
+            EditorGUILayout.LabelField(Localization.S("outdated.title"), boldLabel);
+            using (new EditorGUILayout.VerticalScope(GUI.skin.box))
+            {
+                EditorGUILayout.LabelField(Localization.S("outdated.message"), GUILayout.Height(EditorGUIUtility.singleLineHeight * 2.5f));
+            }
+            EditorGUILayout.Space(5);
+            
             var changeLog = new GUIContent(Localization.G("label.changelog"));
             using (var foldout = new FoldoutHeaderGroupScope(ref _isVersionInfoFoldoutOpen, changeLog, Bluestyle))
             {
